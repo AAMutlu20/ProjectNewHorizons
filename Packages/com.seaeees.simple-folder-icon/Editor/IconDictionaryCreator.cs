@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 namespace SimpleFolderIcon.Editor
@@ -24,14 +25,7 @@ namespace SimpleFolderIcon.Editor
 
         private static bool ContainsIconAsset(string[] assets)
         {
-            foreach (string str in assets)
-            {
-                if (ReplaceSeparatorChar(Path.GetDirectoryName(str)) == "Packages/" + AssetsPath)
-                {
-                    return true;
-                }
-            }
-            return false;
+            return assets.Any(str => ReplaceSeparatorChar(Path.GetDirectoryName(str)) == "Packages/" + AssetsPath);
         }
 
         private static string ReplaceSeparatorChar(string path)
@@ -45,30 +39,25 @@ namespace SimpleFolderIcon.Editor
 
             var appDirPath = Application.dataPath.Replace("Assets","Packages");
             var dir = new DirectoryInfo(appDirPath + "/" + AssetsPath);
-            FileInfo[] info = dir.GetFiles("*.png");
-            foreach(FileInfo f in info)
+            var info = dir.GetFiles("*.png");
+            foreach(var f in info)
             {
                 var texture = (Texture)AssetDatabase.LoadAssetAtPath($"Packages/{AssetsPath}/{f.Name}", typeof(Texture2D));
                 dictionary.Add(Path.GetFileNameWithoutExtension(f.Name),texture);
             }
 
-            FileInfo[] infoSO = dir.GetFiles("*.asset");
-            foreach (FileInfo f in infoSO) 
+            var infoSO = dir.GetFiles("*.asset");
+            foreach (var f in infoSO) 
             {
                 var folderIconSO = (FolderIconSO)AssetDatabase.LoadAssetAtPath($"Packages/{AssetsPath}/{f.Name}", typeof(FolderIconSO));
 
-                if (folderIconSO != null) 
-                {
-                    var texture = (Texture)folderIconSO.icon;
+                if (!folderIconSO) continue;
+                Texture texture = folderIconSO.icon;
 
-                    foreach (string folderName in folderIconSO.folderNames) 
-                    {
-                        if (folderName != null) 
-                        {
-                            // dictionary.TryAdd(folderName, texture);
-                            dictionary.Add(folderName, texture);
-                        }
-                    }
+                foreach (var folderName in folderIconSO.folderNames.Where(folderName => folderName != null))
+                {
+                    // dictionary.TryAdd(folderName, texture);
+                    dictionary.Add(folderName, texture);
                 }
             }
             
