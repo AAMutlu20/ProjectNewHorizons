@@ -1,0 +1,12 @@
+{
+  "name": "com.irminverhoeff.staticutilities",
+  "version": "1.0.0",
+  "displayName": "Irmin Static Utilities",
+  "description": "My trusted static utilities.",
+  "unity": "6000.0",
+  "author": {
+    "name": "IrminVerhoeff",
+    "email": "irminverhoeff@gmail.com",
+    "url": "https://itch.io/profile/irmindev"
+  }
+}
