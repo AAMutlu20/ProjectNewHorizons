@@ -1,0 +1,5 @@
+﻿<Solution>
+  <Project Path="VirtualButtonsScripts.csproj" />
+  <Project Path="SimpleFolderIcon.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
+</Solution>
