@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace IrminStaticUtilities.Tools
@@ -163,6 +164,68 @@ namespace IrminStaticUtilities.Tools
 
             // Return the rotated vector (Y component unchanged)
             return new Vector3(newX, pVector3Input.y, newZ);
+        }
+
+
+        // Got these methods from Deepseek 18-6-2026. They give direction for projectiles to fire from a character over 360 degrees or like a shotgun with the GetDirectionsWithAngleDegrees method. 
+        public static List<Vector3> GetThreeSixtyDirections(int pAmount)
+        {
+            List<Vector3> directions = new List<Vector3>();
+
+            if (pAmount <= 0) return directions;
+
+            float angleStep = 360f / pAmount;
+
+            for (int i = 0; i < pAmount; i++)
+            {
+                float currentAngle = angleStep * i;
+                float radians = currentAngle * Mathf.Deg2Rad;
+
+                // X and Z form the circle, Y stays 0
+                float x = Mathf.Sin(radians);
+                float z = Mathf.Cos(radians);
+
+                Vector3 dir = new Vector3(x, 0f, z).normalized;
+                directions.Add(dir);
+            }
+
+            return directions;
+        }
+
+        public static List<Vector3> GetDirectionsWithAngleDegrees(int pAmount, float pAngleDegrees = 360f)
+        {
+            List<Vector3> directions = new List<Vector3>();
+
+            if (pAmount <= 0) return directions;
+
+            // Clamp angle to valid range (0-360)
+            float constrainedAngle = Mathf.Clamp(pAngleDegrees, 0f, 360f);
+
+            // If angle is 0, return just the forward direction
+            if (constrainedAngle == 0f)
+            {
+                directions.Add(Vector3.forward);
+                return directions;
+            }
+
+            // Calculate starting angle to center the spread around forward
+            float startAngle = -constrainedAngle / 2f;
+            float angleStep = constrainedAngle / (pAmount - 1); // -1 so we include both ends
+
+            for (int i = 0; i < pAmount; i++)
+            {
+                float currentAngle = startAngle + (angleStep * i);
+                float radians = currentAngle * Mathf.Deg2Rad;
+
+                // Rotate around Y axis from forward direction
+                float x = Mathf.Sin(radians);
+                float z = Mathf.Cos(radians);
+
+                Vector3 dir = new Vector3(x, 0f, z).normalized;
+                directions.Add(dir);
+            }
+
+            return directions;
         }
     }
 }

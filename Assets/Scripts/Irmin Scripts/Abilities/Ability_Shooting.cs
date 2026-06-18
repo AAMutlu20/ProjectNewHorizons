@@ -8,19 +8,19 @@ using UnityEngine;
 
 public class Ability_Shooting : Ability_Base
 {
-    [SerializeField] private IrminTimer _fireTimer = new();
-    [SerializeField] private Projectile _projectile;
+    [SerializeField] protected IrminTimer _fireTimer = new();
+    [SerializeField] protected Projectile _projectile;
 
-    [SerializeField] private int _baseProjectileAmount = 1;
-    [SerializeField] private int _currentActualProjectileAmount;
+    [SerializeField] protected int _baseProjectileAmount = 1;
+    [SerializeField] protected int _currentActualProjectileAmount;
 
-    [SerializeField] private float _baseFireSpeed;
+    [SerializeField] protected float _baseFireSpeed;
 
-    [SerializeField] private float _shootOffset = 2;
+    [SerializeField] protected float _shootOffset = 2;
 
-    [SerializeField] private List<Projectile> _spawnedProjectiles = new();
+    [SerializeField] protected List<Projectile> _spawnedProjectiles = new();
 
-    private void Start()
+    protected virtual void Start()
     {
 
         _fireTimer.OnTimeElapsed += RestartTimer;
@@ -29,18 +29,18 @@ public class Ability_Shooting : Ability_Base
         _fireTimer.StartTimer();
     }
 
-    private void Update()
+    protected void Update()
     {
         _fireTimer.UpdateTimer(Time.deltaTime);
     }
 
-    private void RestartTimer()
+    protected void RestartTimer()
     {
         UpdateFireTimerTime();
         _fireTimer.StartTimer();
     }
 
-    public void Shoot()
+    protected virtual void Shoot()
     {
         UpdateProjectileAmount();
         UpdateFireTimerTime();
@@ -58,7 +58,7 @@ public class Ability_Shooting : Ability_Base
         
     }
 
-    private void UpdateProjectileAmount()
+    protected void UpdateProjectileAmount()
     {
         _currentActualProjectileAmount = _baseProjectileAmount + _connectedPlayerStats.ProjectileAmountValue;
         //int extraProjectilesFromSpeed = (int)MathF.Truncate(_connectedPlayerStats.AttackSpeedPercentage / 100);
@@ -79,6 +79,42 @@ public class Ability_Shooting : Ability_Base
             float radians = currentAngle * Mathf.Deg2Rad;
 
             // X and Z form the circle, Y stays 0
+            float x = Mathf.Sin(radians);
+            float z = Mathf.Cos(radians);
+
+            Vector3 dir = new Vector3(x, 0f, z).normalized;
+            directions.Add(dir);
+        }
+
+        return directions;
+    }
+
+    private List<Vector3> GetDirectionsWithAngleDegrees(int pAmount, float pAngleDegrees = 360f)
+    {
+        List<Vector3> directions = new List<Vector3>();
+
+        if (pAmount <= 0) return directions;
+
+        // Clamp angle to valid range (0-360)
+        float constrainedAngle = Mathf.Clamp(pAngleDegrees, 0f, 360f);
+
+        // If angle is 0, return just the forward direction
+        if (constrainedAngle == 0f)
+        {
+            directions.Add(Vector3.forward);
+            return directions;
+        }
+
+        // Calculate starting angle to center the spread around forward
+        float startAngle = -constrainedAngle / 2f;
+        float angleStep = constrainedAngle / (pAmount - 1); // -1 so we include both ends
+
+        for (int i = 0; i < pAmount; i++)
+        {
+            float currentAngle = startAngle + (angleStep * i);
+            float radians = currentAngle * Mathf.Deg2Rad;
+
+            // Rotate around Y axis from forward direction
             float x = Mathf.Sin(radians);
             float z = Mathf.Cos(radians);
 

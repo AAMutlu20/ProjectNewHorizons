@@ -231,6 +231,68 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6986384}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &130158069
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 130158070}
+  - component: {fileID: 130158071}
+  m_Layer: 0
+  m_Name: Basic_Shoot_Ability_Shotgun
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &130158070
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 130158069}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.93, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 674960499}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &130158071
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 130158069}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b4894735fc2775499c5e605ec03a2bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ability_Shooting_Shotgun
+  _connectedPlayerStats: {fileID: 585841668}
+  _fireTimer:
+    _currentTime: 0
+    _time: 5
+    _timerActive: 0
+    _reverse: 0
+    _minRandomTime: 0
+    _maxRandomTime: 0
+    OnTimerActiveChanged:
+      m_PersistentCalls:
+        m_Calls: []
+  _projectile: {fileID: 1588149587727871113, guid: e248c7e3d69331844a090cba948aa29a, type: 3}
+  _baseProjectileAmount: 2
+  _currentActualProjectileAmount: 0
+  _baseFireSpeed: 4
+  _shootOffset: 2
+  _spawnedProjectiles: []
+  _spreadInDegrees: 90
 --- !u!1 &485188664
 GameObject:
   m_ObjectHideFlags: 0
@@ -481,6 +543,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1486913622}
+  - {fileID: 130158070}
   m_Father: {fileID: 1365082893}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &674960500
@@ -751,7 +814,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1486913621}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8300ef6d00d4fe9479bfa7d295abb1a8, type: 3}
   m_Name: 
@@ -768,7 +831,6 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls: []
   _projectile: {fileID: 1588149587727871113, guid: e248c7e3d69331844a090cba948aa29a, type: 3}
-  _abilityFireBaseTime: 4
   _baseProjectileAmount: 1
   _currentActualProjectileAmount: 0
   _baseFireSpeed: 4
