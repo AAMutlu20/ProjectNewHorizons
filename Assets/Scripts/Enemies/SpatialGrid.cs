@@ -7,7 +7,7 @@ namespace Enemies
     /// Spatial hash grid for fast neighbour lookups.
     /// Rebuilt once per frame by EnemyPool; queried by BehaviourController per enemy.
     ///
-    /// Why not Physics2D.OverlapCircle?
+    /// Why not Physics.OverlapSphere?
     ///   — Physics overlap checks cause Rigidbody wakeups and internal broadphase work.
     ///   — At 200+ enemies this burns ~3ms/frame on mobile WebGL.
     ///   — This grid is ~0.2ms for the same query set.
@@ -49,16 +49,16 @@ namespace Enemies
         /// Returns indices (into the activeEnemies list) within radius of pos.
         /// Results are written into the provided list — caller owns clearing it.
         /// </summary>
-        public void GetNeighbourIndices(Vector2 pos, float radius, List<int> results)
+        public void GetNeighbourIndices(Vector3 pos, float radius, List<int> results)
         {
             var r = Mathf.CeilToInt(radius / cellSize);
             var cx = CellCoord(pos.x);
-            var cy = CellCoord(pos.y);
+            var cz = CellCoord(pos.z);
 
             for (var dx = -r; dx <= r; dx++)
-            for (var dy = -r; dy <= r; dy++)
+            for (var dz = -r; dz <= r; dz++)
             {
-                var key = HashCoords(cx + dx, cy + dy);
+                var key = HashCoords(cx + dx, cz + dz);
                 if (_cells.TryGetValue(key, out var list))
                     results.AddRange(list);
             }
@@ -68,7 +68,7 @@ namespace Enemies
 
         private int CellCoord(float v) => Mathf.FloorToInt(v / cellSize);
 
-        private int Hash(Vector2 pos) => HashCoords(CellCoord(pos.x), CellCoord(pos.y));
+        private int Hash(Vector3 pos) => HashCoords(CellCoord(pos.x), CellCoord(pos.z));
 
         // Large primes - reduces collision rate for typical arena sizes
         private static int HashCoords(int cx, int cy) => cx * 73856093 ^ cy * 19349663;

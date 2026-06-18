@@ -35,8 +35,8 @@ namespace Core
             for (var i = 1; i <= segments; i++)
             {
                 var angle = i * step;
-                var next = centre + new Vector3(Mathf.Cos(angle) * radius,
-                    Mathf.Sin(angle) * radius, 0f);
+                var next = centre + new Vector3(Mathf.Cos(angle) * radius, 0f,
+                    Mathf.Sin(angle) * radius);
                 Gizmos.DrawLine(prev, next);
                 prev = next;
             }

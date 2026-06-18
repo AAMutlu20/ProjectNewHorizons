@@ -69,14 +69,18 @@ namespace Enemies
             }
         }
 
-        void Update()
+        void FixedUpdate()
         {
-            var dt = Time.deltaTime;
+            var dt = Time.fixedDeltaTime;
 
             // Rebuild spatial grid once before any behaviour reads from it
             spatialGrid?.Rebuild(_active);
 
-            // Single managed update loop — avoids N separate MonoBehaviour Update calls
+            // Single managed update loop — avoids N separate MonoBehaviour Update calls.
+            // Runs on FixedUpdate because ManagedUpdate calls Rigidbody.MovePosition/
+            // MoveRotation internally (via EnemyView) — those APIs are only meant to be
+            // called from the physics tick. Calling them from Update() caused the
+            // position/rotation timeline mismatch that produced the stretched capsule look.
             // Iterate backwards so Return() mid-loop (swapped with last) stays safe
             for (var i = _active.Count - 1; i >= 0; i--)
             {
@@ -93,7 +97,7 @@ namespace Enemies
         /// Retrieve an enemy from the pool and activate it at worldPos.
         /// Returns null if the pool for this type is exhausted (rare — tune poolSize if it fires).
         /// </summary>
-        public EnemyView Get(EnemyType type, Vector2 worldPos)
+        public EnemyView Get(EnemyType type, Vector3 worldPos)
         {
             if (!_inactive.TryGetValue(type, out var queue) || queue.Count == 0)
             {

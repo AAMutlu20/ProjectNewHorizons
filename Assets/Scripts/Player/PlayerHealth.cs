@@ -49,7 +49,7 @@ namespace Player
             if (_iFrameTimer > 0f) return; // still invincible
 
             // Only take damage if the attack is near enough (simple distance check)
-            var dist = Vector2.Distance(transform.position, evt.Position);
+            var dist = Vector3.Distance(transform.position, evt.Position);
             if (dist > 1.5f) return;
 
             TakeDamage(evt.Damage);

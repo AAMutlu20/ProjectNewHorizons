@@ -52,7 +52,7 @@ namespace Waves
         /// Called every frame by WaveManager. waveTime is seconds since wave start.
         /// Spawns any enemies that are due by now.
         /// </summary>
-        public void Tick(float waveTime, Vector2 arenaCentre, Vector2 playerPos)
+        public void Tick(float waveTime, Vector3 arenaCentre, Vector3 playerPos)
         {
             if (IsExhausted || !_config) return;
 

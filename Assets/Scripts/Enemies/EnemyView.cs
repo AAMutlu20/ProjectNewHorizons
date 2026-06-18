@@ -15,6 +15,7 @@ namespace Enemies
     public class EnemyView : MonoBehaviour
     {
         [SerializeField] private Animator animator; // graybox enemies have none
+        [SerializeField] private Rigidbody rb;      // kinematic — logic owns position/rotation, physics only for collision/trigger events
 
         // The actual runtime data — ref-accessible so BehaviourController writes directly
         private EnemyData _data;
@@ -39,16 +40,60 @@ namespace Enemies
         void Awake()
         {
             _behaviour = GetComponent<BehaviourController>();
+
+            if (rb == null) rb = GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                // Logic owns position AND rotation via EnemyData/MoveRotation — physics
+                // should never be allowed to touch either. Constraints alone weren't
+                // enough: rotation constraints are enforced relative to the rigidbody's
+                // inertia space, and collision response is a documented case where a
+                // constrained axis can still pick up rotation from the solver. Once that
+                // happens, our own MoveRotation calls are composed on top of an already-
+                // tilted base orientation each frame, which reads as "rotates strangely"
+                // and (since a tipped capsule's long axis is no longer vertical) as a
+                // stretched/sunk-into-the-ground look even though no scale ever changed.
+                // Making the body kinematic removes physics as a rotation/position source
+                // entirely — MovePosition/MoveRotation still work and still generate
+                // collision/trigger callbacks, but nothing but our own code can move it.
+                rb.isKinematic = true;
+                rb.useGravity = false;
+                rb.interpolation = RigidbodyInterpolation.Interpolate;
+            }
         }
 
         // Called by EnemyPool
 
         /// <summary>Initialise this view with fresh data. Called immediately after Get() from pool.</summary>
-        public void Init(EnemyTypeSo typeSo, DifficultyParams diff, Vector2 worldPos,
+        public void Init(EnemyTypeSo typeSo, DifficultyParams diff, Vector3 worldPos,
             Transform playerTransform, SpatialGrid grid, System.Collections.Generic.List<EnemyView> activeList)
         {
             _data = EnemyData.Create(typeSo, diff, worldPos);
+
+            // IMPORTANT: with RigidbodyInterpolation.Interpolate, Unity keeps an internal
+            // "previous position" buffer separate from rb.position, used to lerp the
+            // rendered mesh between physics steps. Writing rb.position only updates the
+            // "current" side of that pair — the stale "previous" side (wherever this body
+            // was the last time it was active, possibly clear across the map) is untouched.
+            // The very next rendered frame then interpolates from that stale previous
+            // position to the new spawn position, which is the long smear/sliver.
+            // Toggling interpolation off and back on forces Unity to discard the stale
+            // buffer and reseed both sides of it at the current position, so there's
+            // nothing left for the interpolator to lerp from.
             transform.position = worldPos;
+            transform.rotation = Quaternion.identity;
+
+            if (rb != null)
+            {
+                rb.interpolation = RigidbodyInterpolation.None;
+
+                rb.position = worldPos;
+                rb.rotation = Quaternion.identity;
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+
+                rb.interpolation = RigidbodyInterpolation.Interpolate;
+            }
 
             // Wire BehaviourController references
             _behaviour.PlayerTransform = playerTransform;
@@ -60,8 +105,9 @@ namespace Enemies
         }
 
         /// <summary>
-        /// Called by EnemyPool once per frame instead of using Unity's Update().
-        /// Keeps the number of active MonoBehaviour Update callbacks to a minimum.
+        /// Called by EnemyPool.FixedUpdate once per physics tick instead of using Unity's
+        /// per-enemy Update(). Must stay on the physics cadence — it calls
+        /// Rigidbody.MovePosition/MoveRotation internally, which require FixedUpdate timing.
         /// </summary>
         public void ManagedUpdate(float dt)
         {
@@ -70,13 +116,30 @@ namespace Enemies
             // Tick the behaviour (writes to _data)
             _behaviour.Tick(dt);
 
-            // Sync transform from data position
-            transform.position = new Vector3(_data.Position.x, _data.Position.y, 0f);
+            // Sync transform from data position via Rigidbody — keeps the physics
+            // engine's internal state consistent with logic-driven movement,
+            // which matters for a non-kinematic body that other objects can collide with.
+            if (rb != null)
+                rb.MovePosition(_data.Position);
+            else
+                transform.position = _data.Position;
 
-            // Flip sprite based on movement direction
-            if (_data.Velocity.x != 0f)
-                transform.localScale = new Vector3(
-                    _data.Velocity.x < 0 ? -1f : 1f, 1f, 1f);
+            // Face movement direction (3D capsule rotates on Y axis instead of sprite-flipping).
+            // IMPORTANT: when rb != null, rotation must go through rb.MoveRotation, not
+            // transform.rotation directly. Mixing a physics-driven MovePosition with a
+            // direct transform.rotation write on the same Rigidbody causes the visual
+            // transform to be composed from two different update timelines (physics
+            // interpolation vs. immediate write) — this is what produced the stretched/
+            // sheared capsule look during Play, even though the prefab's rest pose was clean.
+            var flatVel = new Vector3(_data.Velocity.x, 0f, _data.Velocity.z);
+            if (flatVel.sqrMagnitude > 0.0001f)
+            {
+                var targetRotation = Quaternion.LookRotation(flatVel);
+                if (rb != null)
+                    rb.MoveRotation(targetRotation);
+                else
+                    transform.rotation = targetRotation;
+            }
 
             // Drive Animator only when state changes — avoids SetInteger every frame
             if (animator && _data.State != _lastState)
@@ -98,12 +161,24 @@ namespace Enemies
 
         // Damage
 
-        /// <summary>Called by player attack / projectile scripts on collision.</summary>
-        public void TakeDamage(float amount)
+        /// <summary>
+        /// Called by player attack / weapon scripts on collision.
+        /// sourcePosition + knockbackForce/Duration are optional — pass force = 0
+        /// (the default) for damage with no push.
+        /// </summary>
+        public void TakeDamage(float amount, Vector3 sourcePosition = default,
+            float knockbackForce = 0f, float knockbackDuration = 0.2f)
         {
             if (!_data.IsAlive) return;
 
             _data.Hp -= amount;
+
+            if (knockbackForce > 0f)
+            {
+                var dir = _data.Position - sourcePosition;
+                _behaviour.ApplyKnockback(dir, knockbackForce, knockbackDuration);
+            }
+
             if (!(_data.Hp <= 0f)) return;
             _data.Hp = 0f;
             _behaviour.OnDeath();

@@ -22,7 +22,7 @@ namespace Core
     public struct EnemyDiedEvent
     {
         public EnemyType Type;
-        public UnityEngine.Vector2 Position;
+        public UnityEngine.Vector3 Position;
     }
 
     public struct EnemyReturnedEvent

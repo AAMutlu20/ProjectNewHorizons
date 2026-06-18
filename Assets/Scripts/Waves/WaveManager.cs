@@ -81,8 +81,8 @@ namespace Waves
             // Active wave
             WaveTimer += Time.deltaTime;
 
-            var centre = arenaCenter ? (Vector2)arenaCenter.position : Vector2.zero;
-            var playerPos = player ? (Vector2)player.position : Vector2.zero;
+            var centre = arenaCenter ? arenaCenter.position : Vector3.zero;
+            var playerPos = player ? player.position : Vector3.zero;
 
             _scheduler.Tick(WaveTimer, centre, playerPos);
 
