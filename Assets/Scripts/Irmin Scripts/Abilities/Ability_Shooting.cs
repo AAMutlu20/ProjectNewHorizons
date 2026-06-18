@@ -11,8 +11,6 @@ public class Ability_Shooting : Ability_Base
     [SerializeField] private IrminTimer _fireTimer = new();
     [SerializeField] private Projectile _projectile;
 
-    [SerializeField] private float _abilityFireBaseTime = 4;
-
     [SerializeField] private int _baseProjectileAmount = 1;
     [SerializeField] private int _currentActualProjectileAmount;
 
