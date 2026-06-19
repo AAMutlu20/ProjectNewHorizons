@@ -5,6 +5,8 @@ using UnityEngine.InputSystem;
 
 public class JoyStickMover : MonoBehaviour
 {
+    public static JoyStickMover MainPlayerJoyStickMover;
+
     [SerializeField] private VirtualJoystick _virtualJoyStick;
     [SerializeField] private InputActionAsset _inputActionAsset;
     [SerializeField] private string _moveInputActionName;
@@ -39,7 +41,6 @@ public class JoyStickMover : MonoBehaviour
         if(_moving)
         {
             Vector2 input = _moveInputAction.ReadValue<Vector2>();
-            Debug.Log(input);
             Vector3 newMoveVector = new Vector3(input.x, 0, input.y);
             newMoveVector.Normalize();
             newMoveVector *= _speed;

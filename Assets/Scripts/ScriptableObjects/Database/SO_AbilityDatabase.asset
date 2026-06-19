@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: SO_AbilityDatabase
   m_EditorClassIdentifier: Assembly-CSharp::SOS_AbilityDatabase
   _abilities:
-  - {fileID: 0}
+  - {fileID: 7611447742966195758, guid: c05dad07cb3d2c94891d5bf7fde88c57, type: 3}
+  - {fileID: 5469575139844820722, guid: 47e219d4966c88d4eae937aac1b617d8, type: 3}

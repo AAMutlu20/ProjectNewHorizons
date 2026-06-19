@@ -22,7 +22,6 @@ public class Ability_Shooting : Ability_Base
 
     protected virtual void Start()
     {
-
         _fireTimer.OnTimeElapsed += RestartTimer;
         _fireTimer.OnTimeElapsed += Shoot;
         UpdateFireTimerTime();
