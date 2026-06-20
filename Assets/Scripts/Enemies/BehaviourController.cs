@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Core;
 using UnityEngine;
 
@@ -18,6 +17,11 @@ namespace Enemies
     [RequireComponent(typeof(EnemyView))]
     public class BehaviourController : MonoBehaviour
     {
+        private const float SeekJitterEpsilon = 0.0001f;
+        private const float KnockbackDecayRate = 6f;
+        private const float SeparationCheckRadius = 2.5f;
+        private const float SeparationWeight = 0.6f;
+
         // Injected by EnemyPool after Get() - not serialized
         [System.NonSerialized] public Transform PlayerTransform;
         [System.NonSerialized] public SpatialGrid Grid;
@@ -28,7 +32,7 @@ namespace Enemies
 
         private EnemyView _view;
 
-        void Awake()
+        private void Awake()
         {
             _view = GetComponent<EnemyView>();
         }
@@ -38,130 +42,23 @@ namespace Enemies
         /// Keeps Update() off individual enemies — one controlled loop instead of
         /// hundreds of MonoBehaviour Update calls (saves ~1ms on mobile WebGL).
         /// </summary>
-        public void Tick(float dt)
+        public void Tick(float deltaTime)
         {
-            ref var d = ref _view.DataRef;
+            ref var enemy = ref _view.DataRef;
 
-            //Spawn grace period
-            if (d.State == EnemyState.Spawning)
-            {
-                d.SpawnTimer -= dt;
-                if (d.SpawnTimer <= 0f)
-                    d.State = EnemyState.Moving;
-                return;
-            }
-
-            if (!d.IsAlive) return;
-
-            // ── Knockback override ──────────────────────────────────────────
-            // While knocked back, AI movement is suspended entirely — the enemy
-            // is shoved by the hit, not pathing toward the player. Avoids the
-            // two systems fighting over Position in the same frame.
-            if (d.IsKnockedBack)
-            {
-                d.KnockbackTimer -= dt;
-                d.Velocity = d.Knockback;
-                d.Position += d.Velocity * dt;
-
-                // Decay knockback speed toward zero over its remaining lifetime
-                d.Knockback = Vector3.Lerp(d.Knockback, Vector3.zero, dt * 6f);
-
-                if (d.KnockbackTimer <= 0f)
-                {
-                    d.Knockback = Vector3.zero;
-                    d.State = EnemyState.Moving; // resume normal AI next frame
-                }
-                return;
-            }
-
+            if (TickSpawnGracePeriod(ref enemy, deltaTime)) return;
+            if (!enemy.IsAlive) return;
+            if (TickKnockback(ref enemy, deltaTime)) return;
             if (!PlayerTransform) return;
 
-            Vector3 playerPos = PlayerTransform.position;
-            var distToPlayer = Vector3.Distance(d.Position, playerPos);
-
-            //Attack check
-            if (distToPlayer <= d.TypeSo.attackRange)
-            {
-                d.State = EnemyState.Attacking;
-                d.AttackTimer -= dt;
-                if (d.CanAttack)
-                {
-                    d.AttackTimer = d.TypeSo.attackCooldown;
-                    EventBus.Emit(new EnemyAttackEvent
-                    {
-                        Damage   = d.Damage,
-                        Position = d.Position,
-                    });
-                }
-                d.Velocity = Vector3.zero;
-                return;
-            }
-
-            //Move toward player
-            d.State = EnemyState.Moving;
-            var toPlayer = (playerPos - d.Position).normalized;
-
-            // Rotate the seek direction by this enemy's fixed jitter angle (XZ plane only).
-            // Small and constant per-enemy, so a pack approaches from a fan of angles
-            // instead of every enemy converging on the exact same point — without ever
-            // looking like they're failing to chase the player.
-            if (Mathf.Abs(d.SeekAngleJitter) > 0.0001f)
-            {
-                var sin = Mathf.Sin(d.SeekAngleJitter);
-                var cos = Mathf.Cos(d.SeekAngleJitter);
-                toPlayer = new Vector3(
-                    toPlayer.x * cos - toPlayer.z * sin,
-                    0f,
-                    toPlayer.x * sin + toPlayer.z * cos);
-            }
-
-            //Separation from neighbours (flocking)
-            // Widened from the old check radius — separation needs to kick in *before*
-            // enemies are nearly stacked, or a pack funnels into a single-file line
-            // chasing the player instead of fanning out like a swarm.
-            const float separationCheckRadius = 2.5f;
-            _neighbourIndices.Clear();
-            Grid?.GetNeighbourIndices(d.Position, separationCheckRadius, _neighbourIndices);
-
-            var separation = Vector3.zero;
-            var weightSum = 0f;
-            foreach (var neighbour in from idx in _neighbourIndices
-                     where idx >= 0 && idx < ActiveEnemies.Count
-                     select ActiveEnemies[idx]
-                     into neighbour
-                     where neighbour != _view
-                     select neighbour)
-            {
-                var diff = d.Position - neighbour.Data.Position;
-                var dist = diff.magnitude;
-                if (!(dist > 0.01f) || !(dist < separationCheckRadius)) continue;
-
-                // Inverse-distance weighting: a neighbour right on top of you pushes hard,
-                // one near the edge of the check radius barely registers. This is what
-                // makes the push feel continuous as enemies approach each other instead
-                // of "off" then suddenly "on" at a hard 1.2-unit cutoff.
-                var weight = 1f - (dist / separationCheckRadius);
-                separation += (diff / dist) * weight;
-                weightSum += weight;
-            }
-
-            if (weightSum > 0f)
-                separation = (separation / weightSum).normalized * d.TypeSo.separationForce;
-
-            // Blend: mostly toward player, repelled from neighbours. Weight bumped up
-            // from 0.4 now that separation engages earlier and more gradually — without
-            // this the wider radius alone wasn't enough to break up the funnel.
-            var desired = (toPlayer + separation * 0.6f).normalized;
-            d.Velocity = desired * d.Speed;
-            d.Velocity.y = 0f; // lock to XZ plane — no vertical drift from position noise
-            d.Position += d.Velocity * dt;
+            MoveTowardPlayer(ref enemy, deltaTime);
         }
 
         /// <summary>Called by EnemyView when the enemy takes lethal damage.</summary>
         public void OnDeath()
         {
-            ref var d = ref _view.DataRef;
-            d.State = EnemyState.Dying;
+            ref var enemy = ref _view.DataRef;
+            enemy.State = EnemyState.Dying;
             // Pool return is handled by EnemyView after death animation completes
         }
 
@@ -171,15 +68,147 @@ namespace Enemies
         /// </summary>
         public void ApplyKnockback(Vector3 direction, float force, float duration)
         {
-            ref var d = ref _view.DataRef;
-            if (!d.IsAlive) return;
+            ref var enemy = ref _view.DataRef;
+            if (!enemy.IsAlive) return;
 
             direction.y = 0f;
-            if (direction.sqrMagnitude < 0.0001f) return;
+            if (direction.sqrMagnitude < SeekJitterEpsilon) return;
 
-            d.Knockback = direction.normalized * force;
-            d.KnockbackTimer = duration;
-            d.State = EnemyState.Moving; // exit Attacking state so knockback isn't overridden next frame
+            enemy.Knockback = direction.normalized * force;
+            enemy.KnockbackTimer = duration;
+            enemy.State = EnemyState.Moving; // exit Attacking state so knockback isn't overridden next frame
+        }
+
+        /// <summary>Returns true if the enemy is still in its spawn grace period (caller should stop ticking).</summary>
+        private static bool TickSpawnGracePeriod(ref EnemyData enemy, float deltaTime)
+        {
+            if (enemy.State != EnemyState.Spawning) return false;
+
+            enemy.SpawnTimer -= deltaTime;
+            if (enemy.SpawnTimer <= 0f)
+                enemy.State = EnemyState.Moving;
+
+            return true;
+        }
+
+        /// <summary>
+        /// While knocked back, AI movement is suspended entirely — the enemy
+        /// is shoved by the hit, not pathing toward the player. Avoids the
+        /// two systems fighting over Position in the same frame.
+        /// Returns true if knockback consumed this frame (caller should stop ticking).
+        /// </summary>
+        private static bool TickKnockback(ref EnemyData enemy, float deltaTime)
+        {
+            if (!enemy.IsKnockedBack) return false;
+
+            enemy.KnockbackTimer -= deltaTime;
+            enemy.Velocity = enemy.Knockback;
+            enemy.Position += enemy.Velocity * deltaTime;
+
+            // Decay knockback speed toward zero over its remaining lifetime
+            enemy.Knockback = Vector3.Lerp(enemy.Knockback, Vector3.zero, deltaTime * KnockbackDecayRate);
+
+            if (!(enemy.KnockbackTimer <= 0f)) return true;
+            enemy.Knockback = Vector3.zero;
+            enemy.State = EnemyState.Moving; // resume normal AI next frame
+
+            return true;
+        }
+
+        private void MoveTowardPlayer(ref EnemyData enemy, float deltaTime)
+        {
+            var playerPosition = PlayerTransform.position;
+            var distanceToPlayer = Vector3.Distance(enemy.Position, playerPosition);
+
+            if (distanceToPlayer <= enemy.TypeSo.attackRange)
+            {
+                AttackIfReady(ref enemy, deltaTime);
+                return;
+            }
+
+            enemy.State = EnemyState.Moving;
+
+            var seekDirection = GetJitteredSeekDirection(enemy, playerPosition);
+            var separation = GetSeparationFromNeighbours(enemy);
+
+            var desiredDirection = (seekDirection + separation * SeparationWeight).normalized;
+            enemy.Velocity = desiredDirection * enemy.Speed;
+            enemy.Velocity.y = 0f; // lock to XZ plane — no vertical drift from position noise
+            enemy.Position += enemy.Velocity * deltaTime;
+        }
+
+        private static void AttackIfReady(ref EnemyData enemy, float deltaTime)
+        {
+            enemy.State = EnemyState.Attacking;
+            enemy.AttackTimer -= deltaTime;
+            enemy.Velocity = Vector3.zero;
+
+            if (!enemy.CanAttack) return;
+
+            enemy.AttackTimer = enemy.TypeSo.attackCooldown;
+            EventBus.Emit(new EnemyAttackEvent
+            {
+                Damage = enemy.Damage,
+                Position = enemy.Position,
+            });
+        }
+
+        /// <summary>
+        /// Rotates the seek-toward-player direction by this enemy's fixed jitter
+        /// angle (XZ plane only). Small and constant per-enemy, so a pack
+        /// approaches from a fan of angles instead of every enemy converging on
+        /// the exact same point — without ever looking like they're failing to
+        /// chase the player.
+        /// </summary>
+        private static Vector3 GetJitteredSeekDirection(EnemyData enemy, Vector3 playerPosition)
+        {
+            var towardPlayer = (playerPosition - enemy.Position).normalized;
+
+            if (Mathf.Abs(enemy.SeekAngleJitter) <= SeekJitterEpsilon)
+                return towardPlayer;
+
+            var sin = Mathf.Sin(enemy.SeekAngleJitter);
+            var cos = Mathf.Cos(enemy.SeekAngleJitter);
+            return new Vector3(
+                towardPlayer.x * cos - towardPlayer.z * sin,
+                0f,
+                towardPlayer.x * sin + towardPlayer.z * cos);
+        }
+
+        /// <summary>
+        /// Computes a separation force away from nearby enemies (flocking).
+        /// Uses inverse-distance weighting: a neighbour right on top of you
+        /// pushes hard, one near the edge of the check radius barely registers —
+        /// this keeps the push feeling continuous as enemies approach each
+        /// other instead of "off" then suddenly "on" at a hard cutoff.
+        /// </summary>
+        private Vector3 GetSeparationFromNeighbours(EnemyData enemy)
+        {
+            _neighbourIndices.Clear();
+            Grid?.GetNeighbourIndices(enemy.Position, SeparationCheckRadius, _neighbourIndices);
+
+            var separation = Vector3.zero;
+            var weightSum = 0f;
+
+            foreach (var neighbourIndex in _neighbourIndices)
+            {
+                if (neighbourIndex < 0 || neighbourIndex >= ActiveEnemies.Count) continue;
+
+                var neighbour = ActiveEnemies[neighbourIndex];
+                if (neighbour == _view) continue;
+
+                var offsetFromNeighbour = enemy.Position - neighbour.Data.Position;
+                var distance = offsetFromNeighbour.magnitude;
+                if (distance is <= 0.01f or >= SeparationCheckRadius) continue;
+
+                var weight = 1f - (distance / SeparationCheckRadius);
+                separation += (offsetFromNeighbour / distance) * weight;
+                weightSum += weight;
+            }
+
+            if (weightSum <= 0f) return Vector3.zero;
+
+            return (separation / weightSum).normalized * enemy.TypeSo.separationForce;
         }
     }
 

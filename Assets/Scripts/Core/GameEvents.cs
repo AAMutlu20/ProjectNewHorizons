@@ -1,4 +1,5 @@
 using Enemies;
+using Stats;
 
 namespace Core
 {
@@ -43,5 +44,12 @@ namespace Core
         public int   Wave;
         public float CountMult;
         public float SpeedMult;
+    }
+
+    public struct StatCollectedEvent
+    {
+        public StatType StatType;
+        public Rarity Rarity;
+        public float NewTotal;
     }
 }

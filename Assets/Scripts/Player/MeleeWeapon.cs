@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Enemies;
+using Stats;
 using UnityEngine;
 
 namespace Player
@@ -14,27 +15,37 @@ namespace Player
     /// swingActiveDuration, then repeat. Each enemy can only be hit once per swing,
     /// even if they stay inside the trigger for the whole active window.
     ///
+    /// Damage, swing speed, and critical strikes are sourced from StatSheet —
+    /// see the design doc's Attack Damage / Attack Speed / Critical Strike stats.
+    ///
     /// Attach to: a child GameObject of PlayerRoot (e.g. "MeleeAura"), with a
     /// SphereCollider or CapsuleCollider set to IsTrigger = true.
     /// </summary>
     [RequireComponent(typeof(Collider))]
     public class MeleeWeapon : MonoBehaviour
     {
+        // Per the design doc: a critical strike deals 200% of normal damage by
+        // default, before the Critical Strike Damage stat adds on top of that.
+        private const float BaseCriticalStrikeMultiplier = 200f;
+        private const float PercentToFraction = 100f;
+
         [Header("Swing timing")]
-        [Tooltip("Seconds between the start of one swing and the start of the next.")]
-        [SerializeField] private float swingInterval = 1f;
+        [Tooltip("Seconds between the start of one swing and the start of the next, before Attack Speed.")]
+        [SerializeField] private float baseSwingInterval = 1f;
         [Tooltip("Seconds the swing is actually 'live' and can deal damage, starting at the top of each interval.")]
         [SerializeField] private float swingActiveDuration = 0.2f;
 
         [Header("Damage")]
-        [SerializeField] private float damage = 5f;
+        [SerializeField] private float baseDamage = 5f;
 
         [Header("Knockback")]
         [SerializeField] private float knockbackForce = 4f;
         [SerializeField] private float knockbackDuration = 0.2f;
 
-        // Countdown to the next swing. Starts at swingInterval so there's no
-        // instant free hit the moment the weapon is enabled.
+        private StatSheet _statSheet;
+
+        // Countdown to the next swing. Starts at baseSwingInterval so there's
+        // no instant free hit the moment the weapon is enabled.
         private float _timeToNextSwing;
 
         // True only during the swingActiveDuration window at the top of each cycle.
@@ -49,43 +60,57 @@ namespace Player
         // currently inside the trigger are tracked via enter/exit instead of polled.
         private readonly List<EnemyView> _enemiesInRange = new();
 
+        private float CurrentSwingInterval =>
+            baseSwingInterval / (1f + _statSheet.GetTotal(StatType.AttackSpeed) / PercentToFraction);
+
         private void Awake()
         {
+            _statSheet = GetComponentInParent<StatSheet>();
+
             var col = GetComponent<Collider>();
             if (!col.isTrigger)
                 Debug.LogWarning("MeleeWeapon: collider should be set to IsTrigger.", this);
 
-            _timeToNextSwing = swingInterval;
+            _timeToNextSwing = baseSwingInterval;
         }
 
         private void Update()
         {
             _timeToNextSwing -= Time.deltaTime;
 
-            if (!_isSwinging && _timeToNextSwing <= 0f)
+            switch (_isSwinging)
             {
-                // Start a new swing
-                _isSwinging = true;
-                _hitThisSwing.Clear();
+                case false when _timeToNextSwing <= 0f:
+                    StartSwing();
+                    break;
+                case true when _timeToNextSwing <= -swingActiveDuration:
+                    EndSwing();
+                    break;
+            }
+        }
 
-                // Hit everyone already standing in range the instant the swing starts —
-                // without this, an enemy that walked in during the idle window and never
-                // re-triggers OnTriggerEnter would never get hit at all.
-                DamageEveryoneInRange();
-            }
-            else if (_isSwinging && _timeToNextSwing <= -swingActiveDuration)
-            {
-                // Swing window closed — go back to idle and reset the cycle
-                _isSwinging = false;
-                _timeToNextSwing = swingInterval;
-            }
+        private void StartSwing()
+        {
+            _isSwinging = true;
+            _hitThisSwing.Clear();
+
+            // Hit everyone already standing in range the instant the swing starts —
+            // without this, an enemy that walked in during the idle window and never
+            // re-triggers OnTriggerEnter would never get hit at all.
+            DamageEveryoneInRange();
+        }
+
+        private void EndSwing()
+        {
+            _isSwinging = false;
+            _timeToNextSwing = CurrentSwingInterval;
         }
 
         private void DamageEveryoneInRange()
         {
             foreach (var enemy in _enemiesInRange)
             {
-                if (enemy == null) continue; // pooled enemy may have been returned/deactivated
+                if (!enemy) continue; // pooled enemy may have been returned/deactivated
                 TryHit(enemy);
             }
         }
@@ -94,8 +119,21 @@ namespace Player
         {
             if (_hitThisSwing.Contains(enemy)) return;
 
+            var damage = RollDamage();
             enemy.TakeDamage(damage, transform.position, knockbackForce, knockbackDuration);
             _hitThisSwing.Add(enemy);
+        }
+
+        private float RollDamage()
+        {
+            var totalDamage = baseDamage + _statSheet.GetTotal(StatType.AttackDamage);
+
+            var critChancePercent = _statSheet.GetTotal(StatType.CriticalStrikeChance);
+            var rolledCrit = Random.Range(0f, PercentToFraction) < critChancePercent;
+            if (!rolledCrit) return totalDamage;
+
+            var critMultiplierPercent = BaseCriticalStrikeMultiplier + _statSheet.GetTotal(StatType.CriticalStrikeDamage);
+            return totalDamage * (critMultiplierPercent / PercentToFraction);
         }
 
         private void OnTriggerEnter(Collider other)
@@ -115,7 +153,7 @@ namespace Player
         private void OnTriggerExit(Collider other)
         {
             var enemy = other.GetComponentInParent<EnemyView>();
-            if (enemy != null) _enemiesInRange.Remove(enemy);
+            if (enemy) _enemiesInRange.Remove(enemy);
         }
     }
 }

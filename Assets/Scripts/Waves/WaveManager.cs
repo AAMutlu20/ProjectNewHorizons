@@ -117,7 +117,7 @@ namespace Waves
             IsWaveActive = true;
             IsResting    = false;
 
-            DifficultyParams diff = difficultyScaler.Scale(CurrentWave);
+            var diff = difficultyScaler.Scale(CurrentWave);
             _scheduler.LoadWave(waveConfigs[CurrentWave], diff);
 
             if (logWaveEvents)

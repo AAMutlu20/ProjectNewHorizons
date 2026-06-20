@@ -69,7 +69,7 @@ namespace Enemies
             }
         }
 
-        void FixedUpdate()
+        private void FixedUpdate()
         {
             var dt = Time.fixedDeltaTime;
 

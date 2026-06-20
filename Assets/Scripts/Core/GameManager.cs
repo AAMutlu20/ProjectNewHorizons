@@ -23,7 +23,7 @@ namespace Core
 
         private bool _gameOver;
 
-        void Awake()
+        private void Awake()
         {
             // Validate all required references up front — fail loud, fail early
             Debug.Assert(waveManager, "GameManager: WaveManager ref missing");
@@ -31,13 +31,13 @@ namespace Core
             Debug.Assert(difficultyScaler, "GameManager: DifficultyScaler ref missing");
         }
 
-        void Start()
+        private void Start()
         {
             EventBus.Subscribe<PlayerDiedEvent>(OnPlayerDied);
             Invoke(nameof(StartGame), delayBeforeFirstWave);
         }
 
-        void OnDestroy()
+        private void OnDestroy()
         {
             EventBus.ClearAll();
         }

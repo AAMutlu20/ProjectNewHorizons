@@ -37,29 +37,15 @@ namespace Enemies
         private static readonly int AnimState = Animator.StringToHash("State");
         private static readonly int AnimDead = Animator.StringToHash("Dead");
 
-        void Awake()
+        private void Awake()
         {
             _behaviour = GetComponent<BehaviourController>();
 
-            if (rb == null) rb = GetComponent<Rigidbody>();
-            if (rb != null)
-            {
-                // Logic owns position AND rotation via EnemyData/MoveRotation — physics
-                // should never be allowed to touch either. Constraints alone weren't
-                // enough: rotation constraints are enforced relative to the rigidbody's
-                // inertia space, and collision response is a documented case where a
-                // constrained axis can still pick up rotation from the solver. Once that
-                // happens, our own MoveRotation calls are composed on top of an already-
-                // tilted base orientation each frame, which reads as "rotates strangely"
-                // and (since a tipped capsule's long axis is no longer vertical) as a
-                // stretched/sunk-into-the-ground look even though no scale ever changed.
-                // Making the body kinematic removes physics as a rotation/position source
-                // entirely — MovePosition/MoveRotation still work and still generate
-                // collision/trigger callbacks, but nothing but our own code can move it.
-                rb.isKinematic = true;
-                rb.useGravity = false;
-                rb.interpolation = RigidbodyInterpolation.Interpolate;
-            }
+            if (!rb) rb = GetComponent<Rigidbody>();
+            if (!rb) return;
+            rb.isKinematic = true;
+            rb.useGravity = false;
+            rb.interpolation = RigidbodyInterpolation.Interpolate;
         }
 
         // Called by EnemyPool
@@ -69,21 +55,11 @@ namespace Enemies
             Transform playerTransform, SpatialGrid grid, System.Collections.Generic.List<EnemyView> activeList)
         {
             _data = EnemyData.Create(typeSo, diff, worldPos);
-
-            // IMPORTANT: with RigidbodyInterpolation.Interpolate, Unity keeps an internal
-            // "previous position" buffer separate from rb.position, used to lerp the
-            // rendered mesh between physics steps. Writing rb.position only updates the
-            // "current" side of that pair — the stale "previous" side (wherever this body
-            // was the last time it was active, possibly clear across the map) is untouched.
-            // The very next rendered frame then interpolates from that stale previous
-            // position to the new spawn position, which is the long smear/sliver.
-            // Toggling interpolation off and back on forces Unity to discard the stale
-            // buffer and reseed both sides of it at the current position, so there's
-            // nothing left for the interpolator to lerp from.
+            
             transform.position = worldPos;
             transform.rotation = Quaternion.identity;
 
-            if (rb != null)
+            if (rb)
             {
                 rb.interpolation = RigidbodyInterpolation.None;
 
@@ -100,7 +76,7 @@ namespace Enemies
             _behaviour.Grid = grid;
             _behaviour.ActiveEnemies = activeList;
 
-            if (animator != null) animator.SetInteger(AnimState, (int)EnemyState.Spawning);
+            if (animator) animator.SetInteger(AnimState, (int)EnemyState.Spawning);
             _lastState = EnemyState.Spawning;
         }
 
@@ -115,27 +91,17 @@ namespace Enemies
 
             // Tick the behaviour (writes to _data)
             _behaviour.Tick(dt);
-
-            // Sync transform from data position via Rigidbody — keeps the physics
-            // engine's internal state consistent with logic-driven movement,
-            // which matters for a non-kinematic body that other objects can collide with.
-            if (rb != null)
+            
+            if (rb)
                 rb.MovePosition(_data.Position);
             else
                 transform.position = _data.Position;
-
-            // Face movement direction (3D capsule rotates on Y axis instead of sprite-flipping).
-            // IMPORTANT: when rb != null, rotation must go through rb.MoveRotation, not
-            // transform.rotation directly. Mixing a physics-driven MovePosition with a
-            // direct transform.rotation write on the same Rigidbody causes the visual
-            // transform to be composed from two different update timelines (physics
-            // interpolation vs. immediate write) — this is what produced the stretched/
-            // sheared capsule look during Play, even though the prefab's rest pose was clean.
+            
             var flatVel = new Vector3(_data.Velocity.x, 0f, _data.Velocity.z);
             if (flatVel.sqrMagnitude > 0.0001f)
             {
                 var targetRotation = Quaternion.LookRotation(flatVel);
-                if (rb != null)
+                if (rb)
                     rb.MoveRotation(targetRotation);
                 else
                     transform.rotation = targetRotation;

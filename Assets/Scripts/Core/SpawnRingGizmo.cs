@@ -16,7 +16,7 @@ namespace Core
         [SerializeField] private Color ringColor = new(1f, 0.4f, 0.1f, 0.6f);
         [SerializeField] private Color minRingColor = new(0.2f, 0.8f, 1f, 0.3f);
 
-        void OnDrawGizmos()
+        private void OnDrawGizmos()
         {
             if (!difficultyConfig) return;
 
