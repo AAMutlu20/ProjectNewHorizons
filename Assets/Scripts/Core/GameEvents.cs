@@ -24,6 +24,9 @@ namespace Core
     {
         public EnemyType Type;
         public UnityEngine.Vector3 Position;
+        public float XpValue;
+        public bool IsMiniboss;
+        public bool IsBoss;
     }
 
     public struct EnemyReturnedEvent
@@ -51,5 +54,28 @@ namespace Core
         public StatType StatType;
         public Rarity Rarity;
         public float NewTotal;
+    }
+
+    public struct ExperienceChangedEvent
+    {
+        public float CurrentXp;
+        public float XpToNextLevel;
+        public int Level;
+    }
+
+    public struct LevelUpEvent
+    {
+        public int NewLevel;
+        public bool IsAbilityLevel;
+    }
+
+    public struct StatChoicePresentedEvent
+    {
+        public System.Collections.Generic.List<StatChoiceOption> Choices;
+    }
+
+    public struct StatChoiceResolvedEvent
+    {
+        public StatModifier ChosenModifier;
     }
 }
