@@ -12,7 +12,13 @@ namespace Player
     /// drive the HUD — no direct HUD references here. Attacks that carry a
     /// slow (e.g. Spider webs) are forwarded to SlowEffectController.
     ///
-    /// Attach to: PlayerRoot alongside PlayerController and StatSheet.
+    /// If DarkShieldController is granted and has layers available, it blocks
+    /// the hit entirely before damage or i-frames are even considered —
+    /// per the design doc, the shield "blocks any damage they will receive."
+    ///
+    /// Attach to: PlayerRoot alongside PlayerController, StatSheet, and
+    /// DarkShieldController (DarkShieldController is optional — not every
+    /// build of the player needs it granted).
     /// </summary>
     [RequireComponent(typeof(StatSheet))]
     [RequireComponent(typeof(SlowEffectController))]
@@ -31,6 +37,8 @@ namespace Player
 
         private StatSheet _statSheet;
         private SlowEffectController _slowEffects;
+        private DarkShieldController _shield; // optional — null if not granted on this player
+
         private float _currentHp;
         private float _iFrameTimer;
         private bool _isDead;
@@ -42,6 +50,7 @@ namespace Player
         {
             _statSheet = GetComponent<StatSheet>();
             _slowEffects = GetComponent<SlowEffectController>();
+            _shield = GetComponent<DarkShieldController>(); // may be null — that's fine
         }
 
         private void Start()
@@ -89,6 +98,12 @@ namespace Player
             ApplySlowIfAny(attack);
 
             if (_iFrameTimer > 0f) return; // still invincible — damage blocked, slow still applies
+
+            // Shield blocks the hit entirely, consuming a layer, only for
+            // hits that would otherwise actually land — no point spending a
+            // layer on a hit i-frames would have nullified for free.
+            if (_shield != null && _shield.TryBlockDamage()) return;
+
             TakeDamage(attack.Damage);
         }
 

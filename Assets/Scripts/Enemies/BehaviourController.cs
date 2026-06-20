@@ -55,7 +55,15 @@ namespace Enemies
 
             if (TickSpawnGracePeriod(ref enemy, deltaTime)) return;
             if (!enemy.IsAlive) return;
+
+            // Stun timer always decays, even while knockback is also active —
+            // otherwise a stun applied during a knockback would freeze instead
+            // of counting down, since only one "override" state can drive
+            // movement per frame but both timers still need to expire.
+            TickStunTimer(ref enemy, deltaTime);
+
             if (TickKnockback(ref enemy, deltaTime)) return;
+            if (enemy.IsStunned) { enemy.Velocity = Vector3.zero; return; }
 
             enemy.TickBuff(deltaTime);
 
@@ -127,6 +135,22 @@ namespace Enemies
             enemy.State = EnemyState.Moving; // resume normal AI next frame
 
             return true;
+        }
+
+        /// <summary>
+        /// Decays the stun timer unconditionally — called every tick regardless
+        /// of whether knockback is also active, so a stun can't get stuck
+        /// frozen behind a knockback that keeps consuming the frame first.
+        /// Does not touch Velocity or State; the caller decides what to do
+        /// with IsStunned after this runs.
+        /// </summary>
+        private static void TickStunTimer(ref EnemyData enemy, float deltaTime)
+        {
+            if (!enemy.IsStunned) return;
+
+            enemy.StunTimer -= deltaTime;
+            if (enemy.StunTimer <= 0f)
+                enemy.State = EnemyState.Moving; // resume normal AI next frame
         }
 
         private void MoveTowardPlayer(ref EnemyData enemy, float deltaTime)

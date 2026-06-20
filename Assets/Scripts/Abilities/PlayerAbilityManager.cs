@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Enemies;
 using Player;
 using Stats;
 using UnityEngine;
@@ -11,11 +12,14 @@ namespace Abilities
     /// "special attacks that the player automatically, periodically performs."
     ///
     /// Attach to: PlayerRoot, alongside StatSheet and PlayerController.
+    /// Wire: enemyPool reference in Inspector (the scene's single EnemyPool).
     /// </summary>
     [RequireComponent(typeof(StatSheet))]
     [RequireComponent(typeof(PlayerController))]
     public class PlayerAbilityManager : MonoBehaviour
     {
+        [SerializeField] private EnemyPool enemyPool;
+
         private readonly List<AbilityRuntime> _activeAbilities = new();
 
         private StatSheet _statSheet;
@@ -27,6 +31,8 @@ namespace Abilities
         {
             _statSheet = GetComponent<StatSheet>();
             _playerController = GetComponent<PlayerController>();
+
+            Debug.Assert(enemyPool, "PlayerAbilityManager: enemyPool not assigned.", this);
         }
 
         private void Update()
@@ -34,7 +40,7 @@ namespace Abilities
             var castOrigin = _playerController.Position;
 
             foreach (var ability in _activeAbilities)
-                ability.Tick(Time.deltaTime, castOrigin, _statSheet);
+                ability.Tick(Time.deltaTime, castOrigin, _statSheet, enemyPool);
         }
 
         /// <summary>

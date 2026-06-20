@@ -34,10 +34,8 @@ namespace Enemies
 
         // Which specific attack is currently playing, set by the active
         // IEnemyAttackBehaviour before entering EnemyState.Attacking. Archetypes
-        // with only one attack (Zombie, Spider, Eye, TornadoGhost) can leave
-        // this at its default; Boss sets it per-attack so its Animator
-        // Controller can branch to the matching clip (slam vs line-shot).
-        // EnemyView forwards this to an Animator int param alongside State.
+        // with only one attack can leave this at its default; Boss sets it
+        // per-attack so its Animator Controller can branch to the matching clip.
         public int AttackId;
 
         public float Hp;
@@ -55,6 +53,11 @@ namespace Enemies
 
         public Vector3 Knockback;      // current knockback velocity, decays over KnockbackTimer
         public float   KnockbackTimer; // seconds remaining of knockback override
+
+        // Stun suspends AI movement and attacking entirely, like knockback
+        // does, but applies no displacement — used by abilities like
+        // Shockwave that stun without pushing the enemy anywhere.
+        public float StunTimer;
 
         public float AttackTimer; // countdown to next attack
         public float SpawnTimer; // countdown out of Spawning state
@@ -109,6 +112,7 @@ namespace Enemies
                 Velocity = Vector3.zero,
                 Knockback = Vector3.zero,
                 KnockbackTimer = 0f,
+                StunTimer = 0f,
                 AttackTimer = so.attackCooldown,
                 SpawnTimer = 0.5f,// 0.5s spawn grace period
                 IsMiniboss = isMiniboss,
@@ -124,6 +128,7 @@ namespace Enemies
         public bool CanAttack  => State == EnemyState.Attacking && AttackTimer <= 0f;
         public bool IsSpawning => State == EnemyState.Spawning;
         public bool IsKnockedBack => KnockbackTimer > 0f;
+        public bool IsStunned => StunTimer > 0f;
         public bool IsBuffed => BuffTimer > 0f;
 
         /// <summary>Applies or refreshes a timed buff. Called by buff-source abilities (e.g. EyeWinged's pulse).</summary>
@@ -131,6 +136,13 @@ namespace Enemies
         {
             BuffMultiplier = multiplier;
             BuffTimer = durationSeconds;
+        }
+
+        /// <summary>Applies or refreshes a stun. Called by stun-source abilities (e.g. Shockwave).</summary>
+        public void ApplyStun(float durationSeconds)
+        {
+            if (durationSeconds > StunTimer)
+                StunTimer = durationSeconds;
         }
 
         /// <summary>Call once per tick from BehaviourController to decay an active buff.</summary>

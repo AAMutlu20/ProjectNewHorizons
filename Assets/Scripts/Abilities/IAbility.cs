@@ -1,3 +1,4 @@
+using Enemies;
 using Stats;
 
 namespace Abilities
@@ -11,7 +12,12 @@ namespace Abilities
     /// </summary>
     public interface IAbility
     {
-        /// <summary>Executes the ability's effect once, at castOrigin, scaled by rarity and the player's StatSheet.</summary>
-        void Cast(UnityEngine.Vector3 castOrigin, Rarity rarity, StatSheet statSheet);
+        /// <summary>
+        /// Executes the ability's effect once, at castOrigin, scaled by
+        /// rarity and the player's StatSheet. enemyPool is provided for
+        /// abilities that need to query or damage nearby enemies (most of
+        /// them) — pure single-target or self-buff abilities can ignore it.
+        /// </summary>
+        void Cast(UnityEngine.Vector3 castOrigin, Rarity rarity, StatSheet statSheet, EnemyPool enemyPool);
     }
 }

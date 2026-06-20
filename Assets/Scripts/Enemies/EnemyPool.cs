@@ -34,6 +34,18 @@ namespace Enemies
 
         public int ActiveCount => _active.Count;
 
+        /// <summary>
+        /// Read-only view of every currently active enemy. Used by player
+        /// abilities (Shockwave, Meteor Slam, Poison Aura, etc.) that need to
+        /// query "everyone within radius X of the player" — the same data
+        /// BehaviourController already gets injected for enemy-side queries
+        /// like separation and the buff pulse, exposed here for player-side use.
+        /// </summary>
+        public IReadOnlyList<EnemyView> ActiveEnemies => _active;
+
+        /// <summary>Read-only access to the spatial grid for radius queries — see ActiveEnemies.</summary>
+        public SpatialGrid SpatialGrid => spatialGrid;
+
         //Lifecycle
         private void Awake()
         {
