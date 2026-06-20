@@ -96,8 +96,10 @@ namespace Enemies
         /// <summary>
         /// Retrieve an enemy from the pool and activate it at worldPos.
         /// Returns null if the pool for this type is exhausted (rare — tune poolSize if it fires).
+        /// isMiniboss is decided by the caller (spawn scheduler / boss-spawn rules) — see
+        /// the design doc's miniboss-frequency-after-boss-kills rule.
         /// </summary>
-        public EnemyView Get(EnemyType type, Vector3 worldPos)
+        public EnemyView Get(EnemyType type, Vector3 worldPos, bool isMiniboss = false)
         {
             if (!_inactive.TryGetValue(type, out var queue) || queue.Count == 0)
             {
@@ -117,7 +119,7 @@ namespace Enemies
             if (!so) return null;
 
             view.gameObject.SetActive(true);
-            view.Init(so, _currentDiff, worldPos, playerTransform, spatialGrid, _active);
+            view.Init(so, _currentDiff, worldPos, playerTransform, spatialGrid, _active, isMiniboss);
             _active.Add(view);
             return view;
         }

@@ -10,6 +10,11 @@ namespace Player
     /// Uses Rigidbody.MovePosition on the XZ plane — no direct transform manipulation,
     /// so it respects collision boundaries without bypassing physics.
     ///
+    /// External forces (e.g. TornadoGhost's pull) go through ApplyExternalPull
+    /// rather than calling MovePosition themselves — combining both into one
+    /// MovePosition call per frame avoids the two competing depending on
+    /// script execution order.
+    ///
     /// Reads movement through the new Input System (InputActionReference) rather than
     /// the legacy UnityEngine.Input class — required once Player Settings → Active Input
     /// Handling is set to "Input System Package" or "Both".
@@ -19,8 +24,11 @@ namespace Player
     /// </summary>
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(StatSheet))]
+    [RequireComponent(typeof(SlowEffectController))]
     public class PlayerController : MonoBehaviour
     {
+        private const float ExternalPullDecayRate = 4f;
+
         [Header("Movement")]
         [SerializeField] private float baseMoveSpeed = 6f;
 
@@ -35,22 +43,24 @@ namespace Player
 
         private Rigidbody _rb;
         private StatSheet _statSheet;
+        private SlowEffectController _slowEffects;
         private Vector2 _input; // x = horizontal (world X), y = vertical (world Z)
 
-        // Highest active slow as a fraction (0.5 = 50% slowed). Set by status
-        // effect systems (webs, ground hazards, debuffs) — defaults to none.
-        private float _strongestSlowFraction;
+        // Accumulated external displacement per second (e.g. TornadoGhost's pull).
+        // Decays toward zero so a pull feels like a force, not a teleport.
+        private Vector3 _externalPullVelocity;
 
         // Expose position for other systems to read player location
         public Vector3 Position => _rb.position;
 
         public float CurrentMoveSpeed =>
-            (baseMoveSpeed + _statSheet.GetTotal(StatType.MovementSpeed)) * (1f - _strongestSlowFraction);
+            (baseMoveSpeed + _statSheet.GetTotal(StatType.MovementSpeed)) * (1f - _slowEffects.StrongestSlowFraction);
 
         private void Awake()
         {
             _rb = GetComponent<Rigidbody>();
             _statSheet = GetComponent<StatSheet>();
+            _slowEffects = GetComponent<SlowEffectController>();
             _rb.constraints = RigidbodyConstraints.FreezeRotationX
                              | RigidbodyConstraints.FreezeRotationZ
                              | RigidbodyConstraints.FreezePositionY;
@@ -83,14 +93,29 @@ namespace Player
         private void FixedUpdate()
         {
             // Map 2D input to XZ plane — Y (height) is untouched by movement
-            var moveDirection = new Vector3(_input.x, 0f, _input.y);
-            _rb.MovePosition(_rb.position + moveDirection * (CurrentMoveSpeed * Time.fixedDeltaTime));
+            var inputDirection = new Vector3(_input.x, 0f, _input.y);
+            var inputDisplacement = inputDirection * (CurrentMoveSpeed * Time.fixedDeltaTime);
+            var pullDisplacement = _externalPullVelocity * Time.fixedDeltaTime;
+
+            _rb.MovePosition(_rb.position + inputDisplacement + pullDisplacement);
+
+            DecayExternalPull();
         }
 
-        /// <summary>Called by status-effect systems to apply or clear a slow. Pass 0 to clear.</summary>
-        public void SetStrongestSlow(float slowFraction)
+        /// <summary>
+        /// Applies an external displacement force (e.g. being pulled toward a
+        /// TornadoGhost). Additive with any existing pull and with player
+        /// input — does not override or pause normal movement.
+        /// </summary>
+        public void ApplyExternalPull(Vector3 pullVelocity)
         {
-            _strongestSlowFraction = Mathf.Clamp01(slowFraction);
+            _externalPullVelocity += pullVelocity;
+        }
+
+        private void DecayExternalPull()
+        {
+            _externalPullVelocity = Vector3.Lerp(
+                _externalPullVelocity, Vector3.zero, Time.fixedDeltaTime * ExternalPullDecayRate);
         }
     }
 }

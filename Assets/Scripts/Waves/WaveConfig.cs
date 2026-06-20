@@ -13,7 +13,7 @@ namespace Waves
     public class SpawnGroup
     {
         [Tooltip("Which enemy type to spawn")]
-        public EnemyType enemyType = EnemyType.Basic;
+        public EnemyType enemyType = EnemyType.Zombie;
 
         [Tooltip("Total enemies in this group")]
         public int count = 10;

@@ -9,11 +9,13 @@ namespace Player
     /// Manages player HP. Reads Vitality, Health Regeneration, and Damage
     /// Reduction from StatSheet rather than holding its own copies. Receives
     /// damage via the EventBus (EnemyAttackEvent) and emits events that
-    /// drive the HUD — no direct HUD references here.
+    /// drive the HUD — no direct HUD references here. Attacks that carry a
+    /// slow (e.g. Spider webs) are forwarded to SlowEffectController.
     ///
     /// Attach to: PlayerRoot alongside PlayerController and StatSheet.
     /// </summary>
     [RequireComponent(typeof(StatSheet))]
+    [RequireComponent(typeof(SlowEffectController))]
     public class PlayerHealth : MonoBehaviour
     {
         // How close an attack's reported position must be to count as a hit on
@@ -28,6 +30,7 @@ namespace Player
         [SerializeField] private float iFrameDuration = 0.5f;
 
         private StatSheet _statSheet;
+        private SlowEffectController _slowEffects;
         private float _currentHp;
         private float _iFrameTimer;
         private bool _isDead;
@@ -38,6 +41,7 @@ namespace Player
         private void Awake()
         {
             _statSheet = GetComponent<StatSheet>();
+            _slowEffects = GetComponent<SlowEffectController>();
         }
 
         private void Start()
@@ -78,12 +82,20 @@ namespace Player
         private void OnEnemyAttack(EnemyAttackEvent attack)
         {
             if (_isDead) return;
-            if (_iFrameTimer > 0f) return; // still invincible
 
             var distanceToAttack = Vector3.Distance(transform.position, attack.Position);
             if (distanceToAttack > AttackHitRadius) return;
 
+            ApplySlowIfAny(attack);
+
+            if (_iFrameTimer > 0f) return; // still invincible — damage blocked, slow still applies
             TakeDamage(attack.Damage);
+        }
+
+        private void ApplySlowIfAny(EnemyAttackEvent attack)
+        {
+            if (attack.SlowFraction <= 0f || attack.SlowDuration <= 0f) return;
+            _slowEffects.ApplySlow(attack.SlowFraction, attack.SlowDuration);
         }
 
         private void TakeDamage(float amount)

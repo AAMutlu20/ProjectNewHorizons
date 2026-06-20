@@ -32,9 +32,11 @@ namespace Enemies
 
         private BehaviourController _behaviour;
         private EnemyState _lastState;
+        private int _lastAttackId;
 
         // Animator parameter hashes — cache them, string lookup is slow
         private static readonly int AnimState = Animator.StringToHash("State");
+        private static readonly int AnimAttackId = Animator.StringToHash("AttackId");
         private static readonly int AnimDead = Animator.StringToHash("Dead");
 
         private void Awake()
@@ -52,9 +54,10 @@ namespace Enemies
 
         /// <summary>Initialise this view with fresh data. Called immediately after Get() from pool.</summary>
         public void Init(EnemyTypeSo typeSo, DifficultyParams diff, Vector3 worldPos,
-            Transform playerTransform, SpatialGrid grid, System.Collections.Generic.List<EnemyView> activeList)
+            Transform playerTransform, SpatialGrid grid, System.Collections.Generic.List<EnemyView> activeList,
+            bool isMiniboss = false)
         {
-            _data = EnemyData.Create(typeSo, diff, worldPos);
+            _data = EnemyData.Create(typeSo, diff, worldPos, isMiniboss);
             
             transform.position = worldPos;
             transform.rotation = Quaternion.identity;
@@ -76,8 +79,16 @@ namespace Enemies
             _behaviour.Grid = grid;
             _behaviour.ActiveEnemies = activeList;
 
-            if (animator) animator.SetInteger(AnimState, (int)EnemyState.Spawning);
+            if (animator)
+            {
+                animator.SetInteger(AnimState, (int)EnemyState.Spawning);
+                animator.SetInteger(AnimAttackId, 0);
+            }
             _lastState = EnemyState.Spawning;
+            _lastAttackId = 0;
+
+            if (_data.Type == EnemyType.Boss)
+                EmitBossHealthChanged();
         }
 
         /// <summary>
@@ -107,14 +118,7 @@ namespace Enemies
                     transform.rotation = targetRotation;
             }
 
-            // Drive Animator only when state changes — avoids SetInteger every frame
-            if (animator && _data.State != _lastState)
-            {
-                animator.SetInteger(AnimState, (int)_data.State);
-                if (_data.State == EnemyState.Dying)
-                    animator.SetTrigger(AnimDead);
-                _lastState = _data.State;
-            }
+            UpdateAnimatorParameters();
 
             // Return to pool after death animation finishes
             // For graybox: return immediately on death. With animator: check normalizedTime.
@@ -123,6 +127,36 @@ namespace Enemies
                            animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f;
             if (animDone)
                 Pool.Return(this);
+        }
+
+        /// <summary>
+        /// Drives the Animator only when State or AttackId actually changes —
+        /// avoids calling SetInteger every frame. AttackId lets archetypes with
+        /// multiple distinct attacks (e.g. Boss: slam vs line-shot) branch to
+        /// the correct clip in the Animator Controller instead of all attacks
+        /// sharing one generic "Attacking" animation.
+        /// </summary>
+        private void UpdateAnimatorParameters()
+        {
+            if (!animator) return;
+
+            var stateChanged = _data.State != _lastState;
+            var attackIdChanged = _data.AttackId != _lastAttackId;
+            if (!stateChanged && !attackIdChanged) return;
+
+            if (stateChanged)
+            {
+                animator.SetInteger(AnimState, (int)_data.State);
+                if (_data.State == EnemyState.Dying)
+                    animator.SetTrigger(AnimDead);
+                _lastState = _data.State;
+            }
+
+            if (attackIdChanged)
+            {
+                animator.SetInteger(AnimAttackId, _data.AttackId);
+                _lastAttackId = _data.AttackId;
+            }
         }
 
         // Damage
@@ -145,10 +179,39 @@ namespace Enemies
                 _behaviour.ApplyKnockback(dir, knockbackForce, knockbackDuration);
             }
 
+            // Only the Boss has a persistent HUD health bar — other enemy types
+            // don't need a per-hit event, so this stays Boss-specific rather
+            // than firing for every enemy in the game.
+            if (_data.Type == EnemyType.Boss)
+                EmitBossHealthChanged();
+
             if (!(_data.Hp <= 0f)) return;
             _data.Hp = 0f;
             _behaviour.OnDeath();
-            EventBus.Emit(new EnemyDiedEvent { Type = _data.Type, Position = _data.Position });
+            EventBus.Emit(new EnemyDiedEvent
+            {
+                Type = _data.Type,
+                Position = _data.Position,
+                XpValue = _data.XpValue,
+                IsMiniboss = _data.IsMiniboss,
+                IsBoss = _data.Type == EnemyType.Boss,
+            });
         }
+
+        private void EmitBossHealthChanged()
+        {
+            EventBus.Emit(new BossHealthChangedEvent
+            {
+                Current = _data.Hp,
+                Max = _data.MaxHp,
+            });
+        }
+    }
+
+    /// <summary>Emitted whenever the Boss takes damage or spawns — drives the boss bar UI.</summary>
+    public struct BossHealthChangedEvent
+    {
+        public float Current;
+        public float Max;
     }
 }

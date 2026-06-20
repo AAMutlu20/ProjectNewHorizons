@@ -6,27 +6,27 @@ using Waves;
 namespace Core
 {
     /// <summary>
-    /// Bootstraps the game. Holds serialized references to all top-level systems
-    /// and calls StartWave(0) to kick things off.
+    /// Bootstraps the game. Holds serialized references to top-level systems
+    /// for validation and watches for the player's death.
+    ///
+    /// WaveDirector starts itself on its own Start() — it owns the infinite
+    /// cycle's lifecycle, so GameManager no longer needs to kick it off.
     ///
     /// Attach to: a GameObject in [Systems].
     /// </summary>
     public class GameManager : MonoBehaviour
     {
         [Header("Systems")]
-        [SerializeField] private WaveManager waveManager;
+        [SerializeField] private WaveDirector waveDirector;
         [SerializeField] private EnemyPool enemyPool;
         [SerializeField] private DifficultyScaler difficultyScaler;
-
-        [Header("Settings")]
-        [SerializeField] private float delayBeforeFirstWave = 2f;
 
         private bool _gameOver;
 
         private void Awake()
         {
             // Validate all required references up front — fail loud, fail early
-            Debug.Assert(waveManager, "GameManager: WaveManager ref missing");
+            Debug.Assert(waveDirector, "GameManager: WaveDirector ref missing");
             Debug.Assert(enemyPool, "GameManager: EnemyPool ref missing");
             Debug.Assert(difficultyScaler, "GameManager: DifficultyScaler ref missing");
         }
@@ -34,7 +34,6 @@ namespace Core
         private void Start()
         {
             EventBus.Subscribe<PlayerDiedEvent>(OnPlayerDied);
-            Invoke(nameof(StartGame), delayBeforeFirstWave);
         }
 
         private void OnDestroy()
@@ -42,17 +41,12 @@ namespace Core
             EventBus.ClearAll();
         }
 
-        private void StartGame()
-        {
-            waveManager.StartWave(0);
-        }
-
         private void OnPlayerDied(PlayerDiedEvent _)
         {
             if (_gameOver) return;
             _gameOver = true;
             Debug.Log("Game Over");
-            // TODO: show game-over screen, stop WaveManager
+            // TODO: show game-over screen, stop WaveDirector
         }
     }
 }

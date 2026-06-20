@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Core;
 using UnityEngine;
 
 namespace Enemies
@@ -31,10 +30,18 @@ namespace Enemies
         private readonly List<int> _neighbourIndices = new(16);
 
         private EnemyView _view;
+        private IEnemyAttackBehaviour _attackBehaviour;
+        private IPeriodicAbility _periodicAbility; // optional — not every archetype has one
 
         private void Awake()
         {
             _view = GetComponent<EnemyView>();
+            _attackBehaviour = GetComponent<IEnemyAttackBehaviour>();
+            _periodicAbility = GetComponent<IPeriodicAbility>();
+
+            if (_attackBehaviour == null)
+                Debug.LogError($"BehaviourController on '{name}' has no IEnemyAttackBehaviour " +
+                                "attached — this enemy will move but never attack.", this);
         }
 
         /// <summary>
@@ -49,6 +56,13 @@ namespace Enemies
             if (TickSpawnGracePeriod(ref enemy, deltaTime)) return;
             if (!enemy.IsAlive) return;
             if (TickKnockback(ref enemy, deltaTime)) return;
+
+            enemy.TickBuff(deltaTime);
+
+            // Ambient abilities (summoning, buff pulses, etc.) run regardless of
+            // distance to the player — unlike attacks, which are range-gated below.
+            _periodicAbility?.TickAbility(ref enemy, deltaTime);
+
             if (!PlayerTransform) return;
 
             MoveTowardPlayer(ref enemy, deltaTime);
@@ -122,7 +136,7 @@ namespace Enemies
 
             if (distanceToPlayer <= enemy.TypeSo.attackRange)
             {
-                AttackIfReady(ref enemy, deltaTime);
+                _attackBehaviour?.TickAttack(ref enemy, deltaTime);
                 return;
             }
 
@@ -135,22 +149,6 @@ namespace Enemies
             enemy.Velocity = desiredDirection * enemy.Speed;
             enemy.Velocity.y = 0f; // lock to XZ plane — no vertical drift from position noise
             enemy.Position += enemy.Velocity * deltaTime;
-        }
-
-        private static void AttackIfReady(ref EnemyData enemy, float deltaTime)
-        {
-            enemy.State = EnemyState.Attacking;
-            enemy.AttackTimer -= deltaTime;
-            enemy.Velocity = Vector3.zero;
-
-            if (!enemy.CanAttack) return;
-
-            enemy.AttackTimer = enemy.TypeSo.attackCooldown;
-            EventBus.Emit(new EnemyAttackEvent
-            {
-                Damage = enemy.Damage,
-                Position = enemy.Position,
-            });
         }
 
         /// <summary>
@@ -210,12 +208,5 @@ namespace Enemies
 
             return (separation / weightSum).normalized * enemy.TypeSo.separationForce;
         }
-    }
-
-    // Placed here since it's only used by BehaviourController
-    public struct EnemyAttackEvent
-    {
-        public float Damage;
-        public Vector3 Position;
     }
 }

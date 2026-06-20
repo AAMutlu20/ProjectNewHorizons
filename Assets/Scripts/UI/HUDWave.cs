@@ -6,51 +6,51 @@ using Waves;
 namespace UI
 {
     /// <summary>
-    /// Drives the wave counter and rest-period countdown in the HUD.
-    /// Subscribes to EventBus — no direct reference to WaveManager.
+    /// Drives the phase label and elapsed-time counter in the HUD. Subscribes
+    /// to EventBus — no direct reference to WaveDirector except for the live
+    /// elapsed-time readout, which has no event of its own (it changes every
+    /// frame, so polling WaveDirector.ElapsedGameTime is simpler than an
+    /// event firing every tick).
     ///
     /// Attach to: HUD_Canvas root. Wire TMP text refs in Inspector.
     /// </summary>
     public class HUDWave : MonoBehaviour
     {
-        [SerializeField] private TextMeshProUGUI waveLabel;
+        [SerializeField] private TextMeshProUGUI phaseLabel;
         [SerializeField] private TextMeshProUGUI timerLabel;
-        [SerializeField] private WaveManager waveManager; // needed only for live timer display
+        [SerializeField] private WaveDirector waveDirector; // needed only for the live elapsed-time readout
 
-        void Start()
+        private void Start()
         {
-            EventBus.Subscribe<WaveStartedEvent> (OnWaveStarted);
-            EventBus.Subscribe<WaveCompleteEvent>(OnWaveComplete);
-
-            if (waveLabel) waveLabel.text = "Wave 1";
+            EventBus.Subscribe<PhaseStartedEvent>(OnPhaseStarted);
+            EventBus.Subscribe<CycleCompleteEvent>(OnCycleComplete);
         }
 
-        void OnDestroy()
+        private void OnDestroy()
         {
-            EventBus.Unsubscribe<WaveStartedEvent> (OnWaveStarted);
-            EventBus.Unsubscribe<WaveCompleteEvent>(OnWaveComplete);
+            EventBus.Unsubscribe<PhaseStartedEvent>(OnPhaseStarted);
+            EventBus.Unsubscribe<CycleCompleteEvent>(OnCycleComplete);
         }
 
-        void Update()
+        private void Update()
         {
-            // Show live wave timer if active
-            if (!timerLabel || !waveManager) return;
-            if (waveManager.IsWaveActive)
-                timerLabel.text = $"{waveManager.WaveTimer:F0}s";
-            else if (waveManager.IsResting)
-                timerLabel.text = "Rest...";
+            if (!timerLabel || !waveDirector) return;
+            timerLabel.text = $"{waveDirector.ElapsedGameTime:F0}s";
         }
 
-        private void OnWaveStarted(WaveStartedEvent evt)
+        private void OnPhaseStarted(PhaseStartedEvent phaseStarted)
         {
-            if (waveLabel)
-                waveLabel.text = $"Wave {evt.Wave + 1}";
+            if (!phaseLabel) return;
+
+            phaseLabel.text = phaseStarted.EnemyType == Enemies.EnemyType.Boss
+                ? "BOSS"
+                : $"{phaseStarted.EnemyType} incoming";
         }
 
-        private void OnWaveComplete(WaveCompleteEvent evt)
+        private void OnCycleComplete(CycleCompleteEvent cycleComplete)
         {
-            if (waveLabel)
-                waveLabel.text = $"Wave {evt.Wave + 1} complete!";
+            if (!phaseLabel) return;
+            phaseLabel.text = $"Boss defeated! ({cycleComplete.BossKillCount})";
         }
     }
 }

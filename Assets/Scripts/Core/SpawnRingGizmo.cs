@@ -12,7 +12,7 @@ namespace Core
     /// </summary>
     public class SpawnRingGizmo : MonoBehaviour
     {
-        [SerializeField] private DifficultyConfig difficultyConfig;
+        [SerializeField] private DifficultyConfigSo difficultyConfig;
         [SerializeField] private Color ringColor = new(1f, 0.4f, 0.1f, 0.6f);
         [SerializeField] private Color minRingColor = new(0.2f, 0.8f, 1f, 0.3f);
 
