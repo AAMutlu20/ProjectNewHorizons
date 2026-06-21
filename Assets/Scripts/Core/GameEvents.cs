@@ -1,3 +1,4 @@
+using Abilities;
 using Enemies;
 using Stats;
 
@@ -5,7 +6,7 @@ namespace Core
 {
     /// <summary>
     /// All event structs used by the wave/enemy system.
-    /// Plain data structs — no logic, no MonoBehaviour.
+    /// Plain data structs -- no logic, no MonoBehaviour.
     /// </summary>
 
     public struct WaveStartedEvent
@@ -77,5 +78,15 @@ namespace Core
     public struct StatChoiceResolvedEvent
     {
         public StatModifier ChosenModifier;
+    }
+
+    public struct AbilityChoicePresentedEvent
+    {
+        public System.Collections.Generic.List<AbilityChoiceOption> Choices;
+    }
+
+    public struct AbilityChoiceResolvedEvent
+    {
+        public AbilityChoiceOption ChosenOption;
     }
 }
