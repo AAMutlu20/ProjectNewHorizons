@@ -50,8 +50,22 @@ namespace Player
         // Decays toward zero so a pull feels like a force, not a teleport.
         private Vector3 _externalPullVelocity;
 
+        // Holds the last non-zero input direction — used by abilities that need
+        // a "facing" (e.g. Cone of Fire), since the player has no rotation of
+        // their own. Defaults to forward so abilities always get a valid,
+        // non-zero direction even before the player has ever moved.
+        private Vector3 _facingDirection = Vector3.forward;
+
         // Expose position for other systems to read player location
         public Vector3 Position => _rb.position;
+
+        /// <summary>
+        /// The direction the player was last walking, held constant while
+        /// standing still. Not a true facing/aim direction — there's no
+        /// rotation or aim input in this game — but the closest available
+        /// substitute for "in front of the player" (e.g. Cone of Fire).
+        /// </summary>
+        public Vector3 FacingDirection => _facingDirection;
 
         public float CurrentMoveSpeed =>
             (baseMoveSpeed + _statSheet.GetTotal(StatType.MovementSpeed)) * (1f - _slowEffects.StrongestSlowFraction);
@@ -88,6 +102,15 @@ namespace Player
             if (_input.sqrMagnitude > 1f) _input.Normalize();
             // else: read from virtual joystick UI
             // _input = virtualJoystick.Value;
+
+            UpdateFacingDirection();
+        }
+
+        private void UpdateFacingDirection()
+        {
+            if (_input.sqrMagnitude <= 0.0001f) return; // standing still — keep the last facing direction
+
+            _facingDirection = new Vector3(_input.x, 0f, _input.y).normalized;
         }
 
         private void FixedUpdate()

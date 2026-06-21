@@ -39,11 +39,18 @@ namespace Abilities
             if (target == null) return; // no valid target — doc specifies no fallback behaviour
 
             var stats = _definition.GetStatsForRarity(rarity);
-            var scaledDamage = statSheet.ApplyPercentBonus(stats.Damage, StatType.AbilityPower);
+            var scaledImpactDamage = statSheet.ApplyPercentBonus(stats.Damage, StatType.AbilityPower);
+
+            // Ability Power affects "all ability damage" per the design doc —
+            // applied to the lava pool's percent-maxHP rate too, not just the
+            // flat impact hit.
+            var scaledLavaPoolPercent = statSheet.ApplyPercentBonus(
+                stats.LavaPoolDamagePercentPerSecond, StatType.AbilityPower);
+
             var impactPosition = target.Data.Position;
 
             _telegraphPool.Begin(impactPosition, TelegraphDuration, stats.ImpactRadius,
-                () => LandMeteor(impactPosition, stats, scaledDamage, enemyPool));
+                () => LandMeteor(impactPosition, stats, scaledImpactDamage, scaledLavaPoolPercent, enemyPool));
         }
 
         private static EnemyView FindHighestHpEnemy(EnemyPool enemyPool)
@@ -63,7 +70,8 @@ namespace Abilities
             return highestHpEnemy;
         }
 
-        private void LandMeteor(Vector3 impactPosition, MeteorSlamStats stats, float damage, EnemyPool enemyPool)
+        private void LandMeteor(Vector3 impactPosition, MeteorSlamStats stats, float damage,
+            float lavaPoolDamagePercent, EnemyPool enemyPool)
         {
             DamageEnemiesInRadius(impactPosition, stats.ImpactRadius, damage, enemyPool);
 
@@ -74,7 +82,7 @@ namespace Abilities
                 stats.LavaPoolRange,
                 LavaPoolTickInterval,
                 stats.LavaPoolDuration,
-                enemyView => enemyView.Data.MaxHp * stats.LavaPoolDamagePercentPerSecond,
+                enemyView => enemyView.Data.MaxHp * lavaPoolDamagePercent,
                 enemyPool);
         }
 

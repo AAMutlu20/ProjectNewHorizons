@@ -67,6 +67,7 @@ namespace Enemies
 
             enemy.TickBuff(deltaTime);
             enemy.TickWeaken(deltaTime);
+            enemy.TickSlow(deltaTime);
 
             // Ambient abilities (summoning, buff pulses, etc.) run regardless of
             // distance to the player — unlike attacks, which are range-gated below.

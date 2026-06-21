@@ -48,10 +48,16 @@ namespace Abilities
             var weakenMultiplier = 1f + stats.WeakeningMultiplierBonus;
             var rotationSpeed = rarity == Rarity.Legendary ? LegendaryRotationDegreesPerSecond : 0f;
 
+            // Ability Power affects "all ability damage" per the design doc —
+            // applied to the percent-maxHP rate itself, same mechanism as
+            // every flat-damage ability, since it's still ability damage.
+            var scaledDamagePercent = statSheet.ApplyPercentBonus(
+                stats.DamagePercentMaxHpPerSecond, StatType.AbilityPower);
+
             for (var i = 0; i < stats.BeamCount; i++)
             {
                 var direction = CardinalDirections[Random.Range(0, CardinalDirections.Length)];
-                _beamPool.Begin(_playerTransform, direction, BeamWidth, stats.DamagePercentMaxHpPerSecond,
+                _beamPool.Begin(_playerTransform, direction, BeamWidth, scaledDamagePercent,
                     weakenMultiplier, stats.Duration, rotationSpeed, enemyPool);
             }
         }

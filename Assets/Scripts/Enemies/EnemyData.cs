@@ -43,8 +43,8 @@ namespace Enemies
         public float XpValue; // already scaled by miniboss multiplier if applicable
 
         // Backing fields for Speed/Damage — read through the properties below,
-        // which apply BuffMultiplier transparently. Callers that already read
-        // enemy.Speed / enemy.Damage don't need to change.
+        // which apply BuffMultiplier and SlowMultiplier transparently. Callers
+        // that already read enemy.Speed / enemy.Damage don't need to change.
         private float _baseSpeed;
         private float _baseDamage;
 
@@ -82,13 +82,22 @@ namespace Enemies
         public float WeakenMultiplier;
         public float WeakenTimer;
 
+        // Slow debuff (e.g. Poison Aura's Legendary tier): reduces Speed by a
+        // fraction. Expressed as a multiplier already inverted for direct use
+        // (0.5 fraction slow -> SlowMultiplier = 0.5, so Speed is halved) —
+        // unlike Weaken, only one source exists in the doc so far, so this
+        // stays a single value rather than a stacked-source list like the
+        // player's SlowEffectController.
+        public float SlowMultiplier;
+        public float SlowTimer;
+
         // Rolled once at spawn, then held constant — gives same-type enemies a bit of
         // individual variation instead of moving in perfect lockstep as a single mass.
         // Re-rolling these per frame would look like jitter; rolling once gives each
         // enemy a stable "personality" for its lifetime.
         public float SeekAngleJitter; // radians, added to the raw seek-toward-player angle
 
-        public float Speed => _baseSpeed * BuffMultiplier;
+        public float Speed => _baseSpeed * BuffMultiplier * SlowMultiplier;
         public float Damage => _baseDamage * BuffMultiplier;
 
         /// <summary>
@@ -128,6 +137,8 @@ namespace Enemies
                 BuffTimer = 0f,
                 WeakenMultiplier = 1f,
                 WeakenTimer = 0f,
+                SlowMultiplier = 1f,
+                SlowTimer = 0f,
                 // ±12° (≈0.21 rad) — enough to break up a "wall of arrows" funnel effect
                 // without enemies visibly missing the player or looking uncoordinated.
                 SeekAngleJitter = Random.Range(-0.21f, 0.21f),
@@ -141,6 +152,7 @@ namespace Enemies
         public bool IsStunned => StunTimer > 0f;
         public bool IsBuffed => BuffTimer > 0f;
         public bool IsWeakened => WeakenTimer > 0f;
+        public bool IsSlowed => SlowTimer > 0f;
 
         /// <summary>Applies or refreshes a timed buff. Called by buff-source abilities (e.g. EyeWinged's pulse).</summary>
         public void ApplyBuff(float multiplier, float durationSeconds)
@@ -170,6 +182,21 @@ namespace Enemies
                 WeakenTimer = durationSeconds;
         }
 
+        /// <summary>
+        /// Applies or refreshes a slow (e.g. Poison Aura's Legendary tier).
+        /// slowMultiplier is the resulting Speed multiplier (0.5 = half speed),
+        /// not the slow fraction — takes the STRONGER slow (lower multiplier)
+        /// if already slowed, same "don't downgrade an existing effect" rule
+        /// as ApplyWeaken.
+        /// </summary>
+        public void ApplySlow(float slowMultiplier, float durationSeconds)
+        {
+            if (slowMultiplier < SlowMultiplier)
+                SlowMultiplier = slowMultiplier;
+            if (durationSeconds > SlowTimer)
+                SlowTimer = durationSeconds;
+        }
+
         /// <summary>Call once per tick from BehaviourController to decay an active buff.</summary>
         public void TickBuff(float deltaTime)
         {
@@ -188,6 +215,16 @@ namespace Enemies
             WeakenTimer -= deltaTime;
             if (WeakenTimer <= 0f)
                 WeakenMultiplier = 1f;
+        }
+
+        /// <summary>Call once per tick from BehaviourController to decay an active slow.</summary>
+        public void TickSlow(float deltaTime)
+        {
+            if (SlowTimer <= 0f) return;
+
+            SlowTimer -= deltaTime;
+            if (SlowTimer <= 0f)
+                SlowMultiplier = 1f;
         }
     }
 }
