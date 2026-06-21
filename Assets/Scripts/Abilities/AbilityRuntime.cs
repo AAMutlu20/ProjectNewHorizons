@@ -14,6 +14,9 @@ namespace Abilities
     /// Emits AbilityCastEvent every time Cast fires, here rather than inside
     /// each IAbility implementation — so every ability gets a VFX hook point
     /// automatically, without each one needing to remember to emit it.
+    ///
+    /// Icon and CooldownProgress01 exist purely for UI consumption (the
+    /// ability diamond slots) — gameplay logic never reads them.
     /// </summary>
     public class AbilityRuntime
     {
@@ -22,16 +25,24 @@ namespace Abilities
         private readonly Rarity _rarity;
 
         private float _cooldownTimer;
+        private float _currentCooldownDuration; // the resolved (haste-scaled) duration of the CURRENT cooldown cycle
 
         public string DisplayName { get; }
         public Rarity Rarity => _rarity;
+        public Sprite Icon { get; }
 
-        public AbilityRuntime(string displayName, IAbility ability, IAbilityRarityStats stats, Rarity rarity)
+        /// <summary>0 = just cast (full cooldown remaining), 1 = ready to cast. Drives the UI's radial cooldown fill.</summary>
+        public float CooldownProgress01 => _currentCooldownDuration > 0f
+            ? Mathf.Clamp01(1f - _cooldownTimer / _currentCooldownDuration)
+            : 1f;
+
+        public AbilityRuntime(string displayName, IAbility ability, IAbilityRarityStats stats, Rarity rarity, Sprite icon)
         {
             DisplayName = displayName;
             _ability = ability;
             _stats = stats;
             _rarity = rarity;
+            Icon = icon;
         }
 
         /// <summary>Advances the cooldown and casts automatically when it elapses. Call once per frame.</summary>
@@ -61,7 +72,8 @@ namespace Abilities
         private void ResetCooldown(StatSheet statSheet)
         {
             var haste = statSheet.GetTotal(StatType.AbilityHaste);
-            _cooldownTimer = HasteFormula.GetCooldown(_stats.Cooldown, haste);
+            _currentCooldownDuration = HasteFormula.GetCooldown(_stats.Cooldown, haste);
+            _cooldownTimer = _currentCooldownDuration;
         }
     }
 

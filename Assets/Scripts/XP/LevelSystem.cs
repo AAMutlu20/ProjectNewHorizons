@@ -18,6 +18,7 @@ namespace XP
         private const float PercentToFraction = 100f;
         private const float UnfreezeDelaySeconds = 0.5f;
         private const int LevelsPerAbilityChoice = 3;
+        private const string FreezeReason = "LevelUpChoice";
 
         [SerializeField] private StatSheet statSheet;
         [SerializeField] private XpCurveConfigSo xpCurveConfig;
@@ -110,7 +111,7 @@ namespace XP
 
         private void BeginLevelUpChoice()
         {
-            Time.timeScale = 0f;
+            GameFreezeController.RequestFreeze(FreezeReason);
 
             var isAbilityLevel = _currentLevel % LevelsPerAbilityChoice == 0;
             EventBus.Emit(new LevelUpEvent { NewLevel = _currentLevel, IsAbilityLevel = isAbilityLevel });
@@ -140,7 +141,7 @@ namespace XP
 
         private void Unfreeze()
         {
-            Time.timeScale = 1f;
+            GameFreezeController.ReleaseFreeze(FreezeReason);
         }
 
         private void EmitExperienceChanged()

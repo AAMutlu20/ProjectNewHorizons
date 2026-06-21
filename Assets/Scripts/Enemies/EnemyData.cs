@@ -27,6 +27,7 @@ namespace Enemies
         // normal enemies. Applied once at spawn, on top of DifficultyParams.
         private const float MinibossStatMultiplier = 1.5f;
         private const float MinibossXpMultiplier = 1.5f;
+        private const float BleedTickInterval = 1f; // matches the project's per-second DOT convention
 
         public EnemyType Type;
         public EnemyTypeSo TypeSo; // SO reference for stats — read-only at runtime
@@ -91,6 +92,15 @@ namespace Enemies
         public float SlowMultiplier;
         public float SlowTimer;
 
+        // Bleed DOT (e.g. Cleaving Attacks): unlike Weaken/Slow/Buff, this
+        // ACTIVELY deals damage rather than just modifying a multiplier —
+        // BehaviourController.TickBleed calls EnemyView.TakeDamage directly
+        // when BleedTickTimer elapses. BleedDamagePerSecond is a percent of
+        // THIS enemy's own MaxHp per second, matching the doc's "%maxhp/s".
+        public float BleedDamagePercentPerSecond;
+        public float BleedTimer;
+        public float BleedTickTimer;
+
         // Rolled once at spawn, then held constant — gives same-type enemies a bit of
         // individual variation instead of moving in perfect lockstep as a single mass.
         // Re-rolling these per frame would look like jitter; rolling once gives each
@@ -139,6 +149,9 @@ namespace Enemies
                 WeakenTimer = 0f,
                 SlowMultiplier = 1f,
                 SlowTimer = 0f,
+                BleedDamagePercentPerSecond = 0f,
+                BleedTimer = 0f,
+                BleedTickTimer = 0f,
                 // ±12° (≈0.21 rad) — enough to break up a "wall of arrows" funnel effect
                 // without enemies visibly missing the player or looking uncoordinated.
                 SeekAngleJitter = Random.Range(-0.21f, 0.21f),
@@ -153,6 +166,7 @@ namespace Enemies
         public bool IsBuffed => BuffTimer > 0f;
         public bool IsWeakened => WeakenTimer > 0f;
         public bool IsSlowed => SlowTimer > 0f;
+        public bool IsBleeding => BleedTimer > 0f;
 
         /// <summary>Applies or refreshes a timed buff. Called by buff-source abilities (e.g. EyeWinged's pulse).</summary>
         public void ApplyBuff(float multiplier, float durationSeconds)
@@ -197,6 +211,20 @@ namespace Enemies
                 SlowTimer = durationSeconds;
         }
 
+        /// <summary>
+        /// Applies or refreshes bleed (e.g. Cleaving Attacks). Takes the
+        /// STRONGER percent-per-second rate if already bleeding, same
+        /// "don't downgrade" rule as Weaken/Slow. Does not reset the tick
+        /// timer, so re-applying bleed mid-tick doesn't delay the next tick.
+        /// </summary>
+        public void ApplyBleed(float damagePercentPerSecond, float durationSeconds)
+        {
+            if (damagePercentPerSecond > BleedDamagePercentPerSecond)
+                BleedDamagePercentPerSecond = damagePercentPerSecond;
+            if (durationSeconds > BleedTimer)
+                BleedTimer = durationSeconds;
+        }
+
         /// <summary>Call once per tick from BehaviourController to decay an active buff.</summary>
         public void TickBuff(float deltaTime)
         {
@@ -225,6 +253,33 @@ namespace Enemies
             SlowTimer -= deltaTime;
             if (SlowTimer <= 0f)
                 SlowMultiplier = 1f;
+        }
+
+        /// <summary>
+        /// Decays the bleed duration and its internal tick timer. Returns
+        /// true exactly on the frame a damage tick should be applied — the
+        /// CALLER (BehaviourController) is responsible for actually dealing
+        /// the damage via EnemyView.TakeDamage, since EnemyData itself has
+        /// no reference back to EnemyView.
+        /// </summary>
+        public bool TickBleed(float deltaTime, out float tickDamage)
+        {
+            tickDamage = 0f;
+            if (BleedTimer <= 0f) return false;
+
+            BleedTimer -= deltaTime;
+            if (BleedTimer <= 0f)
+            {
+                BleedDamagePercentPerSecond = 0f;
+                return false;
+            }
+
+            BleedTickTimer -= deltaTime;
+            if (BleedTickTimer > 0f) return false;
+
+            BleedTickTimer = BleedTickInterval;
+            tickDamage = MaxHp * BleedDamagePercentPerSecond * BleedTickInterval;
+            return true;
         }
     }
 }

@@ -16,6 +16,10 @@ namespace Player
     /// the hit entirely before damage or i-frames are even considered —
     /// per the design doc, the shield "blocks any damage they will receive."
     ///
+    /// Heal and IncreaseMaxHpPermanently are public so melee enchants (e.g.
+    /// Lifesteal) and other systems can call them directly without needing
+    /// their own parallel healing implementation.
+    ///
     /// Attach to: PlayerRoot alongside PlayerController, StatSheet, and
     /// DarkShieldController (DarkShieldController is optional — not every
     /// build of the player needs it granted).
@@ -129,9 +133,21 @@ namespace Player
                 Die();
         }
 
-        private void Heal(float amount)
+        /// <summary>Heals the player by amount, clamped to MaxHp. Public so abilities/enchants (e.g. Lifesteal) can call it directly.</summary>
+        public void Heal(float amount)
         {
             _currentHp = Mathf.Min(MaxHp, _currentHp + amount);
+            EmitHealthChanged();
+        }
+
+        /// <summary>
+        /// Permanently raises baseMaxHp (e.g. Lifesteal's Legendary tier).
+        /// Distinct from Heal — this raises the ceiling itself, not just
+        /// current HP toward an existing ceiling.
+        /// </summary>
+        public void IncreaseMaxHpPermanently(float amount)
+        {
+            baseMaxHp += amount;
             EmitHealthChanged();
         }
 

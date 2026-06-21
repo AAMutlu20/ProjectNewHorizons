@@ -69,6 +69,13 @@ namespace Enemies
             enemy.TickWeaken(deltaTime);
             enemy.TickSlow(deltaTime);
 
+            // Bleed can kill on its own tick (e.g. a low-HP enemy bleeding out) —
+            // re-check IsAlive afterward since TakeDamage may have set State
+            // to Dying, in which case the rest of this frame's logic must not run.
+            if (enemy.TickBleed(deltaTime, out var bleedDamage))
+                _view.TakeDamage(bleedDamage);
+            if (!enemy.IsAlive) return;
+
             // Ambient abilities (summoning, buff pulses, etc.) run regardless of
             // distance to the player — unlike attacks, which are range-gated below.
             _periodicAbility?.TickAbility(ref enemy, deltaTime);

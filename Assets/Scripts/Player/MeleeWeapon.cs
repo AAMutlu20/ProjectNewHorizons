@@ -18,6 +18,9 @@ namespace Player
     /// Damage, swing speed, and critical strikes are sourced from StatSheet —
     /// see the design doc's Attack Damage / Attack Speed / Critical Strike stats.
     ///
+    /// Melee enchants (Cleaving Attacks, Lifesteal, Knockback) are discovered as
+    /// sibling IMeleeEnchant components and called automatically — see IMeleeEnchant.
+    ///
     /// Attach to: a child GameObject of PlayerRoot (e.g. "MeleeAura"), with a
     /// SphereCollider or CapsuleCollider set to IsTrigger = true.
     /// </summary>
@@ -39,10 +42,11 @@ namespace Player
         [SerializeField] private float baseDamage = 5f;
 
         [Header("Knockback")]
-        [SerializeField] private float knockbackForce = 4f;
+        [SerializeField] private float baseKnockbackForce = 4f;
         [SerializeField] private float knockbackDuration = 0.2f;
 
         private StatSheet _statSheet;
+        private IMeleeEnchant[] _enchants;
 
         // Countdown to the next swing. Starts at baseSwingInterval so there's
         // no instant free hit the moment the weapon is enabled.
@@ -63,9 +67,28 @@ namespace Player
         private float CurrentSwingInterval =>
             baseSwingInterval / (1f + _statSheet.GetTotal(StatType.AttackSpeed) / PercentToFraction);
 
+        private float CurrentKnockbackForce()
+        {
+            // If a Knockback enchant is granted, it defines the TOTAL force for
+            // that tier (per the doc's KnockbackIs values reading as totals, not
+            // additive bonuses) — it overrides baseKnockbackForce rather than
+            // adding to it. Multiple enchants overriding would be a misconfiguration;
+            // the last one found wins, since only one Knockback enchant should
+            // ever be attached.
+            foreach (var enchant in _enchants)
+            {
+                var overrideForce = enchant.GetKnockbackForceOverride();
+                if (overrideForce.HasValue)
+                    return overrideForce.Value;
+            }
+
+            return baseKnockbackForce;
+        }
+
         private void Awake()
         {
             _statSheet = GetComponentInParent<StatSheet>();
+            _enchants = GetComponents<IMeleeEnchant>();
 
             var col = GetComponent<Collider>();
             if (!col.isTrigger)
@@ -104,6 +127,9 @@ namespace Player
         {
             _isSwinging = false;
             _timeToNextSwing = CurrentSwingInterval;
+
+            foreach (var enchant in _enchants)
+                enchant.OnSwingComplete(_hitThisSwing.Count);
         }
 
         private void DamageEveryoneInRange()
@@ -120,8 +146,11 @@ namespace Player
             if (_hitThisSwing.Contains(enemy)) return;
 
             var damage = RollDamage();
-            enemy.TakeDamage(damage, transform.position, knockbackForce, knockbackDuration);
+            enemy.TakeDamage(damage, transform.position, CurrentKnockbackForce(), knockbackDuration);
             _hitThisSwing.Add(enemy);
+
+            foreach (var enchant in _enchants)
+                enchant.OnMeleeHit(enemy, damage, transform.position);
         }
 
         private float RollDamage()

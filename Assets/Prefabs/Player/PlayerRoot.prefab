@@ -66,10 +66,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 250c6d192b844554aaa90e87cbb4f77c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player.MeleeWeapon
-  swingInterval: 1
+  baseSwingInterval: 1
   swingActiveDuration: 0.2
-  damage: 5
-  knockbackForce: 3
+  baseDamage: 5
+  baseKnockbackForce: 4
   knockbackDuration: 0.2
 --- !u!1 &6955145415990806990
 GameObject:
@@ -83,6 +83,8 @@ GameObject:
   - component: {fileID: 6569945976528704555}
   - component: {fileID: 5036581919655227542}
   - component: {fileID: 3460304846283416259}
+  - component: {fileID: 6188529409620670152}
+  - component: {fileID: 9001983333979278165}
   m_Layer: 7
   m_Name: PlayerRoot
   m_TagString: Untagged
@@ -146,7 +148,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cfa3f1b5e29833429d785a43c22b19d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player.PlayerController
-  moveSpeed: 6
+  baseMoveSpeed: 6
   moveAction: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   useMobileInput: 0
 --- !u!114 &3460304846283416259
@@ -161,8 +163,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c15c213ab9dbb14cac7081aaa5b19ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player.PlayerHealth
-  maxHp: 100
+  baseMaxHp: 200
   iFrameDuration: 0.5
+--- !u!114 &6188529409620670152
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6955145415990806990}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89eff80a0f1a8594da409e755fc7d3b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Stats.StatSheet
+--- !u!114 &9001983333979278165
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6955145415990806990}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f13a6aff73bb1264ba102f56bb112797, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Player.SlowEffectController
 --- !u!1 &8070881957287425590
 GameObject:
   m_ObjectHideFlags: 0
@@ -230,7 +256,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 80640465f3c39ce4a90e46e32a4748a5, type: 2}
+  - {fileID: 2100000, guid: c21898f0a873dc24d9816fd75f47080b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

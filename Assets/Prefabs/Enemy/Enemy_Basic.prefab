@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7411379810358643514}
   - component: {fileID: 3424364851886732031}
   - component: {fileID: 5823625726690736022}
+  - component: {fileID: 1739128886419745133}
   m_Layer: 8
   m_Name: Enemy_Basic
   m_TagString: Untagged
@@ -88,6 +89,22 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1739128886419745133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1886500714260005098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06cdaf694c7e98444881b3f03854f211, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VFX.EnemyGlowController
+  modelRenderer: {fileID: 3779256831268441747}
+  minibossGlowIntensity: 1.5
+  buffedGlowIntensity: 1
+  fadeSpeed: 4
 --- !u!1 &8354537584274273573
 GameObject:
   m_ObjectHideFlags: 0
@@ -155,7 +172,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 08fc9efb6780b35449d1050c2286c028, type: 2}
+  - {fileID: 2100000, guid: cdeb1014c7f3d364e935ac42daa5f365, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
