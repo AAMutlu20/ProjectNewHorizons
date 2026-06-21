@@ -32,11 +32,9 @@ namespace Enemies
 
         private BehaviourController _behaviour;
         private EnemyState _lastState;
-        private int _lastAttackId;
 
         // Animator parameter hashes — cache them, string lookup is slow
         private static readonly int AnimState = Animator.StringToHash("State");
-        private static readonly int AnimAttackId = Animator.StringToHash("AttackId");
         private static readonly int AnimDead = Animator.StringToHash("Dead");
 
         private void Awake()
@@ -79,13 +77,8 @@ namespace Enemies
             _behaviour.Grid = grid;
             _behaviour.ActiveEnemies = activeList;
 
-            if (animator)
-            {
-                animator.SetInteger(AnimState, (int)EnemyState.Spawning);
-                animator.SetInteger(AnimAttackId, 0);
-            }
+            if (animator) animator.SetInteger(AnimState, (int)EnemyState.Spawning);
             _lastState = EnemyState.Spawning;
-            _lastAttackId = 0;
 
             if (_data.Type == EnemyType.Boss)
                 EmitBossHealthChanged();
@@ -118,7 +111,14 @@ namespace Enemies
                     transform.rotation = targetRotation;
             }
 
-            UpdateAnimatorParameters();
+            // Drive Animator only when state changes — avoids SetInteger every frame
+            if (animator && _data.State != _lastState)
+            {
+                animator.SetInteger(AnimState, (int)_data.State);
+                if (_data.State == EnemyState.Dying)
+                    animator.SetTrigger(AnimDead);
+                _lastState = _data.State;
+            }
 
             // Return to pool after death animation finishes
             // For graybox: return immediately on death. With animator: check normalizedTime.
@@ -127,36 +127,6 @@ namespace Enemies
                            animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f;
             if (animDone)
                 Pool.Return(this);
-        }
-
-        /// <summary>
-        /// Drives the Animator only when State or AttackId actually changes —
-        /// avoids calling SetInteger every frame. AttackId lets archetypes with
-        /// multiple distinct attacks (e.g. Boss: slam vs line-shot) branch to
-        /// the correct clip in the Animator Controller instead of all attacks
-        /// sharing one generic "Attacking" animation.
-        /// </summary>
-        private void UpdateAnimatorParameters()
-        {
-            if (!animator) return;
-
-            var stateChanged = _data.State != _lastState;
-            var attackIdChanged = _data.AttackId != _lastAttackId;
-            if (!stateChanged && !attackIdChanged) return;
-
-            if (stateChanged)
-            {
-                animator.SetInteger(AnimState, (int)_data.State);
-                if (_data.State == EnemyState.Dying)
-                    animator.SetTrigger(AnimDead);
-                _lastState = _data.State;
-            }
-
-            if (attackIdChanged)
-            {
-                animator.SetInteger(AnimAttackId, _data.AttackId);
-                _lastAttackId = _data.AttackId;
-            }
         }
 
         // Damage
@@ -171,7 +141,12 @@ namespace Enemies
         {
             if (!_data.IsAlive) return;
 
-            _data.Hp -= amount;
+            // Weaken applies here, at the single chokepoint every damage source
+            // already passes through — melee, abilities, and any future source
+            // all get the multiplier applied identically, with no per-source
+            // special-casing needed.
+            var weakenedAmount = amount * _data.WeakenMultiplier;
+            _data.Hp -= weakenedAmount;
 
             if (knockbackForce > 0f)
             {

@@ -74,6 +74,14 @@ namespace Enemies
         public float BuffMultiplier;
         public float BuffTimer;
 
+        // Weaken debuff (e.g. Laser Beam): increases damage taken from EVERY
+        // source — melee, abilities, even other enemies' splash — since it's
+        // applied at the single TakeDamage chokepoint in EnemyView rather
+        // than at each individual damage source. Expressed as a multiplier
+        // (1.10 = take 10% more damage), defaulting to 1 (no effect).
+        public float WeakenMultiplier;
+        public float WeakenTimer;
+
         // Rolled once at spawn, then held constant — gives same-type enemies a bit of
         // individual variation instead of moving in perfect lockstep as a single mass.
         // Re-rolling these per frame would look like jitter; rolling once gives each
@@ -118,6 +126,8 @@ namespace Enemies
                 IsMiniboss = isMiniboss,
                 BuffMultiplier = 1f,
                 BuffTimer = 0f,
+                WeakenMultiplier = 1f,
+                WeakenTimer = 0f,
                 // ±12° (≈0.21 rad) — enough to break up a "wall of arrows" funnel effect
                 // without enemies visibly missing the player or looking uncoordinated.
                 SeekAngleJitter = Random.Range(-0.21f, 0.21f),
@@ -130,6 +140,7 @@ namespace Enemies
         public bool IsKnockedBack => KnockbackTimer > 0f;
         public bool IsStunned => StunTimer > 0f;
         public bool IsBuffed => BuffTimer > 0f;
+        public bool IsWeakened => WeakenTimer > 0f;
 
         /// <summary>Applies or refreshes a timed buff. Called by buff-source abilities (e.g. EyeWinged's pulse).</summary>
         public void ApplyBuff(float multiplier, float durationSeconds)
@@ -145,6 +156,20 @@ namespace Enemies
                 StunTimer = durationSeconds;
         }
 
+        /// <summary>
+        /// Applies or refreshes a weaken debuff (e.g. Laser Beam). If already
+        /// weakened, takes the STRONGER of the two multipliers rather than
+        /// just resetting the timer — being hit by two different weaken
+        /// sources should apply the bigger one, not silently downgrade it.
+        /// </summary>
+        public void ApplyWeaken(float multiplier, float durationSeconds)
+        {
+            if (multiplier > WeakenMultiplier)
+                WeakenMultiplier = multiplier;
+            if (durationSeconds > WeakenTimer)
+                WeakenTimer = durationSeconds;
+        }
+
         /// <summary>Call once per tick from BehaviourController to decay an active buff.</summary>
         public void TickBuff(float deltaTime)
         {
@@ -153,6 +178,16 @@ namespace Enemies
             BuffTimer -= deltaTime;
             if (BuffTimer <= 0f)
                 BuffMultiplier = 1f;
+        }
+
+        /// <summary>Call once per tick from BehaviourController to decay an active weaken debuff.</summary>
+        public void TickWeaken(float deltaTime)
+        {
+            if (WeakenTimer <= 0f) return;
+
+            WeakenTimer -= deltaTime;
+            if (WeakenTimer <= 0f)
+                WeakenMultiplier = 1f;
         }
     }
 }

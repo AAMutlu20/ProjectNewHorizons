@@ -41,6 +41,13 @@ namespace VFX
             _onComplete = onComplete;
 
             if (ringFillImage) ringFillImage.fillAmount = 0f;
+
+            EventBus.Emit(new AoeTelegraphStartedEvent
+            {
+                Position = worldPosition,
+                Radius = radius,
+                Duration = durationSeconds,
+            });
         }
 
         private void Update()
@@ -66,6 +73,14 @@ namespace VFX
             EventBus.Emit(new AoeTelegraphCompleteEvent { Position = transform.position, Radius = _radius });
             Pool.Return(this);
         }
+    }
+
+    /// <summary>Emitted the moment a telegraph ring begins — used to start matching "incoming" VFX (e.g. a falling meteor streak).</summary>
+    public struct AoeTelegraphStartedEvent
+    {
+        public Vector3 Position;
+        public float Radius;
+        public float Duration;
     }
 
     /// <summary>Emitted when a telegraph ring finishes filling — the AOE effect should land now.</summary>

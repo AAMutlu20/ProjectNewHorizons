@@ -66,6 +66,7 @@ namespace Enemies
             if (enemy.IsStunned) { enemy.Velocity = Vector3.zero; return; }
 
             enemy.TickBuff(deltaTime);
+            enemy.TickWeaken(deltaTime);
 
             // Ambient abilities (summoning, buff pulses, etc.) run regardless of
             // distance to the player — unlike attacks, which are range-gated below.
