@@ -764,9 +764,9 @@ MonoBehaviour:
   laserBeamZonePool: {fileID: 326629443}
   playerTransform: {fileID: 1205439592}
   laserBeamEntry: {fileID: 0}
-  coneOfFireDefinition: {fileID: 0}
-  coneOfFireResidualPool: {fileID: 0}
-  playerController: {fileID: 0}
+  coneOfFireDefinition: {fileID: 11400000, guid: 3bb801a9edb450243b7182f72ca8fbb0, type: 2}
+  coneOfFireResidualPool: {fileID: 2062740777}
+  playerController: {fileID: 1205439585}
   coneOfFireEntry: {fileID: 0}
 --- !u!1 &1153906214
 GameObject:
@@ -812,6 +812,17 @@ Transform:
   - {fileID: 2062740776}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1205439585 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1134146142326819542, guid: 982c915fe6cb7b54fbed5faba0fa6461, type: 3}
+  m_PrefabInstance: {fileID: 8488075931304306164}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3cfa3f1b5e29833429d785a43c22b19d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Player.PlayerController
 --- !u!114 &1205439587 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4969071804314949550, guid: 982c915fe6cb7b54fbed5faba0fa6461, type: 3}
