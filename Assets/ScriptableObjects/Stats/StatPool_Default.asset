@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a52eecedbc1f034a901926689e20172, type: 3}
+  m_Name: StatPool_Default
+  m_EditorClassIdentifier: Assembly-CSharp::Stats.StatPoolSo
+  availableStats:
+  - {fileID: 11400000, guid: 935556af48c21bc40bc2d558f85811e8, type: 2}
+  - {fileID: 11400000, guid: 4656d4f872502cc45a58ec9cbac528bb, type: 2}
+  - {fileID: 11400000, guid: 05c1fcd1dc985a540a9946849acf549a, type: 2}
+  - {fileID: 11400000, guid: ddba356b08b81e9458ba9d263d7bcf74, type: 2}
+  - {fileID: 11400000, guid: a13f79b4a96f32e4182a10ee08c5c576, type: 2}
+  - {fileID: 11400000, guid: 7922341588dac5649bea1672832bc400, type: 2}
+  - {fileID: 11400000, guid: 46a204b78546dc145acaa265167b3cf3, type: 2}
+  - {fileID: 11400000, guid: 8b5dbeb7a7cfbe3488b5340713b58b1e, type: 2}
+  - {fileID: 11400000, guid: a43dbb8de3839a44da3a6d7be96b5ff0, type: 2}
+  - {fileID: 11400000, guid: 8b1d6c62ee7d0ae4e9956acf746915ec, type: 2}
+  - {fileID: 11400000, guid: 4b72aeacf133448498def44d172ea66f, type: 2}
+  - {fileID: 11400000, guid: e737173172bf4d74082c8637dc6c6487, type: 2}

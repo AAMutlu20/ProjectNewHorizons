@@ -7,13 +7,18 @@ namespace Enemies
     /// attacking by contact. attackRange on the EnemyTypeSo should be set
     /// large (effectively the Eye's firing range) since this never melees.
     ///
+    /// Reads the projectile pool from BehaviourController.ProjectilePool
+    /// (injected by EnemyPool at spawn time) rather than its own
+    /// [SerializeField] -- a prefab asset can't reference EnemyProjectilePool
+    /// directly since that pool lives in the scene, not as an asset. Wire the
+    /// pool on EnemyPool itself instead (see EnemyPool's Inspector).
+    ///
     /// Attach to: the EyeWinged prefab, alongside BehaviourController,
     /// instead of MeleeAttackBehaviour.
     /// </summary>
     [RequireComponent(typeof(BehaviourController))]
     public class EyeRangedAttackBehaviour : MonoBehaviour, IEnemyAttackBehaviour
     {
-        [SerializeField] private EnemyProjectilePool projectilePool;
         [SerializeField] private float projectileSpeed = 12f;
         [SerializeField] private float projectileLifetime = 5f;
 
@@ -22,7 +27,6 @@ namespace Enemies
         private void Awake()
         {
             _behaviour = GetComponent<BehaviourController>();
-            Debug.Assert(projectilePool, "EyeRangedAttackBehaviour: projectilePool not assigned.", this);
         }
 
         public void TickAttack(ref EnemyData enemy, float deltaTime)
@@ -41,8 +45,15 @@ namespace Enemies
         {
             if (!_behaviour.PlayerTransform) return;
 
+            if (!_behaviour.ProjectilePool)
+            {
+                Debug.LogError("EyeRangedAttackBehaviour: BehaviourController.ProjectilePool is not set -- " +
+                                "wire projectilePool on EnemyPool in the scene.", this);
+                return;
+            }
+
             var direction = (_behaviour.PlayerTransform.position - enemy.Position).normalized;
-            projectilePool.Fire(enemy.Position, direction, projectileSpeed, enemy.Damage, projectileLifetime);
+            _behaviour.ProjectilePool.Fire(enemy.Position, direction, projectileSpeed, enemy.Damage, projectileLifetime);
         }
     }
 }

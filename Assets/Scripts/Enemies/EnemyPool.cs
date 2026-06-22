@@ -23,6 +23,13 @@ namespace Enemies
         [SerializeField] private Transform  playerTransform;
         [SerializeField] private SpatialGrid spatialGrid;
 
+        [Header("Shared pools (for archetypes that need ranged attacks/telegraphs)")]
+        [Tooltip("Wired here, not on individual enemy prefabs, since a prefab asset " +
+                 "can't reference a scene object directly. EnemyPool (itself a scene " +
+                 "object) holds the reference and forwards it to each spawned enemy.")]
+        [SerializeField] private EnemyProjectilePool projectilePool;
+        [SerializeField] private VFX.AoeTelegraphRingPool telegraphPool;
+
         // Pool storage per type
         private Dictionary<EnemyType, Queue<EnemyView>> _inactive;
 
@@ -131,7 +138,8 @@ namespace Enemies
             if (!so) return null;
 
             view.gameObject.SetActive(true);
-            view.Init(so, _currentDiff, worldPos, playerTransform, spatialGrid, _active, isMiniboss);
+            view.Init(so, _currentDiff, worldPos, playerTransform, spatialGrid, _active, isMiniboss,
+                projectilePool, telegraphPool);
             _active.Add(view);
             return view;
         }

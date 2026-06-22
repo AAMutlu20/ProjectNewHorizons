@@ -1,15 +1,20 @@
 using Core;
 using UnityEngine;
-using VFX;
 
 namespace Enemies
 {
     /// <summary>
     /// Boss attack: alternates between two telegraphed AOE patterns per the
-    /// design doc — a line of projectiles toward the player, and a ground
+    /// design doc -- a line of projectiles toward the player, and a ground
     /// slam centred on the boss. Both show a telegraph ring before landing.
     ///
-    /// Unlike other archetypes, this does NOT use enemy.AttackTimer/CanAttack —
+    /// Reads both pools from BehaviourController.ProjectilePool/TelegraphPool
+    /// (injected by EnemyPool at spawn time) rather than its own
+    /// [SerializeField]s -- a prefab asset can't reference EnemyProjectilePool
+    /// or AoeTelegraphRingPool directly since both live in the scene, not as
+    /// assets. Wire both pools on EnemyPool itself instead.
+    ///
+    /// Unlike other archetypes, this does NOT use enemy.AttackTimer/CanAttack --
     /// the boss's pace is driven by its own attackCycleInterval, since it has
     /// two distinct attacks to alternate between rather than one repeating hit.
     ///
@@ -21,7 +26,7 @@ namespace Enemies
     /// actually lands. If useAnimationEventForRelease is enabled (once a real
     /// rig exists), the telegraph still plays for its full duration as visual
     /// warning, but the damage/projectile effect waits for OnAttackAnimationEvent
-    /// instead — so it lands exactly on the swing/impact frame of the clip
+    /// instead -- so it lands exactly on the swing/impact frame of the clip
     /// rather than on a flat timer.
     ///
     /// Attach to: the Boss prefab, alongside BehaviourController, instead of
@@ -51,14 +56,12 @@ namespace Enemies
         [SerializeField] private float animationEventTimeoutSeconds = 3f;
 
         [Header("Line attack")]
-        [SerializeField] private EnemyProjectilePool projectilePool;
         [SerializeField] private int lineProjectileCount = 5;
         [SerializeField] private float lineProjectileSpacing = 1.5f;
         [SerializeField] private float lineProjectileSpeed = 14f;
         [SerializeField] private float lineTelegraphRadius = 1f;
 
         [Header("Ground slam")]
-        [SerializeField] private AoeTelegraphRingPool telegraphPool;
         [SerializeField] private float slamRadius = 8f;
 
         private BehaviourController _behaviour;
@@ -101,7 +104,7 @@ namespace Enemies
             if (_pendingReleaseTimeoutTimer > 0f) return;
 
             Debug.LogWarning($"BossAttackBehaviour on '{name}': Animation Event '{ReleaseAnimationEventName}' " +
-                              "never fired before timeout — firing the attack effect anyway so the boss " +
+                              "never fired before timeout -- firing the attack effect anyway so the boss " +
                               "doesn't get stuck. Check the attack clip has the event authored correctly.", this);
 
             var effect = _pendingReleaseEffect;
@@ -140,22 +143,24 @@ namespace Enemies
 
         private void BeginGroundSlam(EnemyData enemy)
         {
-            if (!telegraphPool)
+            if (!_behaviour.TelegraphPool)
             {
-                Debug.LogError("BossAttackBehaviour: telegraphPool not assigned.", this);
+                Debug.LogError("BossAttackBehaviour: BehaviourController.TelegraphPool is not set -- " +
+                                "wire telegraphPool on EnemyPool in the scene.", this);
                 _isAttackInProgress = false;
                 return;
             }
 
-            telegraphPool.Begin(enemy.Position, telegraphDuration, slamRadius,
+            _behaviour.TelegraphPool.Begin(enemy.Position, telegraphDuration, slamRadius,
                 () => ResolveReleaseEffect(() => LandGroundSlam(enemy)));
         }
 
         private void BeginLineAttack(EnemyData enemy)
         {
-            if (!telegraphPool || !projectilePool)
+            if (!_behaviour.TelegraphPool || !_behaviour.ProjectilePool)
             {
-                Debug.LogError("BossAttackBehaviour: telegraphPool or projectilePool not assigned.", this);
+                Debug.LogError("BossAttackBehaviour: BehaviourController.TelegraphPool or ProjectilePool " +
+                                "is not set -- wire both on EnemyPool in the scene.", this);
                 _isAttackInProgress = false;
                 return;
             }
@@ -167,7 +172,7 @@ namespace Enemies
             }
 
             var directionToPlayer = (_behaviour.PlayerTransform.position - enemy.Position).normalized;
-            telegraphPool.Begin(enemy.Position, telegraphDuration, lineTelegraphRadius,
+            _behaviour.TelegraphPool.Begin(enemy.Position, telegraphDuration, lineTelegraphRadius,
                 () => ResolveReleaseEffect(() => FireProjectileLine(enemy, directionToPlayer)));
         }
 
@@ -209,7 +214,7 @@ namespace Enemies
             for (var i = 0; i < lineProjectileCount; i++)
             {
                 var spawnOffset = direction * (lineProjectileSpacing * i);
-                projectilePool.Fire(enemy.Position + spawnOffset, direction, lineProjectileSpeed, enemy.Damage, 5f);
+                _behaviour.ProjectilePool.Fire(enemy.Position + spawnOffset, direction, lineProjectileSpeed, enemy.Damage, 5f);
             }
 
             _isAttackInProgress = false;

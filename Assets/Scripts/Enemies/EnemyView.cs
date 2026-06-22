@@ -53,7 +53,7 @@ namespace Enemies
         /// <summary>Initialise this view with fresh data. Called immediately after Get() from pool.</summary>
         public void Init(EnemyTypeSo typeSo, DifficultyParams diff, Vector3 worldPos,
             Transform playerTransform, SpatialGrid grid, System.Collections.Generic.List<EnemyView> activeList,
-            bool isMiniboss = false)
+            bool isMiniboss = false, EnemyProjectilePool projectilePool = null, VFX.AoeTelegraphRingPool telegraphPool = null)
         {
             _data = EnemyData.Create(typeSo, diff, worldPos, isMiniboss);
             
@@ -76,6 +76,8 @@ namespace Enemies
             _behaviour.PlayerTransform = playerTransform;
             _behaviour.Grid = grid;
             _behaviour.ActiveEnemies = activeList;
+            _behaviour.ProjectilePool = projectilePool;
+            _behaviour.TelegraphPool = telegraphPool;
 
             if (animator) animator.SetInteger(AnimState, (int)EnemyState.Spawning);
             _lastState = EnemyState.Spawning;
