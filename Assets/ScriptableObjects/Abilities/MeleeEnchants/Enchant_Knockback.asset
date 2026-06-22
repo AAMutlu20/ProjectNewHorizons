@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cecee35c0896c445aa480b117e35ec9, type: 3}
+  m_Name: Enchant_Knockback
+  m_EditorClassIdentifier: Assembly-CSharp::Abilities.KnockbackDefinitionSo
+  displayName: Knockback
+  statsByRarity:
+  - KnockbackForce: 4
+  - KnockbackForce: 5
+  - KnockbackForce: 6
+  - KnockbackForce: 8

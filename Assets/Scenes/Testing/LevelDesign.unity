@@ -370,6 +370,52 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!1 &326629441
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 326629442}
+  - component: {fileID: 326629443}
+  m_Layer: 0
+  m_Name: LaserBeamZonePool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &326629442
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 326629441}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1153906215}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &326629443
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 326629441}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1bca9c233dee65489252e5b7e6db538, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VFX.LaserBeamZonePool
+  beamPrefab: {fileID: 1729661256916451311, guid: 2d8f9a004049a1b4c97456f1dc0e85bb, type: 3}
+  poolSize: 6
 --- !u!1 &560933938
 GameObject:
   m_ObjectHideFlags: 0
@@ -664,6 +710,64 @@ MonoBehaviour:
   spatialGrid: {fileID: 1854307704}
   projectilePool: {fileID: 2001496770}
   telegraphPool: {fileID: 723124716}
+--- !u!1 &1119508608
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1119508609}
+  - component: {fileID: 1119508610}
+  m_Layer: 0
+  m_Name: AbilityBootstrap
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1119508609
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1119508608}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1153906215}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1119508610
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1119508608}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8aae4b53dc011b3428adb94738fc2c79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Abilities.AbilityBootstrap
+  shockwaveDefinition: {fileID: 11400000, guid: 4a1fb76ed9925344c9ffc0da0ee83a7c, type: 2}
+  shockwaveEntry: {fileID: 0}
+  meteorSlamDefinition: {fileID: 11400000, guid: c196b48c5243b30459ffd2c57b7e1562, type: 2}
+  meteorSlamTelegraphPool: {fileID: 723124716}
+  meteorSlamLavaPoolPool: {fileID: 2062740777}
+  meteorSlamEntry: {fileID: 0}
+  laserBeamDefinition: {fileID: 11400000, guid: 00e6189d0c88db14bb4b229f0b3203e2, type: 2}
+  laserBeamZonePool: {fileID: 326629443}
+  playerTransform: {fileID: 1205439592}
+  laserBeamEntry: {fileID: 0}
+  coneOfFireDefinition: {fileID: 0}
+  coneOfFireResidualPool: {fileID: 0}
+  playerController: {fileID: 0}
+  coneOfFireEntry: {fileID: 0}
 --- !u!1 &1153906214
 GameObject:
   m_ObjectHideFlags: 0
@@ -693,16 +797,19 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 836117069}
   - {fileID: 1854307703}
   - {fileID: 1379580685}
   - {fileID: 1829396420}
   - {fileID: 1822844216}
+  - {fileID: 1119508609}
   - {fileID: 44553442}
   - {fileID: 1723545241}
   - {fileID: 1467669227}
+  - {fileID: 836117069}
   - {fileID: 2001496769}
   - {fileID: 723124715}
+  - {fileID: 326629442}
+  - {fileID: 2062740776}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1205439587 stripped
@@ -1282,6 +1389,52 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemies.EnemyProjectilePool
   projectilePrefab: {fileID: 1309321225790389675, guid: 19ad89a77aed9cc47a94327f666f7331, type: 3}
   poolSize: 64
+--- !u!1 &2062740775
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2062740776}
+  - component: {fileID: 2062740777}
+  m_Layer: 0
+  m_Name: DamageOverTimeZonePool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2062740776
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2062740775}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1153906215}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2062740777
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2062740775}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79d734ca0e4e8d84086429c773a943b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VFX.DamageOverTimeZonePool
+  zonePrefab: {fileID: 6465263947437841213, guid: 456cb1c95205d214893bbfd6514380e8, type: 3}
+  poolSize: 8
 --- !u!1001 &8488075931304306164
 PrefabInstance:
   m_ObjectHideFlags: 0

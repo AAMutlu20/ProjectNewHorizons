@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27b4d0cd66ef38a4d80c42c0cb50296c, type: 3}
+  m_Name: Ability_Shockwave
+  m_EditorClassIdentifier: Assembly-CSharp::Abilities.ShockwaveDefinitionSo
+  displayName: Shockwave
+  statsByRarity:
+  - Damage: 50
+    Radius: 15
+    Cooldown: 5
+    StunDuration: 0.2
+  - Damage: 150
+    Radius: 25
+    Cooldown: 4
+    StunDuration: 0.8
+  - Damage: 200
+    Radius: 30
+    Cooldown: 4
+    StunDuration: 1.2
+  - Damage: 300
+    Radius: 45
+    Cooldown: 4
+    StunDuration: 2

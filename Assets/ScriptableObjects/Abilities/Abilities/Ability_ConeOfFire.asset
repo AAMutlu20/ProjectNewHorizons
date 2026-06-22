@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be0a7fd8b1e2fa140b15a9acb8ad1155, type: 3}
+  m_Name: Ability_ConeOfFire
+  m_EditorClassIdentifier: Assembly-CSharp::Abilities.ConeOfFireDefinitionSo
+  displayName: Cone of Fire
+  statsByRarity:
+  - Damage: 20
+    Range: 10
+    Cooldown: 8
+    ResidualDamagePerSecond: 10
+    ResidualDuration: 10
+  - Damage: 40
+    Range: 11
+    Cooldown: 7
+    ResidualDamagePerSecond: 20
+    ResidualDuration: 5
+  - Damage: 60
+    Range: 12
+    Cooldown: 6
+    ResidualDamagePerSecond: 40
+    ResidualDuration: 4
+  - Damage: 80
+    Range: 13
+    Cooldown: 5
+    ResidualDamagePerSecond: 60
+    ResidualDuration: 3

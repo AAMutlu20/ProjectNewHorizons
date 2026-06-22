@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8cddd6e4bde7eed4d96ee7e695853440, type: 3}
+  m_Name: Ability_MeteorSlam
+  m_EditorClassIdentifier: Assembly-CSharp::Abilities.MeteorSlamDefinitionSo
+  displayName: Meteor Slam
+  statsByRarity:
+  - Damage: 200
+    ImpactRadius: 10
+    Cooldown: 15
+    LavaPoolDamagePercentPerSecond: 0
+    LavaPoolRange: 0
+    LavaPoolDuration: 0
+  - Damage: 300
+    ImpactRadius: 10
+    Cooldown: 14
+    LavaPoolDamagePercentPerSecond: 0
+    LavaPoolRange: 0
+    LavaPoolDuration: 0
+  - Damage: 400
+    ImpactRadius: 15
+    Cooldown: 13
+    LavaPoolDamagePercentPerSecond: 0.1
+    LavaPoolRange: 12
+    LavaPoolDuration: 6
+  - Damage: 600
+    ImpactRadius: 20
+    Cooldown: 12
+    LavaPoolDamagePercentPerSecond: 0.1
+    LavaPoolRange: 18
+    LavaPoolDuration: 6
