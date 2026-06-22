@@ -23,25 +23,24 @@ namespace Abilities
     {
         [Header("Shockwave")]
         [SerializeField] private ShockwaveDefinitionSo shockwaveDefinition;
-        [SerializeField] private CooldownAbilityChoiceEntry<ShockwaveStats> shockwaveEntry;
+        [SerializeField] private ShockwaveChoiceEntry shockwaveEntry;
 
         [Header("Meteor Slam")]
         [SerializeField] private MeteorSlamDefinitionSo meteorSlamDefinition;
         [SerializeField] private AoeTelegraphRingPool meteorSlamTelegraphPool;
         [SerializeField] private DamageOverTimeZonePool meteorSlamLavaPoolPool;
-        [SerializeField] private CooldownAbilityChoiceEntry<MeteorSlamStats> meteorSlamEntry;
+        [SerializeField] private MeteorSlamChoiceEntry meteorSlamEntry;
 
         [Header("Laser Beam")]
         [SerializeField] private LaserBeamDefinitionSo laserBeamDefinition;
         [SerializeField] private LaserBeamZonePool laserBeamZonePool;
         [SerializeField] private Transform playerTransform;
-        [SerializeField] private CooldownAbilityChoiceEntry<LaserBeamStats> laserBeamEntry;
+        [SerializeField] private LaserBeamChoiceEntry laserBeamEntry;
 
         [Header("Cone of Fire")]
         [SerializeField] private ConeOfFireDefinitionSo coneOfFireDefinition;
-        [SerializeField] private DamageOverTimeZonePool coneOfFireResidualPool;
         [SerializeField] private Player.PlayerController playerController;
-        [SerializeField] private CooldownAbilityChoiceEntry<ConeOfFireStats> coneOfFireEntry;
+        [SerializeField] private ConeOfFireChoiceEntry coneOfFireEntry;
 
         private void Awake()
         {
@@ -92,13 +91,13 @@ namespace Abilities
 
         private void ConfigureConeOfFire()
         {
-            if (!coneOfFireDefinition || !coneOfFireResidualPool || !playerController || !coneOfFireEntry)
+            if (!coneOfFireDefinition || !playerController || !coneOfFireEntry)
             {
                 Debug.LogError("AbilityBootstrap: Cone of Fire dependencies not fully assigned.", this);
                 return;
             }
 
-            var ability = new ConeOfFireAbility(coneOfFireDefinition, coneOfFireResidualPool, playerController);
+            var ability = new ConeOfFireAbility(coneOfFireDefinition, playerController);
             coneOfFireEntry.Configure(ability,
                 stats => $"Damage: {stats.Damage:F0}  Range: {stats.Range:F0}");
         }

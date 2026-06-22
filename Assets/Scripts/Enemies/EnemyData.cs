@@ -101,6 +101,18 @@ namespace Enemies
         public float BleedTimer;
         public float BleedTickTimer;
 
+        // Burn DOT (Cone of Fire's residual fire): same mechanism as Bleed,
+        // but FLAT damage per second rather than a percent of max HP — the
+        // doc's Cone of Fire values (Damage: 20, ResidualDmg: 10) are clearly
+        // flat numbers in the same scale as a normal hit, not percentages,
+        // unlike Cleaving's bleed which is explicitly "%maxhp/s". Kept as its
+        // own separate timer/field set rather than reusing Bleed, since the
+        // two have genuinely different units and the doc never says a burning
+        // enemy can't also be bleeding from something else at the same time.
+        public float BurnDamagePerSecond;
+        public float BurnTimer;
+        public float BurnTickTimer;
+
         // Rolled once at spawn, then held constant — gives same-type enemies a bit of
         // individual variation instead of moving in perfect lockstep as a single mass.
         // Re-rolling these per frame would look like jitter; rolling once gives each
@@ -152,6 +164,9 @@ namespace Enemies
                 BleedDamagePercentPerSecond = 0f,
                 BleedTimer = 0f,
                 BleedTickTimer = 0f,
+                BurnDamagePerSecond = 0f,
+                BurnTimer = 0f,
+                BurnTickTimer = 0f,
                 // ±12° (≈0.21 rad) — enough to break up a "wall of arrows" funnel effect
                 // without enemies visibly missing the player or looking uncoordinated.
                 SeekAngleJitter = Random.Range(-0.21f, 0.21f),
@@ -167,6 +182,7 @@ namespace Enemies
         public bool IsWeakened => WeakenTimer > 0f;
         public bool IsSlowed => SlowTimer > 0f;
         public bool IsBleeding => BleedTimer > 0f;
+        public bool IsBurning => BurnTimer > 0f;
 
         /// <summary>Applies or refreshes a timed buff. Called by buff-source abilities (e.g. EyeWinged's pulse).</summary>
         public void ApplyBuff(float multiplier, float durationSeconds)
@@ -225,6 +241,19 @@ namespace Enemies
                 BleedTimer = durationSeconds;
         }
 
+        /// <summary>
+        /// Applies or refreshes burn (Cone of Fire's residual fire). Same
+        /// "don't downgrade, don't reset the tick timer" rules as ApplyBleed,
+        /// but FLAT damage per second rather than a percent of max HP.
+        /// </summary>
+        public void ApplyBurn(float damagePerSecond, float durationSeconds)
+        {
+            if (damagePerSecond > BurnDamagePerSecond)
+                BurnDamagePerSecond = damagePerSecond;
+            if (durationSeconds > BurnTimer)
+                BurnTimer = durationSeconds;
+        }
+
         /// <summary>Call once per tick from BehaviourController to decay an active buff.</summary>
         public void TickBuff(float deltaTime)
         {
@@ -279,6 +308,32 @@ namespace Enemies
 
             BleedTickTimer = BleedTickInterval;
             tickDamage = MaxHp * BleedDamagePercentPerSecond * BleedTickInterval;
+            return true;
+        }
+
+        /// <summary>
+        /// Decays the burn duration and its internal tick timer. Same shape
+        /// as TickBleed, but the resulting tickDamage is flat, not a percent
+        /// of MaxHp -- the caller (BehaviourController) still owns actually
+        /// dealing the damage via EnemyView.TakeDamage.
+        /// </summary>
+        public bool TickBurn(float deltaTime, out float tickDamage)
+        {
+            tickDamage = 0f;
+            if (BurnTimer <= 0f) return false;
+
+            BurnTimer -= deltaTime;
+            if (BurnTimer <= 0f)
+            {
+                BurnDamagePerSecond = 0f;
+                return false;
+            }
+
+            BurnTickTimer -= deltaTime;
+            if (BurnTickTimer > 0f) return false;
+
+            BurnTickTimer = BleedTickInterval; // same per-second tick cadence as bleed
+            tickDamage = BurnDamagePerSecond * BleedTickInterval;
             return true;
         }
     }

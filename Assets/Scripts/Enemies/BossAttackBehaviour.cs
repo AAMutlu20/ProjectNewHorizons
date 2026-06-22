@@ -1,20 +1,21 @@
 using Core;
 using UnityEngine;
+using VFX;
 
 namespace Enemies
 {
     /// <summary>
     /// Boss attack: alternates between two telegraphed AOE patterns per the
-    /// design doc -- a line of projectiles toward the player, and a ground
+    /// design doc — a line of projectiles toward the player, and a ground
     /// slam centred on the boss. Both show a telegraph ring before landing.
     ///
     /// Reads both pools from BehaviourController.ProjectilePool/TelegraphPool
     /// (injected by EnemyPool at spawn time) rather than its own
-    /// [SerializeField]s -- a prefab asset can't reference EnemyProjectilePool
+    /// [SerializeField]s — a prefab asset can't reference EnemyProjectilePool
     /// or AoeTelegraphRingPool directly since both live in the scene, not as
     /// assets. Wire both pools on EnemyPool itself instead.
     ///
-    /// Unlike other archetypes, this does NOT use enemy.AttackTimer/CanAttack --
+    /// Unlike other archetypes, this does NOT use enemy.AttackTimer/CanAttack —
     /// the boss's pace is driven by its own attackCycleInterval, since it has
     /// two distinct attacks to alternate between rather than one repeating hit.
     ///
@@ -26,7 +27,7 @@ namespace Enemies
     /// actually lands. If useAnimationEventForRelease is enabled (once a real
     /// rig exists), the telegraph still plays for its full duration as visual
     /// warning, but the damage/projectile effect waits for OnAttackAnimationEvent
-    /// instead -- so it lands exactly on the swing/impact frame of the clip
+    /// instead — so it lands exactly on the swing/impact frame of the clip
     /// rather than on a flat timer.
     ///
     /// Attach to: the Boss prefab, alongside BehaviourController, instead of
@@ -104,7 +105,7 @@ namespace Enemies
             if (_pendingReleaseTimeoutTimer > 0f) return;
 
             Debug.LogWarning($"BossAttackBehaviour on '{name}': Animation Event '{ReleaseAnimationEventName}' " +
-                              "never fired before timeout -- firing the attack effect anyway so the boss " +
+                              "never fired before timeout — firing the attack effect anyway so the boss " +
                               "doesn't get stuck. Check the attack clip has the event authored correctly.", this);
 
             var effect = _pendingReleaseEffect;

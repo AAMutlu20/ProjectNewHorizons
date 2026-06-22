@@ -85,6 +85,12 @@ namespace Enemies
                 _view.TakeDamage(bleedDamage);
             if (!enemy.IsAlive) return;
 
+            // Burn (Cone of Fire's residual fire) follows the exact same pattern
+            // as Bleed above, just a separate flat-damage DOT slot.
+            if (enemy.TickBurn(deltaTime, out var burnDamage))
+                _view.TakeDamage(burnDamage);
+            if (!enemy.IsAlive) return;
+
             // Ambient abilities (summoning, buff pulses, etc.) run regardless of
             // distance to the player — unlike attacks, which are range-gated below.
             _periodicAbility?.TickAbility(ref enemy, deltaTime);
