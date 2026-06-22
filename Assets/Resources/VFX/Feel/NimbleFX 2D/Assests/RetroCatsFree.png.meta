@@ -1,0 +1,797 @@
+fileFormatVersion: 2
+guid: 3ce6cfd911aea9049bb6508e71f92d20
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -3513057317577747854
+    second: RetroCatsFree_0
+  - first:
+      213: -257452214851007813
+    second: RetroCatsFree_1
+  - first:
+      213: 148183108384984710
+    second: RetroCatsFree_2
+  - first:
+      213: -7440523100793261235
+    second: RetroCatsFree_3
+  - first:
+      213: 8355702582816197484
+    second: RetroCatsFree_4
+  - first:
+      213: 2238565306757974126
+    second: RetroCatsFree_5
+  - first:
+      213: 5496264814403042477
+    second: RetroCatsFree_6
+  - first:
+      213: -9140735090286671063
+    second: RetroCatsFree_7
+  - first:
+      213: -5342742397969034934
+    second: RetroCatsFree_8
+  - first:
+      213: 8946715800184864353
+    second: RetroCatsFree_9
+  - first:
+      213: 5943617886987436761
+    second: RetroCatsFree_10
+  - first:
+      213: -8072563733219040548
+    second: RetroCatsFree_11
+  - first:
+      213: -582779016733915179
+    second: RetroCatsFree_12
+  - first:
+      213: 7663328776049652936
+    second: RetroCatsFree_13
+  - first:
+      213: -1805783546388002624
+    second: RetroCatsFree_14
+  - first:
+      213: 4818059489773563552
+    second: RetroCatsFree_15
+  - first:
+      213: -4257782857245500747
+    second: RetroCatsFree_16
+  - first:
+      213: 4145682809804341258
+    second: RetroCatsFree_17
+  - first:
+      213: -4898827618775093411
+    second: RetroCatsFree_18
+  - first:
+      213: 9162416404151209717
+    second: RetroCatsFree_19
+  - first:
+      213: 3341944901828079118
+    second: RetroCatsFree_20
+  - first:
+      213: -790707649625987976
+    second: RetroCatsFree_21
+  - first:
+      213: -1341020805189649248
+    second: RetroCatsFree_22
+  - first:
+      213: -5013348029207087494
+    second: RetroCatsFree_23
+  - first:
+      213: 7886210706918713977
+    second: RetroCatsFree_24
+  - first:
+      213: 8714344146856254220
+    second: RetroCatsFree_25
+  - first:
+      213: -7847950781208817348
+    second: RetroCatsFree_26
+  - first:
+      213: -7027294326915988025
+    second: RetroCatsFree_27
+  - first:
+      213: -5790358578401711450
+    second: RetroCatsFree_28
+  - first:
+      213: -1232591543157860750
+    second: RetroCatsFree_29
+  - first:
+      213: 1854935020090786876
+    second: RetroCatsFree_30
+  - first:
+      213: 5023261737801290226
+    second: RetroCatsFree_31
+  - first:
+      213: 3502842539200918625
+    second: RetroCatsFree_32
+  - first:
+      213: -2526682427006257968
+    second: RetroCatsFree_33
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 64
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Win64
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: RetroCatsFree_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 371
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f618cb63bacfe4e4db1d1e216360c438
+      internalID: -1880908825
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RetroCatsFree_1
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 371
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c427291f7bbe08e47b321b32aca0eac9
+      internalID: 1737900210
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RetroCatsFree_2
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 371
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 15ef23037160738458cce47373a9f6e7
+      internalID: 2024491628
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RetroCatsFree_3
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 371
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5783a0e310a965a49af73a4564dccc0a
+      internalID: -1115919229
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RetroCatsFree_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 307
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9815d8217369eea4689e80726874a4a9
+      internalID: 648919722
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RetroCatsFree_5
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 307
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2935047f241e6b34a8a1da01a7d0b57f
+      internalID: 627419360
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RetroCatsFree_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 243
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5d05eb840a0fd7e45b4cbc583d614855
+      internalID: 218060219
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RetroCatsFree_7
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 243
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5a3e77584103af34488bfe9124098ccb
+      internalID: -998485453
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RetroCatsFree_8
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 243
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1f67219363935d64f9214e088779619b
+      internalID: -650170200
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RetroCatsFree_9
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 243
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 74379407f48fb91489a563a141a08e15
+      internalID: 876030008
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RetroCatsFree_10
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 179
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 73014f8eaf21c584c971757af34320da
+      internalID: -1640355118
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RetroCatsFree_11
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 179
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9254f16b1125dba4c9a191b0be28f3b4
+      internalID: -1344046877
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RetroCatsFree_12
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 179
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1a4873d174570244ca5dbc8178caf7f1
+      internalID: 1264381809
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RetroCatsFree_13
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 179
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9593158dc230e6b45a5f362c863f557e
+      internalID: -2025835752
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RetroCatsFree_14
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 115
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1dc3dae0c6678ca448fd9fd1c3dcadbc
+      internalID: -1279740455
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RetroCatsFree_15
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 115
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 907c090409b95cb4193d211dcfae2720
+      internalID: 1429848204
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RetroCatsFree_16
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 115
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 14fba686376a3a84aad7d22664301c00
+      internalID: -1688871974
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RetroCatsFree_17
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 115
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5fd671a8780136844bea53fc54614233
+      internalID: 1910956167
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RetroCatsFree_18
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 51
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c4bd3c2e6e01b6f49a67bde04991067b
+      internalID: -376515189
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RetroCatsFree_19
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 51
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 747e573713f898d48a1f27d6bc73b6ab
+      internalID: 1557867465
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RetroCatsFree_20
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 51
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 39e00318ccbbe2246a2eeef2f30501cb
+      internalID: 1210518458
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RetroCatsFree_21
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 51
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6434a359584bd2549a55b8003e329621
+      internalID: 305194381
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 101a30416c7ed7548b2746c23fd678c8
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      RetroCatsFree_0: -1880908825
+      RetroCatsFree_1: 1737900210
+      RetroCatsFree_10: -1640355118
+      RetroCatsFree_11: -1344046877
+      RetroCatsFree_12: 1264381809
+      RetroCatsFree_13: -2025835752
+      RetroCatsFree_14: -1279740455
+      RetroCatsFree_15: 1429848204
+      RetroCatsFree_16: -1688871974
+      RetroCatsFree_17: 1910956167
+      RetroCatsFree_18: -376515189
+      RetroCatsFree_19: 1557867465
+      RetroCatsFree_2: 2024491628
+      RetroCatsFree_20: 1210518458
+      RetroCatsFree_21: 305194381
+      RetroCatsFree_3: -1115919229
+      RetroCatsFree_4: 648919722
+      RetroCatsFree_5: 627419360
+      RetroCatsFree_6: 218060219
+      RetroCatsFree_7: -998485453
+      RetroCatsFree_8: -650170200
+      RetroCatsFree_9: 876030008
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 325234
+  packageName: NimbleFX 2D
+  packageVersion: 1.0.0
+  assetPath: Assets/NimbleFX 2D/Assests/RetroCatsFree.png
+  uploadId: 796354
