@@ -74,6 +74,13 @@ namespace Waves
         {
             _elapsedGameTime += Time.deltaTime;
 
+            // Guards against TickCurrentPhase running before BeginFirstPhase's
+            // Invoke(delayBeforeFirstPhase) has actually fired -- without this,
+            // Update ticks every frame from scene start, including the very
+            // first frame, when _currentPhaseIndex is still its default -1
+            // (no phase has begun yet) and cycleConfig.phases[-1] throws.
+            if (_currentPhaseIndex < 0) return;
+
             if (_isWaitingToStartNextCycle)
             {
                 TickNextCycleDelay();
@@ -155,14 +162,17 @@ namespace Waves
             _currentDifficulty = difficultyScaler.Scale(_elapsedGameTime, _escalation);
             enemyPool.SetDifficulty(_currentDifficulty);
 
-            var spawnPosition = SpawnShape.GetPosition(
+            // RollCandidatePosition is also the RETRY function -- if EnemyPool's
+            // SpawnPositionResolver finds the first roll obstructed or ungrounded,
+            // it calls this again for a fresh candidate on the same ring.
+            Vector3 RollCandidatePosition() => SpawnShape.GetPosition(
                 SpawnShapeType.Ring,
                 GetArenaCentre(),
                 _currentDifficulty.SpawnRadius,
                 GetPlayerPosition());
 
             var isMiniboss = Random.value < _escalation.MinibossChance(cycleConfig.baseMinibossChance);
-            enemyPool.Get(enemyType, spawnPosition, isMiniboss);
+            enemyPool.Get(enemyType, RollCandidatePosition(), RollCandidatePosition, isMiniboss);
         }
 
         // Boss phase
@@ -172,8 +182,19 @@ namespace Waves
             _isBossPhaseActive = true;
             enemyPool.ReturnAll(); // clear the arena per the design doc
 
-            var bossSpawnPosition = GetArenaCentre();
-            enemyPool.Get(EnemyType.Boss, bossSpawnPosition);
+            // The boss's candidate is always the arena centre, per the design doc --
+            // but retrying the SAME point if obstructed would loop uselessly, so a
+            // small jitter gives the resolver an actually different candidate.
+            const float bossRetryJitterRadius = 2f;
+            Vector3 RollBossRetryPosition()
+            {
+                var jitter2D = Random.insideUnitCircle * bossRetryJitterRadius;
+                // Explicit X/Z construction -- Unity's implicit Vector2->Vector3 cast
+                // would put jitter2D.y into world Y (height), not Z (ground depth).
+                return GetArenaCentre() + new Vector3(jitter2D.x, 0f, jitter2D.y);
+            }
+
+            enemyPool.Get(EnemyType.Boss, GetArenaCentre(), RollBossRetryPosition);
 
             if (logPhaseEvents)
                 Debug.Log($"WaveDirector: boss phase started (kill #{_escalation.BossKillCount + 1})");

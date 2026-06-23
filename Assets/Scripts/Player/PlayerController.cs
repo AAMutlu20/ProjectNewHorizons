@@ -75,9 +75,13 @@ namespace Player
             _rb = GetComponent<Rigidbody>();
             _statSheet = GetComponent<StatSheet>();
             _slowEffects = GetComponent<SlowEffectController>();
+
+            // FreezePositionY removed -- it previously locked the player to a
+            // fixed height regardless of gravity settings. FixedUpdate below
+            // only ever drives horizontal intent via MovePosition deltas, so
+            // gravity/collision now genuinely own Y.
             _rb.constraints = RigidbodyConstraints.FreezeRotationX
-                             | RigidbodyConstraints.FreezeRotationZ
-                             | RigidbodyConstraints.FreezePositionY;
+                             | RigidbodyConstraints.FreezeRotationZ;
         }
 
         private void OnEnable()

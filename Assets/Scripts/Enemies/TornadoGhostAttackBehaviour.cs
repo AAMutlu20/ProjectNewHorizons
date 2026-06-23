@@ -54,7 +54,11 @@ namespace Enemies
 
             if (!_cachedPlayerController) return;
 
-            var pullDirection = (enemy.Position - _behaviour.PlayerTransform.position).normalized;
+            // Y explicitly zeroed -- this is a horizontal drag toward the ghost,
+            // never a vertical yank, now that enemy height is real physics.
+            var toGhost = enemy.Position - _behaviour.PlayerTransform.position;
+            toGhost.y = 0f;
+            var pullDirection = toGhost.normalized;
             _cachedPlayerController.ApplyExternalPull(pullDirection * pullStrength);
         }
     }

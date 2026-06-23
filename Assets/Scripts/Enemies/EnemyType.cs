@@ -29,6 +29,13 @@ namespace Enemies
         public EnemyType type;
         public GameObject prefab;
 
+        [Tooltip("LOCAL foot-to-pivot offset for this archetype -- e.g. half the capsule's " +
+                 "actual scaled height, if the capsule's pivot is its center. Applied by " +
+                 "SpawnPositionResolver ON TOP OF THE REAL DETECTED GROUND HEIGHT at spawn " +
+                 "time (via a downward raycast), NOT as an absolute world Y -- this correctly " +
+                 "handles raised platforms, ramps, or uneven floor noise identically to flat ground.")]
+        public float groundOffsetY = 1f;
+
         [Header("Pool")]
         [Tooltip("How many instances to pre-allocate. Set to your expected max on screen + buffer.")]
         public int poolSize = 100;

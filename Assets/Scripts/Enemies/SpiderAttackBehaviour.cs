@@ -75,9 +75,15 @@ namespace Enemies
 
             for (var i = 0; i < minionsPerSummon; i++)
             {
-                var offset = Random.insideUnitCircle * summonRadius;
-                var spawnPosition = spiderPosition + new Vector3(offset.x, 0f, offset.y);
-                _view.Pool.Get(EnemyType.SpiderMinion, spawnPosition);
+                // RollOffsetPosition is also the RETRY function -- same pattern
+                // as BossEscortBehaviour.
+                Vector3 RollOffsetPosition()
+                {
+                    var offset = Random.insideUnitCircle * summonRadius;
+                    return spiderPosition + new Vector3(offset.x, 0f, offset.y);
+                }
+
+                _view.Pool.Get(EnemyType.SpiderMinion, RollOffsetPosition(), RollOffsetPosition);
             }
         }
     }

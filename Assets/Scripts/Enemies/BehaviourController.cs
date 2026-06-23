@@ -35,6 +35,11 @@ namespace Enemies
         [System.NonSerialized] public EnemyProjectilePool ProjectilePool;
         [System.NonSerialized] public VFX.AoeTelegraphRingPool TelegraphPool;
 
+        // Layers considered solid for line-of-sight purposes (the Obstructions
+        // layer, etc.) -- an enemy in attackRange but with an obstruction
+        // between it and the player should NOT be able to attack. Injected by EnemyPool.
+        [System.NonSerialized] public LayerMask ObstructionLayers;
+
         // Reused per-frame list — avoids allocation in the hot path
         private readonly List<int> _neighbourIndices = new(16);
 
@@ -180,9 +185,15 @@ namespace Enemies
         private void MoveTowardPlayer(ref EnemyData enemy, float deltaTime)
         {
             var playerPosition = PlayerTransform.position;
-            var distanceToPlayer = Vector3.Distance(enemy.Position, playerPosition);
 
-            if (distanceToPlayer <= enemy.TypeSo.attackRange)
+            // XZ-only distance -- a small height difference (e.g. a platform)
+            // should never matter for attack range on its own. What SHOULD
+            // block an attack is an obstruction genuinely in the way, checked below via
+            // HasLineOfSightToPlayer.
+            var flatOffset = new Vector3(enemy.Position.x - playerPosition.x, 0f, enemy.Position.z - playerPosition.z);
+            var distanceToPlayer = flatOffset.magnitude;
+
+            if (distanceToPlayer <= enemy.TypeSo.attackRange && HasLineOfSightToPlayer(enemy.Position, playerPosition))
             {
                 _attackBehaviour?.TickAttack(ref enemy, deltaTime);
                 return;
@@ -197,6 +208,23 @@ namespace Enemies
             enemy.Velocity = desiredDirection * enemy.Speed;
             enemy.Velocity.y = 0f; // lock to XZ plane — no vertical drift from position noise
             enemy.Position += enemy.Velocity * deltaTime;
+        }
+
+        /// <summary>
+        /// True if nothing on ObstructionLayers blocks a straight line between
+        /// enemyPosition and playerPosition. If ObstructionLayers was never assigned
+        /// (defaults to 0), this always returns true so obstruction-blocking is
+        /// opt-in, not a silent requirement.
+        /// </summary>
+        private bool HasLineOfSightToPlayer(Vector3 enemyPosition, Vector3 playerPosition)
+        {
+            if (ObstructionLayers == 0) return true;
+
+            var toPlayer = playerPosition - enemyPosition;
+            var distance = toPlayer.magnitude;
+            if (distance <= 0.0001f) return true;
+
+            return !Physics.Raycast(enemyPosition, toPlayer.normalized, distance, ObstructionLayers);
         }
 
         /// <summary>
@@ -244,6 +272,7 @@ namespace Enemies
                 if (neighbour == _view) continue;
 
                 var offsetFromNeighbour = enemy.Position - neighbour.Data.Position;
+                offsetFromNeighbour.y = 0f;
                 var distance = offsetFromNeighbour.magnitude;
                 if (distance is <= 0.01f or >= SeparationCheckRadius) continue;
 

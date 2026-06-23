@@ -68,9 +68,16 @@ namespace Enemies
                 return;
             }
 
-            var offset = Random.insideUnitCircle * spawnRadius;
-            var spawnPosition = bossPosition + new Vector3(offset.x, 0f, offset.y);
-            _view.Pool.Get(EnemyType.EyeWinged, spawnPosition, isMiniboss: true);
+            // RollOffsetPosition is also the RETRY function -- if the first roll
+            // is obstructed or has no ground beneath it, SpawnPositionResolver
+            // calls this again for a fresh candidate around the boss.
+            Vector3 RollOffsetPosition()
+            {
+                var offset = Random.insideUnitCircle * spawnRadius;
+                return bossPosition + new Vector3(offset.x, 0f, offset.y);
+            }
+
+            _view.Pool.Get(EnemyType.EyeWinged, RollOffsetPosition(), RollOffsetPosition, isMiniboss: true);
         }
     }
 }

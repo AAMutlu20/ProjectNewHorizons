@@ -30,6 +30,18 @@ namespace Enemies
         [SerializeField] private EnemyProjectilePool projectilePool;
         [SerializeField] private VFX.AoeTelegraphRingPool telegraphPool;
 
+        [Header("Spawn placement")]
+        [Tooltip("Resolves a candidate X/Z into a real, grounded, unobstructed spawn position -- " +
+                 "owned here (not by callers of Get) so EVERY spawn path automatically benefits, " +
+                 "not just the ones that remember to resolve positions themselves first.")]
+        [SerializeField] private Waves.SpawnPositionResolver spawnPositionResolver;
+
+        [Header("Combat")]
+        [Tooltip("Layers treated as solid obstructions for line-of-sight purposes -- an enemy " +
+                 "within attackRange but with an obstruction on this layer between it and the " +
+                 "player cannot attack. Leave at None/0 to disable obstruction-blocking entirely.")]
+        [SerializeField] private LayerMask obstructionLayers;
+
         // Pool storage per type
         private Dictionary<EnemyType, Queue<EnemyView>> _inactive;
 
@@ -59,6 +71,7 @@ namespace Enemies
             Debug.Assert(enemyTypes is { Length: > 0 },
                 "EnemyPool: no enemy types assigned");
             Debug.Assert(playerTransform, "EnemyPool: playerTransform not assigned");
+            Debug.Assert(spawnPositionResolver, "EnemyPool: spawnPositionResolver not assigned");
 
             _inactive = new Dictionary<EnemyType, Queue<EnemyView>>();
             _active = new List<EnemyView>(512);
@@ -113,12 +126,24 @@ namespace Enemies
         public void SetDifficulty(DifficultyParams diff) => _currentDiff = diff;
 
         /// <summary>
-        /// Retrieve an enemy from the pool and activate it at worldPos.
-        /// Returns null if the pool for this type is exhausted (rare — tune poolSize if it fires).
+        /// Retrieve an enemy from the pool and activate it near candidateXz.
+        /// The actual spawn Y and final X/Z are resolved by SpawnPositionResolver --
+        /// a real downward raycast against world geometry (so raised platforms,
+        /// ramps, or floor noise are respected) plus an obstruction check (so the
+        /// enemy never spawns inside a wall, a well, or another solid collider).
+        /// If the first candidate is obstructed or has no ground beneath it,
+        /// retryPositionFunc is called to get a new candidate, up to the
+        /// resolver's own retry cap.
+        ///
+        /// Returns null if the pool for this type is exhausted, the active budget
+        /// is full, OR no valid unobstructed grounded position could be found
+        /// after all retries.
+        ///
         /// isMiniboss is decided by the caller (spawn scheduler / boss-spawn rules) — see
         /// the design doc's miniboss-frequency-after-boss-kills rule.
         /// </summary>
-        public EnemyView Get(EnemyType type, Vector3 worldPos, bool isMiniboss = false)
+        public EnemyView Get(EnemyType type, Vector3 candidateXz, System.Func<Vector3> retryPositionFunc,
+            bool isMiniboss = false)
         {
             if (!_inactive.TryGetValue(type, out var queue) || queue.Count == 0)
             {
@@ -131,15 +156,22 @@ namespace Enemies
             if (_active.Count >= _currentDiff.Budget)
                 return null;
 
-            var view = queue.Dequeue();
-
             // Find the SO for this type to pass to Init
             var so = FindSo(type);
             if (!so) return null;
 
+            if (!spawnPositionResolver.TryResolve(candidateXz, so.groundOffsetY, retryPositionFunc, out var resolvedPosition))
+            {
+                Debug.LogWarning($"EnemyPool: could not find a valid grounded, unobstructed spawn " +
+                                  $"position for {type} after all retries — skipping this spawn.");
+                return null;
+            }
+
+            var view = queue.Dequeue();
+
             view.gameObject.SetActive(true);
-            view.Init(so, _currentDiff, worldPos, playerTransform, spatialGrid, _active, isMiniboss,
-                projectilePool, telegraphPool);
+            view.Init(so, _currentDiff, resolvedPosition, playerTransform, spatialGrid, _active, isMiniboss,
+                projectilePool, telegraphPool, obstructionLayers);
             _active.Add(view);
             return view;
         }
