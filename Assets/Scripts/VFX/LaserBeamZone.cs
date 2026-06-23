@@ -27,7 +27,7 @@ namespace VFX
         private Vector3 _direction;
         private float _beamWidth;
         private float _damagePercentMaxHpPerSecond;
-        private float _weakenMultiplier;
+        private float _weakenFraction;
         private float _rotationDegreesPerSecond;
 
         private float _remainingDuration;
@@ -44,13 +44,13 @@ namespace VFX
         /// always moving — tracking is the sensible read).
         /// </summary>
         public void Begin(Transform followTarget, Vector3 direction, float beamWidth, float damagePercentMaxHpPerSecond,
-            float weakenMultiplier, float durationSeconds, float rotationDegreesPerSecond, EnemyPool enemyPool)
+            float weakenFraction, float durationSeconds, float rotationDegreesPerSecond, EnemyPool enemyPool)
         {
             _followTarget = followTarget;
             _direction = direction.normalized;
             _beamWidth = beamWidth;
             _damagePercentMaxHpPerSecond = damagePercentMaxHpPerSecond;
-            _weakenMultiplier = weakenMultiplier;
+            _weakenFraction = weakenFraction;
             _rotationDegreesPerSecond = rotationDegreesPerSecond;
 
             _remainingDuration = durationSeconds;
@@ -102,7 +102,7 @@ namespace VFX
 
                 var damagePerTick = enemyView.Data.MaxHp * _damagePercentMaxHpPerSecond * TickInterval;
                 enemyView.TakeDamage(damagePerTick);
-                enemyView.DataRef.ApplyWeaken(_weakenMultiplier, WeakenDurationPerTick);
+                enemyView.DataRef.ApplyWeaken(_weakenFraction, WeakenDurationPerTick);
             }
         }
 

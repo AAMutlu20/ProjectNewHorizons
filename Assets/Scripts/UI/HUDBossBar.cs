@@ -7,28 +7,55 @@ using UnityEngine.UI;
 namespace UI
 {
     /// <summary>
-    /// Desktop boss bar: name + HP fill driven by BossHealthChangedEvent
-    /// (event-driven, cheap), plus a row of debuff icons polled directly
-    /// from the boss's EnemyView each frame (debuff timers decay every
-    /// frame regardless of damage events, so polling is correct here rather
-    /// than trying to event-drive something that changes continuously).
+    /// Desktop boss bar: name + HP fill + HP number (event-driven, cheap),
+    /// plus a dynamic debuff icon row polled directly from the boss's
+    /// EnemyView each frame (debuff timers decay every frame regardless of
+    /// damage events, so polling is correct here rather than event-driving
+    /// something that changes continuously).
+    ///
+    /// Per design: icons only appear once that debuff type is actually
+    /// active (no fixed empty slots), and the row visually grows outward
+    /// from CENTER as more debuff types become active -- achieved by
+    /// parenting all icons under one HorizontalLayoutGroup with
+    /// Child Alignment = Middle Center, NOT by any manual position math
+    /// here; this script only ever shows/hides/binds icons, Unity's layout
+    /// system handles the centering automatically as children are
+    /// activated/deactivated.
+    ///
+    /// "Buffed" is intentionally NOT shown here -- a buff is the enemy
+    /// receiving help from another enemy (e.g. Eye's pulse), not something
+    /// the player inflicted, so it has no place in a player-facing debuff
+    /// display. Debuffs shown: Stunned, Weakened, Slowed, Bleeding, Burning.
     ///
     /// Hidden by default, shown on first BossHealthChangedEvent, hidden
     /// again on the boss's EnemyDiedEvent.
     ///
-    /// Attach to: Desktop HUD canvas, top-center. Wire debuffIconPrefab to
-    /// a small Image; one is shown per active debuff, toggled rather than
-    /// instantiated/destroyed since the debuff set is small and fixed (5).
+    /// Attach to: Desktop HUD canvas, top-center. The 5 DebuffIconWidget
+    /// fields below are pre-placed instances inside one HorizontalLayoutGroup
+    /// (NOT instantiated at runtime, since the debuff set is small and
+    /// fixed) -- each just activates/deactivates itself via Bind/Hide.
     /// </summary>
     public class HUDBossBar : MonoBehaviour
     {
         [SerializeField] private GameObject bossBarRoot;
         [SerializeField] private TextMeshProUGUI bossNameLabel;
         [SerializeField] private Image bossBarFill;
+        [SerializeField] private TextMeshProUGUI hpLabel;
         [SerializeField] private EnemyPool enemyPool;
 
-        [Header("Debuff icons — index order: Stunned, Buffed, Weakened, Slowed, Bleeding")]
-        [SerializeField] private Image[] debuffIcons = new Image[5];
+        [Header("Debuff icons -- order: Stunned, Weakened, Slowed, Bleeding, Burning")]
+        [SerializeField] private DebuffIconWidget stunnedIcon;
+        [SerializeField] private DebuffIconWidget weakenedIcon;
+        [SerializeField] private DebuffIconWidget slowedIcon;
+        [SerializeField] private DebuffIconWidget bleedingIcon;
+        [SerializeField] private DebuffIconWidget burningIcon;
+
+        [Header("Debuff icon sprites")]
+        [SerializeField] private Sprite stunnedSprite;
+        [SerializeField] private Sprite weakenedSprite;
+        [SerializeField] private Sprite slowedSprite;
+        [SerializeField] private Sprite bleedingSprite;
+        [SerializeField] private Sprite burningSprite;
 
         private EnemyView _trackedBoss;
 
@@ -63,6 +90,9 @@ namespace UI
 
             if (bossBarFill)
                 bossBarFill.fillAmount = healthChanged.Max > 0f ? healthChanged.Current / healthChanged.Max : 0f;
+
+            if (hpLabel)
+                hpLabel.text = Mathf.RoundToInt(healthChanged.Current).ToString("N0");
         }
 
         private void OnEnemyDied(EnemyDiedEvent enemyDied)
@@ -89,17 +119,21 @@ namespace UI
 
         private void UpdateDebuffIcons(EnemyData data)
         {
-            SetIconActive(0, data.IsStunned);
-            SetIconActive(1, data.IsBuffed);
-            SetIconActive(2, data.IsWeakened);
-            SetIconActive(3, data.IsSlowed);
-            SetIconActive(4, data.IsBleeding);
-        }
+            // Stun never stacks -- BindNoStackCount, radial only.
+            if (data.IsStunned) stunnedIcon.BindNoStackCount(stunnedSprite, data.StunRemainingFraction01);
+            else stunnedIcon.Hide();
 
-        private void SetIconActive(int index, bool isActive)
-        {
-            if (index < 0 || index >= debuffIcons.Length || !debuffIcons[index]) return;
-            debuffIcons[index].gameObject.SetActive(isActive);
+            if (data.IsWeakened) weakenedIcon.Bind(weakenedSprite, data.WeakenStack.RemainingFraction01, data.WeakenStack.StackCount);
+            else weakenedIcon.Hide();
+
+            if (data.IsSlowed) slowedIcon.Bind(slowedSprite, data.SlowStack.RemainingFraction01, data.SlowStack.StackCount);
+            else slowedIcon.Hide();
+
+            if (data.IsBleeding) bleedingIcon.Bind(bleedingSprite, data.BleedStack.RemainingFraction01, data.BleedStack.StackCount);
+            else bleedingIcon.Hide();
+
+            if (data.IsBurning) burningIcon.Bind(burningSprite, data.BurnStack.RemainingFraction01, data.BurnStack.StackCount);
+            else burningIcon.Hide();
         }
 
         private void SetVisible(bool isVisible)

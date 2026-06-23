@@ -40,6 +40,14 @@ namespace Enemies
         // between it and the player should NOT be able to attack. Injected by EnemyPool.
         [System.NonSerialized] public LayerMask ObstructionLayers;
 
+        // The player's StatSheet, injected by EnemyPool. Needed for Bleed/Burn's
+        // per-stack independent crit rolling -- per design, each DOT stack's
+        // damage rolls its own crit chance/damage against the ATTACKER's current
+        // stats, not the enemy's. EnemyData itself has no StatSheet reference
+        // (enemies don't have a StatSheet at all), so this is threaded through
+        // here at tick time instead.
+        [System.NonSerialized] public Stats.StatSheet PlayerStatSheet;
+
         // Reused per-frame list — avoids allocation in the hot path
         private readonly List<int> _neighbourIndices = new(16);
 
@@ -86,13 +94,13 @@ namespace Enemies
             // Bleed can kill on its own tick (e.g. a low-HP enemy bleeding out) —
             // re-check IsAlive afterward since TakeDamage may have set State
             // to Dying, in which case the rest of this frame's logic must not run.
-            if (enemy.TickBleed(deltaTime, out var bleedDamage))
+            if (enemy.TickBleed(deltaTime, RollAttackerCritMultiplier, out var bleedDamage))
                 _view.TakeDamage(bleedDamage);
             if (!enemy.IsAlive) return;
 
             // Burn (Cone of Fire's residual fire) follows the exact same pattern
             // as Bleed above, just a separate flat-damage DOT slot.
-            if (enemy.TickBurn(deltaTime, out var burnDamage))
+            if (enemy.TickBurn(deltaTime, RollAttackerCritMultiplier, out var burnDamage))
                 _view.TakeDamage(burnDamage);
             if (!enemy.IsAlive) return;
 
@@ -208,6 +216,36 @@ namespace Enemies
             enemy.Velocity = desiredDirection * enemy.Speed;
             enemy.Velocity.y = 0f; // lock to XZ plane — no vertical drift from position noise
             enemy.Position += enemy.Velocity * deltaTime;
+        }
+
+        /// <summary>
+        /// Rolls a crit independently and returns the resulting damage
+        /// multiplier (1.0 if no crit, else the full crit multiplier) --
+        /// used by Bleed/Burn's per-stack DOT damage, per design: each
+        /// stack's damage rolls its own crit chance/damage against the
+        /// attacker's CURRENT stats every tick, not once at application.
+        ///
+        /// Mirrors MeleeWeapon.RollDamage's crit formula exactly (same
+        /// BaseCriticalStrikeMultiplier/PercentToFraction constants) --
+        /// duplicated here rather than refactored into one shared helper,
+        /// since this is already the second copy of this exact formula in
+        /// the codebase and a proper shared CritRoller utility is a
+        /// reasonable follow-up, not done here to keep this change scoped
+        /// to the debuff stacking rework.
+        /// </summary>
+        private float RollAttackerCritMultiplier()
+        {
+            const float baseCriticalStrikeMultiplier = 200f;
+            const float percentToFraction = 100f;
+
+            if (!PlayerStatSheet) return 1f;
+
+            var critChancePercent = PlayerStatSheet.GetTotal(Stats.StatType.CriticalStrikeChance);
+            var rolledCrit = Random.Range(0f, percentToFraction) < critChancePercent;
+            if (!rolledCrit) return 1f;
+
+            var critMultiplierPercent = baseCriticalStrikeMultiplier + PlayerStatSheet.GetTotal(Stats.StatType.CriticalStrikeDamage);
+            return critMultiplierPercent / percentToFraction;
         }
 
         /// <summary>

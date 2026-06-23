@@ -45,7 +45,11 @@ namespace Abilities
         public void Cast(Vector3 castOrigin, Rarity rarity, StatSheet statSheet, EnemyPool enemyPool)
         {
             var stats = _definition.GetStatsForRarity(rarity);
-            var weakenMultiplier = 1f + stats.WeakeningMultiplierBonus;
+            // Raw fraction (e.g. 0.10 for +10% damage taken), NOT 1+fraction --
+            // EnemyData.ApplyWeaken now applies the "1 + fraction * stackMultiplier"
+            // math itself as part of the stacking rework, so this must pass the
+            // bare fraction, not a pre-added multiplier.
+            var weakenFraction = stats.WeakeningMultiplierBonus;
             var rotationSpeed = rarity == Rarity.Legendary ? LegendaryRotationDegreesPerSecond : 0f;
 
             // Ability Power affects "all ability damage" per the design doc —
@@ -58,7 +62,7 @@ namespace Abilities
             {
                 var direction = CardinalDirections[Random.Range(0, CardinalDirections.Length)];
                 _beamPool.Begin(_playerTransform, direction, BeamWidth, scaledDamagePercent,
-                    weakenMultiplier, stats.Duration, rotationSpeed, enemyPool);
+                    weakenFraction, stats.Duration, rotationSpeed, enemyPool);
             }
         }
     }

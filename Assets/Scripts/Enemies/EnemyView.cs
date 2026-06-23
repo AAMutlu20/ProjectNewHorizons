@@ -45,22 +45,27 @@ namespace Enemies
             if (!rb) rb = GetComponent<Rigidbody>();
             if (!rb) return;
 
-            // Kinematic, no gravity -- BehaviourController owns position/rotation
-            // entirely via MovePosition/MoveRotation deltas each tick. We tried
-            // non-kinematic + gravity for real falling/climbing; it introduced
-            // two worse problems than it solved: (1) the physics solver's own
-            // penetration-resolution impulses fought with player input whenever
-            // the player walked into an enemy, pushing/spinning the player
-            // unpredictably, and (2) gravity kept integrating into linearVelocity
-            // every tick with nothing to cap it (MovePosition doesn't behave like
-            // a normal resting body), eventually destabilizing enough to tunnel
-            // through the floor regardless of collision detection mode. Kinematic
-            // sidesteps both: no solver-driven impulses, no integrated gravity to
-            // run away. Ground is treated as flat; SpawnPositionResolver's raycast
-            // still finds real X/Z ground height at spawn time, just without any
-            // runtime physics interaction afterward.
-            rb.isKinematic = true;
-            rb.useGravity = false;
+            // Non-kinematic with gravity enabled, but Y is locked via
+            // FreezePositionY below -- see that constraint's comment for why.
+            // useGravity stays true (harmless with Y frozen) since
+            // SpawnPositionResolver's raycast still needs real downward physics
+            // queries to work for spawn placement.
+            rb.isKinematic = false;
+            rb.useGravity = true;
+
+            // FreezePositionY: enemies were randomly falling through the floor
+            // over time, regardless of collider setup -- root cause not fully
+            // diagnosed, but locking Y via this hard constraint stops it outright.
+            // Tradeoff accepted: ground is treated as flat going forward -- no
+            // falling, no climbing onto raised platforms via physics anymore.
+            rb.constraints = RigidbodyConstraints.FreezeRotationX
+                            | RigidbodyConstraints.FreezeRotationZ
+                            | RigidbodyConstraints.FreezePositionY;
+
+            // Continuous detection avoids tunnelling through thin platform edges at
+            // normal enemy speeds.
+            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+
             rb.interpolation = RigidbodyInterpolation.Interpolate;
         }
 
@@ -70,7 +75,7 @@ namespace Enemies
         public void Init(EnemyTypeSo typeSo, DifficultyParams diff, Vector3 worldPos,
             Transform playerTransform, SpatialGrid grid, System.Collections.Generic.List<EnemyView> activeList,
             bool isMiniboss = false, EnemyProjectilePool projectilePool = null, VFX.AoeTelegraphRingPool telegraphPool = null,
-            LayerMask obstructionLayers = default)
+            LayerMask obstructionLayers = default, Stats.StatSheet playerStatSheet = null)
         {
             // worldPos arrives here ALREADY fully resolved -- EnemyPool.Get()
             // calls SpawnPositionResolver first, which raycasts to find the
@@ -100,6 +105,7 @@ namespace Enemies
             _behaviour.ProjectilePool = projectilePool;
             _behaviour.TelegraphPool = telegraphPool;
             _behaviour.ObstructionLayers = obstructionLayers;
+            _behaviour.PlayerStatSheet = playerStatSheet;
 
             if (animator) animator.SetInteger(AnimState, (int)EnemyState.Spawning);
             _lastState = EnemyState.Spawning;
@@ -117,13 +123,41 @@ namespace Enemies
         {
             if (_data.State == EnemyState.Inactive) return;
 
-            // Tick the behaviour (writes to _data)
+            // Tick the behaviour (writes to _data.Velocity, X/Z only -- Y is
+            // always zeroed by BehaviourController's own movement/knockback math)
             _behaviour.Tick(dt);
-            
+
             if (rb)
-                rb.MovePosition(_data.Position);
+            {
+                // Apply ONLY the horizontal intent as a delta on top of the
+                // rigidbody's current position -- Y is locked by
+                // FreezePositionY (see Awake), so this never touches it either
+                // way, but keeping movement delta-based (not an absolute
+                // position snap) avoids fighting the constraint or physics
+                // solver in general.
+                var horizontalDelta = new Vector3(_data.Velocity.x, 0f, _data.Velocity.z) * dt;
+                rb.MovePosition(rb.position + horizontalDelta);
+
+                // MovePosition on a non-kinematic body fights with the solver's own
+                // resting-contact response -- gravity keeps integrating into
+                // linearVelocity.y every step with nothing capping it back down the
+                // way a normal (non-MovePosition-driven) resting body would self-correct.
+                // Left unchecked, that buildup eventually destabilizes the solver enough
+                // to tunnel through the floor even with Continuous Dynamic CCD. Clamping
+                // here keeps a resting enemy's fall speed from ever exceeding one frame's
+                // worth of gravity, while still allowing it to fall normally off a ledge.
+                var clampedFallSpeed = Mathf.Max(rb.linearVelocity.y, -Mathf.Abs(Physics.gravity.y) * dt * 2f);
+                rb.linearVelocity = new Vector3(0f, clampedFallSpeed, 0f);
+
+                // Sync _data.Position back from the REAL post-physics rigidbody
+                // position -- every other system (abilities, attack-range checks)
+                // reads enemy.Position expecting it to be ground truth.
+                _data.Position = rb.position;
+            }
             else
+            {
                 transform.position = _data.Position;
+            }
             
             var flatVel = new Vector3(_data.Velocity.x, 0f, _data.Velocity.z);
             if (flatVel.sqrMagnitude > 0.0001f)
@@ -169,7 +203,7 @@ namespace Enemies
             // already passes through — melee, abilities, and any future source
             // all get the multiplier applied identically, with no per-source
             // special-casing needed.
-            var weakenedAmount = amount * _data.WeakenMultiplier;
+            var weakenedAmount = amount * _data.GetWeakenDamageMultiplier();
             _data.Hp -= weakenedAmount;
 
             if (knockbackForce > 0f)

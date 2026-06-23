@@ -42,6 +42,10 @@ namespace Enemies
                  "player cannot attack. Leave at None/0 to disable obstruction-blocking entirely.")]
         [SerializeField] private LayerMask obstructionLayers;
 
+        [Tooltip("The player's StatSheet -- needed for Bleed/Burn's per-stack crit rolling " +
+                 "(each DOT stack rolls crit chance/damage against the player's current stats).")]
+        [SerializeField] private Stats.StatSheet playerStatSheet;
+
         // Pool storage per type
         private Dictionary<EnemyType, Queue<EnemyView>> _inactive;
 
@@ -171,7 +175,7 @@ namespace Enemies
 
             view.gameObject.SetActive(true);
             view.Init(so, _currentDiff, resolvedPosition, playerTransform, spatialGrid, _active, isMiniboss,
-                projectilePool, telegraphPool, obstructionLayers);
+                projectilePool, telegraphPool, obstructionLayers, playerStatSheet);
             _active.Add(view);
             return view;
         }

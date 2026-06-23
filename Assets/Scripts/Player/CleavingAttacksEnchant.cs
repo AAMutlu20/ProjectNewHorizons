@@ -81,8 +81,11 @@ namespace Player
 
                 target.DataRef.ApplyBleed(_stats.BleedDamagePercentPerSecond, _stats.BleedDuration);
 
+                // Raw fraction (e.g. 0.15 for +15% damage taken), NOT 1+fraction --
+                // EnemyData.ApplyWeaken applies the "1 + fraction * stackMultiplier"
+                // math itself as part of the stacking rework.
                 if (_stats.WeakenMultiplierBonus > 0f)
-                    target.DataRef.ApplyWeaken(1f + _stats.WeakenMultiplierBonus, _stats.BleedDuration);
+                    target.DataRef.ApplyWeaken(_stats.WeakenMultiplierBonus, _stats.BleedDuration);
             }
         }
     }

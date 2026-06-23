@@ -33,7 +33,7 @@ namespace VFX
 
         /// <summary>Begins a beam. Returns false if the pool is exhausted.</summary>
         public bool Begin(Transform followTarget, Vector3 direction, float beamWidth, float damagePercentMaxHpPerSecond,
-            float weakenMultiplier, float durationSeconds, float rotationDegreesPerSecond, EnemyPool enemyPool)
+            float weakenFraction, float durationSeconds, float rotationDegreesPerSecond, EnemyPool enemyPool)
         {
             if (_inactive.Count == 0)
             {
@@ -44,7 +44,7 @@ namespace VFX
             var beam = _inactive.Dequeue();
             beam.gameObject.SetActive(true);
             beam.Begin(followTarget, direction, beamWidth, damagePercentMaxHpPerSecond,
-                weakenMultiplier, durationSeconds, rotationDegreesPerSecond, enemyPool);
+                weakenFraction, durationSeconds, rotationDegreesPerSecond, enemyPool);
             return true;
         }
 

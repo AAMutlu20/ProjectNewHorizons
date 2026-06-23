@@ -65,7 +65,6 @@ namespace Player
             // applied here even though Poison Aura isn't an IAbility.Cast,
             // since it's still an ability for stat-scaling purposes.
             var scaledDamage = statSheet.ApplyPercentBonus(_baseDamage, Stats.StatType.AbilityPower);
-            var slowMultiplier = 1f - _slowFraction; // 0 slow -> 1x speed, 0.5 slow -> 0.5x speed
             var playerPosition = transform.position;
 
             foreach (var enemyView in enemyPool.ActiveEnemies)
@@ -77,8 +76,12 @@ namespace Player
 
                 enemyView.TakeDamage(scaledDamage);
 
+                // Raw fraction (e.g. 0.5 for "50% slower"), NOT a pre-inverted
+                // speed multiplier -- EnemyData.ApplySlow applies the
+                // "1 - fraction * stackMultiplier" math itself as part of the
+                // stacking rework.
                 if (_slowFraction > 0f)
-                    enemyView.DataRef.ApplySlow(slowMultiplier, _damageFrequencySeconds * 1.5f);
+                    enemyView.DataRef.ApplySlow(_slowFraction, _damageFrequencySeconds * 1.5f);
             }
         }
     }
