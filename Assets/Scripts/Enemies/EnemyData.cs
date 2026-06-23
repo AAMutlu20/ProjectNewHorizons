@@ -49,7 +49,7 @@ namespace Enemies
         private float _baseSpeed;
         private float _baseDamage;
 
-        public Vector3 Position; // X/Z driven by BehaviourController's movement intent; Y is synced FROM the rigidbody's real physics-resolved height every tick (see EnemyView.ManagedUpdate) — not the other way around.
+        public Vector3 Position; // world position (XZ plane, Y is ground height) — EnemyView syncs transform from this
         public Vector3 Velocity; // set by BehaviourController each frame, Y always 0
 
         public Vector3 Knockback;      // current knockback velocity, decays over KnockbackTimer

@@ -109,9 +109,9 @@ namespace Enemies
             spatialGrid?.Rebuild(_active);
 
             // Single managed update loop — avoids N separate MonoBehaviour Update calls.
-            // Runs on FixedUpdate because ManagedUpdate calls Rigidbody.MovePosition/
-            // MoveRotation internally (via EnemyView) — those APIs are only meant to be
-            // called from the physics tick. Calling them from Update() caused the
+            // Runs on FixedUpdate because ManagedUpdate writes Rigidbody.linearVelocity/
+            // calls MoveRotation internally (via EnemyView) — both require physics-tick
+            // timing to integrate correctly. Calling them from Update() caused the
             // position/rotation timeline mismatch that produced the stretched capsule look.
             // Iterate backwards so Return() mid-loop (swapped with last) stays safe
             for (var i = _active.Count - 1; i >= 0; i--)

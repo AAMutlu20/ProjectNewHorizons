@@ -45,21 +45,22 @@ namespace Enemies
             if (!rb) rb = GetComponent<Rigidbody>();
             if (!rb) return;
 
-            // Non-kinematic + gravity so falling and climbing onto raised platforms
-            // work via real physics. BehaviourController only ever drives horizontal
-            // intent -- see ManagedUpdate for how that's applied on top of whatever
-            // vertical motion gravity/collision already resolved this physics step.
-            rb.isKinematic = false;
-            rb.useGravity = true;
-
-            // Enemies shouldn't tip over or spin from physics contact -- BehaviourController
-            // drives facing via MoveRotation, not physics torque.
-            rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
-
-            // Continuous detection avoids tunnelling through thin platform edges at
-            // normal enemy speeds.
-            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-
+            // Kinematic, no gravity -- BehaviourController owns position/rotation
+            // entirely via MovePosition/MoveRotation deltas each tick. We tried
+            // non-kinematic + gravity for real falling/climbing; it introduced
+            // two worse problems than it solved: (1) the physics solver's own
+            // penetration-resolution impulses fought with player input whenever
+            // the player walked into an enemy, pushing/spinning the player
+            // unpredictably, and (2) gravity kept integrating into linearVelocity
+            // every tick with nothing to cap it (MovePosition doesn't behave like
+            // a normal resting body), eventually destabilizing enough to tunnel
+            // through the floor regardless of collision detection mode. Kinematic
+            // sidesteps both: no solver-driven impulses, no integrated gravity to
+            // run away. Ground is treated as flat; SpawnPositionResolver's raycast
+            // still finds real X/Z ground height at spawn time, just without any
+            // runtime physics interaction afterward.
+            rb.isKinematic = true;
+            rb.useGravity = false;
             rb.interpolation = RigidbodyInterpolation.Interpolate;
         }
 
@@ -116,40 +117,13 @@ namespace Enemies
         {
             if (_data.State == EnemyState.Inactive) return;
 
-            // Tick the behaviour (writes to _data.Velocity, X/Z only -- Y is
-            // always zeroed by BehaviourController's own movement/knockback math)
+            // Tick the behaviour (writes to _data)
             _behaviour.Tick(dt);
-
+            
             if (rb)
-            {
-                // Apply ONLY the horizontal intent as a delta on top of wherever
-                // the rigidbody's own Y currently is -- gravity and collision
-                // already resolved vertical motion for this physics step. This is
-                // what lets falling and climbing onto a raised platform work:
-                // nothing here ever stomps Y with an absolute value.
-                var horizontalDelta = new Vector3(_data.Velocity.x, 0f, _data.Velocity.z) * dt;
-                rb.MovePosition(rb.position + horizontalDelta);
-
-                // MovePosition on a non-kinematic body fights with the solver's own
-                // resting-contact response -- gravity keeps integrating into
-                // linearVelocity.y every step with nothing capping it back down the
-                // way a normal (non-MovePosition-driven) resting body would self-correct.
-                // Left unchecked, that buildup eventually destabilizes the solver enough
-                // to tunnel through the floor even with Continuous Dynamic CCD. Clamping
-                // here keeps a resting enemy's fall speed from ever exceeding one frame's
-                // worth of gravity, while still allowing it to fall normally off a ledge.
-                var clampedFallSpeed = Mathf.Max(rb.linearVelocity.y, -Mathf.Abs(Physics.gravity.y) * dt * 2f);
-                rb.linearVelocity = new Vector3(0f, clampedFallSpeed, 0f);
-
-                // Sync _data.Position back from the REAL post-physics rigidbody
-                // position -- every other system (abilities, attack-range checks)
-                // reads enemy.Position expecting it to be ground truth.
-                _data.Position = rb.position;
-            }
+                rb.MovePosition(_data.Position);
             else
-            {
                 transform.position = _data.Position;
-            }
             
             var flatVel = new Vector3(_data.Velocity.x, 0f, _data.Velocity.z);
             if (flatVel.sqrMagnitude > 0.0001f)

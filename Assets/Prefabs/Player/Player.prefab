@@ -195,7 +195,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 1
@@ -316,6 +316,9 @@ GameObject:
   - component: {fileID: 7750488870421387143}
   - component: {fileID: 4768702188243717903}
   - component: {fileID: 5160196058405644670}
+  - component: {fileID: 2564277803011622410}
+  - component: {fileID: 21854933721318785}
+  - component: {fileID: 6566405550504304502}
   m_Layer: 0
   m_Name: MeleeAura
   m_TagString: Untagged
@@ -376,3 +379,42 @@ MonoBehaviour:
   baseDamage: 5
   baseKnockbackForce: 4
   knockbackDuration: 0.2
+--- !u!114 &2564277803011622410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8504597042455349107}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d57551b62db69d740981c2a7d76fcb12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Player.CleavingAttacksEnchant
+  definition: {fileID: 11400000, guid: 2eab74b1a115fb64c80f20ea1c45bb6b, type: 2}
+--- !u!114 &21854933721318785
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8504597042455349107}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66e0513d310e24c4caf8b6f621a8e1ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Player.LifestealEnchant
+  definition: {fileID: 11400000, guid: 1766771d9ffe3174dacbf570151b33e3, type: 2}
+--- !u!114 &6566405550504304502
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8504597042455349107}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ac4cd5a9e95312469db29a5e3d580b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Player.KnockbackEnchant
+  definition: {fileID: 11400000, guid: 16711a66a471151448e60128e35194fd, type: 2}

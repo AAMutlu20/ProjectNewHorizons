@@ -76,10 +76,19 @@ namespace Player
             _statSheet = GetComponent<StatSheet>();
             _slowEffects = GetComponent<SlowEffectController>();
 
-            // FreezePositionY removed -- it previously locked the player to a
-            // fixed height regardless of gravity settings. FixedUpdate below
-            // only ever drives horizontal intent via MovePosition deltas, so
-            // gravity/collision now genuinely own Y.
+            // Kinematic, matching the enemy revert -- the player's own movement
+            // is entirely MovePosition-driven (FixedUpdate below), same as every
+            // enemy via BehaviourController. Previously the player rigidbody
+            // relied on the Inspector's default (non-kinematic) while colliding
+            // against now-non-kinematic enemies -- when the player walked into
+            // an enemy, the solver's penetration-resolution impulse pushed/spun
+            // the player unpredictably, fighting the input-driven MovePosition
+            // call every tick. Kinematic removes the player from that fight
+            // entirely: no solver-applied impulses, ever, only what FixedUpdate
+            // explicitly tells it to do.
+            _rb.isKinematic = true;
+            _rb.useGravity = false;
+
             _rb.constraints = RigidbodyConstraints.FreezeRotationX
                              | RigidbodyConstraints.FreezeRotationZ;
         }
