@@ -7,6 +7,7 @@ public class MenuManager : MonoBehaviour
     public GameObject overlay;
     public GameObject settings;
 
+
     // Closes the game
     public void QuitGame()
     {
