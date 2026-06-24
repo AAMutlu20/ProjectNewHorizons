@@ -2,6 +2,7 @@ using Abilities;
 using Core;
 using Enemies;
 using Stats;
+using System.Collections;
 using UnityEngine;
 
 namespace XP
@@ -170,7 +171,7 @@ namespace XP
             statSheet.ApplyModifier(chosenModifier);
             EventBus.Emit(new StatChoiceResolvedEvent { ChosenModifier = chosenModifier });
 
-            Invoke(nameof(Unfreeze), UnfreezeDelaySeconds);
+            StartCoroutine(UnfreezeAfterDelay());
         }
 
         /// <summary>Called by the choice UI once the player picks an ability card. Mirrors ResolveStatChoice.</summary>
@@ -179,11 +180,20 @@ namespace XP
             chosenOption.Entry.Grant(chosenOption.Rarity);
             EventBus.Emit(new AbilityChoiceResolvedEvent { ChosenOption = chosenOption });
 
-            Invoke(nameof(Unfreeze), UnfreezeDelaySeconds);
+            StartCoroutine(UnfreezeAfterDelay());
         }
 
-        private void Unfreeze()
+        /// <summary>
+        /// Waits UnfreezeDelaySeconds of REAL (unscaled) time before releasing
+        /// the freeze. This used to be Invoke(nameof(Unfreeze), ...), which is
+        /// a genuine deadlock: Invoke's delay is scaled by Time.timeScale, and
+        /// since RequestFreeze sets timeScale to 0, that delay could never
+        /// elapse -- the game would freeze on every level-up and never recover.
+        /// WaitForSecondsRealtime ignores timeScale entirely, so it actually fires.
+        /// </summary>
+        private IEnumerator UnfreezeAfterDelay()
         {
+            yield return new WaitForSecondsRealtime(UnfreezeDelaySeconds);
             GameFreezeController.ReleaseFreeze(FreezeReason);
         }
 

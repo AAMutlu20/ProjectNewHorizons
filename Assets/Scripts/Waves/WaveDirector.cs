@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Core;
 using Difficulty;
 using Enemies;
@@ -7,9 +8,17 @@ namespace Waves
 {
     /// <summary>
     /// Drives the infinite enemy-introduction cycle described in the design
-    /// doc: phases unlock enemy types one at a time, each ramping in count
-    /// over its duration, ending in a boss fight. After the boss dies, the
-    /// cycle repeats from phase 0 — but harder, via CycleEscalation.
+    /// doc: phases unlock enemy types one at a time, but ALREADY-UNLOCKED
+    /// types keep spawning -- per the doc, "spider enemy gets introduced
+    /// into the mix" and "zombies increase as well, but slower." This is an
+    /// ACCUMULATING set of concurrently-active spawn types, not a single
+    /// "current phase" that gets replaced by the next one.
+    ///
+    /// Each EnemyCyclePhase's baseDuration means "how long after this phase
+    /// unlocks until the NEXT phase unlocks" -- it does NOT mean "how long
+    /// this type keeps spawning." Once unlocked, a type keeps spawning
+    /// (on its own independent timer/count-ramp) until the boss phase
+    /// clears the arena and the whole cycle restarts from just the first type.
     ///
     /// Replaces the old finite WaveManager/WaveConfig[] entirely — there is
     /// no "wave index" here, only elapsed time and how many bosses have died.
@@ -35,15 +44,35 @@ namespace Waves
         [Header("Startup")]
         [SerializeField] private float delayBeforeFirstPhase = 2f;
 
+        /// <summary>
+        /// One concurrently-active spawning type. Each entry ticks its own
+        /// spawnIntervalTimer and tracks its own timeSinceUnlocked (which
+        /// drives that phase's countRampOverPhase curve) completely
+        /// independently of every other active entry -- this is what lets
+        /// Zombies and Spiders both keep spawning at once.
+        /// </summary>
+        private class ActivePhaseState
+        {
+            public int PhaseIndex;
+            public float TimeSinceUnlocked;
+            public float SpawnIntervalTimer;
+        }
+
+        private readonly List<ActivePhaseState> _activePhases = new();
         private readonly CycleEscalation _escalation = new();
 
-        private int _currentPhaseIndex = -1;
-        private float _phaseTimer;
+        // Which phase index will unlock NEXT, and how long until it does --
+        // separate from _activePhases, since "the next type is about to
+        // unlock" is a distinct concept from "every type already unlocked
+        // keeps spawning."
+        private int _nextPhaseToUnlock;
+        private float _timeUntilNextUnlock;
+
         private float _elapsedGameTime;
-        private float _spawnIntervalTimer;
         private bool _isBossPhaseActive;
         private bool _isWaitingToStartNextCycle;
         private float _nextCycleDelayTimer;
+        private bool _hasCycleStarted;
 
         private DifficultyParams _currentDifficulty;
 
@@ -60,10 +89,15 @@ namespace Waves
         private void Start()
         {
             EventBus.Subscribe<EnemyDiedEvent>(OnEnemyDied);
-            Invoke(nameof(BeginFirstPhase), delayBeforeFirstPhase);
+            Invoke(nameof(BeginCycle), delayBeforeFirstPhase);
         }
 
-        private void BeginFirstPhase() => BeginPhase(0);
+        private void BeginCycle()
+        {
+            _hasCycleStarted = true;
+            ResetCycleState();
+            UnlockNextPhase(); // unlocks phase 0 (Zombie) immediately
+        }
 
         private void OnDestroy()
         {
@@ -74,12 +108,10 @@ namespace Waves
         {
             _elapsedGameTime += Time.deltaTime;
 
-            // Guards against TickCurrentPhase running before BeginFirstPhase's
-            // Invoke(delayBeforeFirstPhase) has actually fired -- without this,
-            // Update ticks every frame from scene start, including the very
-            // first frame, when _currentPhaseIndex is still its default -1
-            // (no phase has begun yet) and cycleConfig.phases[-1] throws.
-            if (_currentPhaseIndex < 0) return;
+            // Guards against ticking before BeginCycle's Invoke(delayBeforeFirstPhase)
+            // has fired -- without this, Update runs from the very first frame,
+            // before any phase has unlocked.
+            if (!_hasCycleStarted) return;
 
             if (_isWaitingToStartNextCycle)
             {
@@ -89,24 +121,71 @@ namespace Waves
 
             if (_isBossPhaseActive) return; // boss phase ends on EnemyDiedEvent, not a timer
 
-            TickCurrentPhase();
-        }
-
-        // Phase lifecycle
-
-        private void BeginPhase(int phaseIndex)
-        {
-            if (phaseIndex >= cycleConfig.phases.Length)
-            {
-                BeginPhase(0); // shouldn't normally happen — boss phase loops explicitly — but fail safe
-                return;
-            }
-
-            _currentPhaseIndex = phaseIndex;
-            var phase = cycleConfig.phases[phaseIndex];
-
             _currentDifficulty = difficultyScaler.Scale(_elapsedGameTime, _escalation);
             enemyPool.SetDifficulty(_currentDifficulty);
+
+            TickActivePhaseSpawning();
+            TickNextUnlockTimer();
+        }
+
+        private void ResetCycleState()
+        {
+            _activePhases.Clear();
+            _nextPhaseToUnlock = 0;
+            _timeUntilNextUnlock = 0f; // unlock phase 0 immediately on cycle start
+        }
+
+        /// <summary>
+        /// Every currently-active phase spawns on its OWN independent timer
+        /// and count-ramp -- this is the core of "accumulate, don't replace."
+        /// </summary>
+        private void TickActivePhaseSpawning()
+        {
+            foreach (var activePhase in _activePhases)
+            {
+                activePhase.TimeSinceUnlocked += Time.deltaTime;
+
+                activePhase.SpawnIntervalTimer -= Time.deltaTime;
+                if (activePhase.SpawnIntervalTimer > 0f) continue;
+
+                var phase = cycleConfig.phases[activePhase.PhaseIndex];
+                activePhase.SpawnIntervalTimer = phase.spawnInterval;
+
+                var rampProgress = phase.baseDuration > 0f
+                    ? Mathf.Clamp01(activePhase.TimeSinceUnlocked / phase.baseDuration)
+                    : 1f;
+                var spawnCountThisInterval = Mathf.Max(1, Mathf.RoundToInt(phase.countRampOverPhase.Evaluate(rampProgress)));
+
+                for (var i = 0; i < spawnCountThisInterval; i++)
+                    SpawnEnemy(phase.enemyType);
+            }
+        }
+
+        /// <summary>
+        /// Counts down to the next phase unlocking. baseDuration on the
+        /// CURRENTLY-MOST-RECENTLY-UNLOCKED phase is what decides this delay --
+        /// matching the doc's "a minute elapses, then the next type gets
+        /// introduced" framing, while everything already unlocked keeps
+        /// spawning via TickActivePhaseSpawning above, completely unaffected
+        /// by this timer.
+        /// </summary>
+        private void TickNextUnlockTimer()
+        {
+            if (_nextPhaseToUnlock >= cycleConfig.phases.Length) return; // every non-boss phase already unlocked
+
+            _timeUntilNextUnlock -= Time.deltaTime;
+            if (_timeUntilNextUnlock > 0f) return;
+
+            UnlockNextPhase();
+        }
+
+        private void UnlockNextPhase()
+        {
+            if (_nextPhaseToUnlock >= cycleConfig.phases.Length) return;
+
+            var phaseIndex = _nextPhaseToUnlock;
+            var phase = cycleConfig.phases[phaseIndex];
+            _nextPhaseToUnlock++;
 
             if (phase.isBossPhase)
             {
@@ -114,41 +193,19 @@ namespace Waves
                 return;
             }
 
-            _phaseTimer = 0f;
-            _spawnIntervalTimer = 0f;
+            var effectiveDuration = Mathf.Max(1f, phase.baseDuration - _escalation.PhaseIntervalReduction);
+            _timeUntilNextUnlock = effectiveDuration;
+
+            _activePhases.Add(new ActivePhaseState { PhaseIndex = phaseIndex, TimeSinceUnlocked = 0f, SpawnIntervalTimer = 0f });
+
             SpawnInitialBurst(phase);
 
             if (logPhaseEvents)
-                Debug.Log($"WaveDirector: phase {phaseIndex} started — {phase.enemyType}, " +
-                          $"{phase.startingCount} initial, bossKills={_escalation.BossKillCount}");
+                Debug.Log($"WaveDirector: phase {phaseIndex} unlocked — {phase.enemyType} joins the mix " +
+                          $"({_activePhases.Count} type(s) now active), {phase.startingCount} initial, " +
+                          $"bossKills={_escalation.BossKillCount}");
 
             EventBus.Emit(new PhaseStartedEvent { EnemyType = phase.enemyType, PhaseIndex = phaseIndex });
-        }
-
-        private void TickCurrentPhase()
-        {
-            var phase = cycleConfig.phases[_currentPhaseIndex];
-
-            _phaseTimer += Time.deltaTime;
-            TickPhaseSpawning(phase);
-
-            var effectiveDuration = Mathf.Max(1f, phase.baseDuration - _escalation.PhaseIntervalReduction);
-            if (_phaseTimer >= effectiveDuration)
-                BeginPhase(_currentPhaseIndex + 1);
-        }
-
-        private void TickPhaseSpawning(EnemyCyclePhase phase)
-        {
-            _spawnIntervalTimer -= Time.deltaTime;
-            if (_spawnIntervalTimer > 0f) return;
-
-            _spawnIntervalTimer = phase.spawnInterval;
-
-            var phaseProgress = phase.baseDuration > 0f ? Mathf.Clamp01(_phaseTimer / phase.baseDuration) : 1f;
-            var spawnCountThisInterval = Mathf.Max(1, Mathf.RoundToInt(phase.countRampOverPhase.Evaluate(phaseProgress)));
-
-            for (var i = 0; i < spawnCountThisInterval; i++)
-                SpawnEnemy(phase.enemyType);
         }
 
         private void SpawnInitialBurst(EnemyCyclePhase phase)
@@ -159,9 +216,6 @@ namespace Waves
 
         private void SpawnEnemy(EnemyType enemyType)
         {
-            _currentDifficulty = difficultyScaler.Scale(_elapsedGameTime, _escalation);
-            enemyPool.SetDifficulty(_currentDifficulty);
-
             // RollCandidatePosition is also the RETRY function -- if EnemyPool's
             // SpawnPositionResolver finds the first roll obstructed or ungrounded,
             // it calls this again for a fresh candidate on the same ring.
@@ -199,7 +253,7 @@ namespace Waves
             if (logPhaseEvents)
                 Debug.Log($"WaveDirector: boss phase started (kill #{_escalation.BossKillCount + 1})");
 
-            EventBus.Emit(new PhaseStartedEvent { EnemyType = EnemyType.Boss, PhaseIndex = _currentPhaseIndex });
+            EventBus.Emit(new PhaseStartedEvent { EnemyType = EnemyType.Boss, PhaseIndex = _nextPhaseToUnlock - 1 });
         }
 
         private void OnEnemyDied(EnemyDiedEvent enemyDied)
@@ -225,7 +279,8 @@ namespace Waves
             if (_nextCycleDelayTimer > 0f) return;
 
             _isWaitingToStartNextCycle = false;
-            BeginPhase(0);
+            ResetCycleState();
+            UnlockNextPhase(); // restarts from phase 0 (Zombie) -- the whole accumulated set clears with the arena
         }
 
         // Helpers
@@ -234,7 +289,7 @@ namespace Waves
         private Vector3 GetPlayerPosition() => player ? player.position : Vector3.zero;
     }
 
-    /// <summary>Emitted whenever a new phase begins — UI can use this to show "Spiders incoming!" etc.</summary>
+    /// <summary>Emitted whenever a new phase unlocks — UI can use this to show "Spiders incoming!" etc.</summary>
     public struct PhaseStartedEvent
     {
         public EnemyType EnemyType;

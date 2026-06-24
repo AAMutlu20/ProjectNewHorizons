@@ -62,8 +62,11 @@ namespace Enemies
             _periodicAbility = GetComponent<IPeriodicAbility>();
 
             if (_attackBehaviour == null)
-                Debug.LogError($"BehaviourController on '{name}' has no IEnemyAttackBehaviour " +
-                                "attached — this enemy will move but never attack.", this);
+                Debug.LogWarning($"BehaviourController on '{name}' has no IEnemyAttackBehaviour " +
+                                  "attached -- this enemy will move but won't attack via the normal " +
+                                  "range-gated path. This is EXPECTED for Zombie, whose explosion is " +
+                                  "a separate trigger-collider-based attack (see ZombieExplodeBehaviour) " +
+                                  "rather than going through this interface at all.", this);
         }
 
         /// <summary>

@@ -107,6 +107,14 @@ namespace Enemies
             _behaviour.ObstructionLayers = obstructionLayers;
             _behaviour.PlayerStatSheet = playerStatSheet;
 
+            // Re-arms the Zombie's trigger-based explosion on every reuse from
+            // the pool (clears the one-shot _hasExploded flag from any
+            // previous life). GetComponentInChildren returns null gracefully
+            // for every other archetype that doesn't have this child at all --
+            // safe to call unconditionally here rather than special-casing by type.
+            var explodeBehaviour = GetComponentInChildren<ZombieExplodeBehaviour>(includeInactive: true);
+            if (explodeBehaviour) explodeBehaviour.ResetForReuse(this);
+
             if (animator) animator.SetInteger(AnimState, (int)EnemyState.Spawning);
             _lastState = EnemyState.Spawning;
 

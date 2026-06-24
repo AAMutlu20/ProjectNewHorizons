@@ -19,7 +19,7 @@ MonoBehaviour:
   baseHp: 20
   baseSpeed: 4
   baseDamage: 10
-  attackRange: 1.2
+  attackRange: 1.5
   attackCooldown: 1
   separationForce: 1.5
   xpValue: 1

@@ -96,7 +96,19 @@ namespace Player
         {
             if (_isDead) return;
 
-            var distanceToAttack = Vector3.Distance(transform.position, attack.Position);
+            // XZ-only distance -- matches BehaviourController's attack-range
+            // check (also XZ-only, per design: small vertical offsets between
+            // an enemy's resting height and the player's shouldn't matter for
+            // whether a melee/explosion attack lands). A full 3D distance
+            // check here was rejecting attacks that BehaviourController had
+            // already correctly decided were in range, purely because each
+            // archetype's groundOffsetY doesn't exactly match the player's
+            // own resting Y -- e.g. a zombie sitting at Y=4.3 next to a
+            // player at Y=4.41 could exceed AttackHitRadius in full 3D
+            // distance while being right next to the player horizontally.
+            var playerPositionXz = new Vector3(transform.position.x, 0f, transform.position.z);
+            var attackPositionXz = new Vector3(attack.Position.x, 0f, attack.Position.z);
+            var distanceToAttack = Vector3.Distance(playerPositionXz, attackPositionXz);
             if (distanceToAttack > AttackHitRadius) return;
 
             ApplySlowIfAny(attack);
