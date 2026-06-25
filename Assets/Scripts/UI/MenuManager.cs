@@ -47,6 +47,7 @@ public class MenuManager : MonoBehaviour
     {
         overlay.gameObject.SetActive(false);
         settings.gameObject.SetActive(true);
+        Time.timeScale = 0f;
     }
 
     //Closes the Settings menu
@@ -54,6 +55,7 @@ public class MenuManager : MonoBehaviour
     {
         overlay.gameObject.SetActive(true);
         settings.gameObject.SetActive(false);
+        Time.timeScale = 1f;
     }
 
 }
