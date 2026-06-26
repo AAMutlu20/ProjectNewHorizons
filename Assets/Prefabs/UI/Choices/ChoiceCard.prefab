@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 1389767512806285300}
   - component: {fileID: 6074427435728244959}
   - component: {fileID: 7563844034069660422}
+  - component: {fileID: 5418552456174643486}
   m_Layer: 5
   m_Name: ChoiceCard
   m_TagString: Untagged
@@ -147,6 +148,42 @@ MonoBehaviour:
   - {r: 0.25, g: 0.55, b: 1, a: 1}
   - {r: 0.65, g: 0.25, b: 0.95, a: 1}
   - {r: 1, g: 0.65, b: 0.1, a: 1}
+--- !u!114 &5418552456174643486
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 101802236153983312}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c043640c13ed216488655ead66500728, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BhanuProductions.NimbleFX.UIAnimations
+  animationType: 4
+  targettedSprite: {fileID: 101802236153983312}
+  autoStart: 1
+  loop: 0
+  loopDelay: 0
+  onComplete:
+    m_PersistentCalls:
+      m_Calls: []
+  bounceDuration: 0.5
+  bounceScale: 1
+  shakeDuration: 2
+  shakeIntensity: 1.66
+  glowDuration: 1
+  minAlpha: 0.2
+  maxAlpha: 1
+  rotationSpeed: 90
+  spriteFrames: []
+  frameRate: 10
+  targetScale: {x: 1.2, y: 1.2, z: 1.2}
+  scaleDuration: 0.5
+  ResetOriginalSize: 0
+  elasticTargetScale: {x: 1.2, y: 0.8, z: 1}
+  elasticDuration: 0.5
+  elasticBounciness: 2.5
 --- !u!1 &970335457956179344
 GameObject:
   m_ObjectHideFlags: 0

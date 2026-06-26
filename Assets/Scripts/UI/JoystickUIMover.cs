@@ -22,6 +22,7 @@ public class JoystickUIMover : MonoBehaviour
     {
         _touchInputAction = _inputActionAsset.FindAction(_touchInputActionName);
         _touchInputAction.started += CheckToMoveUIElement;
+        _touchInputAction.performed += CheckToMoveUIElement;
         //_touchInputAction.started += ShowUIToMove;
         //_touchInputAction.canceled += HideUIToMove;
     }
@@ -44,6 +45,12 @@ public class JoystickUIMover : MonoBehaviour
 
     private void CheckToMoveUIElement(InputAction.CallbackContext context)
     {
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+        {
+            Debug.Log("UI MOVE FAIL Joystick");
+            return;
+        }
+            
         // Check if we are already hovering the UI
         //if (EventSystem.current.IsPointerOverGameObject())
         //{
@@ -52,13 +59,13 @@ public class JoystickUIMover : MonoBehaviour
         // If not we move the movement UI element
         Vector2 mousePos = Mouse.current.position.ReadValue();
 
-        if (Input.touches.Length <= 0 )
-        {
-            return;
-        }
-        Touch lastTouch = Input.GetTouch(Input.touchCount - 1);
+        //if (Input.touches.Length <= 0 )
+        //{
+        //    return;
+        //}
+        //Touch lastTouch = Input.GetTouch(Input.touchCount - 1);
         // Access the screen position of the last touch
-        Vector2 lastTouchScreenPosition = lastTouch.position;
+        Vector2 lastTouchScreenPosition = context.action.ReadValue<Vector2>();
 
 
         _uiToMove.position = lastTouchScreenPosition;
