@@ -20,7 +20,7 @@ namespace Player
         [SerializeField] private EnemyPool enemyPool;
         [SerializeField] private Stats.StatSheet statSheet;
 
-        [SerializeField] private ParticleSystem particleSystem;
+        [SerializeField] private GameObject poisonAuraVisual;
 
         private float _baseDamage;
         private float _damageFrequencySeconds;
@@ -58,6 +58,9 @@ namespace Player
             _range = stats.Range;
             _slowFraction = stats.SlowFraction;
 
+            // Enable visual
+            poisonAuraVisual.SetActive(true);
+
             _isGranted = true;
             _tickTimer = 0f; // tick immediately on grant rather than waiting a full interval
         }
@@ -69,9 +72,6 @@ namespace Player
             // since it's still an ability for stat-scaling purposes.
             var scaledDamage = statSheet.ApplyPercentBonus(_baseDamage, Stats.StatType.AbilityPower);
             var playerPosition = transform.position;
-
-            // Play poison particle
-            particleSystem.Play();
 
             foreach (var enemyView in enemyPool.ActiveEnemies)
             {
