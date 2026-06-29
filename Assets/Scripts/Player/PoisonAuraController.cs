@@ -20,6 +20,8 @@ namespace Player
         [SerializeField] private EnemyPool enemyPool;
         [SerializeField] private Stats.StatSheet statSheet;
 
+        [SerializeField] private ParticleSystem particleSystem;
+
         private float _baseDamage;
         private float _damageFrequencySeconds;
         private float _range;
@@ -28,7 +30,8 @@ namespace Player
         private float _tickTimer;
         private bool _isGranted;
 
-        public bool IsGranted => _isGranted;
+        // The poison particle system starts and stops by this setting.
+        public bool IsGranted { get { return _isGranted; } set { _isGranted = value; } }
 
         private void Awake()
         {
@@ -66,6 +69,9 @@ namespace Player
             // since it's still an ability for stat-scaling purposes.
             var scaledDamage = statSheet.ApplyPercentBonus(_baseDamage, Stats.StatType.AbilityPower);
             var playerPosition = transform.position;
+
+            // Play poison particle
+            particleSystem.Play();
 
             foreach (var enemyView in enemyPool.ActiveEnemies)
             {
