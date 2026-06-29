@@ -45,6 +45,9 @@ namespace Player
         [SerializeField] private float baseKnockbackForce = 4f;
         [SerializeField] private float knockbackDuration = 0.2f;
 
+        [Header("Particle Effect")]
+        [SerializeField] private ParticleSystem AttackParticleEffect;
+
         private StatSheet _statSheet;
         private IMeleeEnchant[] _enchants;
 
@@ -115,6 +118,7 @@ namespace Player
         private void StartSwing()
         {
             _isSwinging = true;
+            AttackParticleEffect.Play();
             _hitThisSwing.Clear();
 
             // Hit everyone already standing in range the instant the swing starts —

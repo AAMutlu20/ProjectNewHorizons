@@ -20,6 +20,8 @@ namespace Player
         [SerializeField] private EnemyPool enemyPool;
         [SerializeField] private Stats.StatSheet statSheet;
 
+        [SerializeField] private GameObject poisonAuraVisual;
+
         private float _baseDamage;
         private float _damageFrequencySeconds;
         private float _range;
@@ -28,7 +30,8 @@ namespace Player
         private float _tickTimer;
         private bool _isGranted;
 
-        public bool IsGranted => _isGranted;
+        // The poison particle system starts and stops by this setting.
+        public bool IsGranted { get { return _isGranted; } set { _isGranted = value; } }
 
         private void Awake()
         {
@@ -54,6 +57,9 @@ namespace Player
             _damageFrequencySeconds = stats.DamageFrequencySeconds;
             _range = stats.Range;
             _slowFraction = stats.SlowFraction;
+
+            // Enable visual
+            poisonAuraVisual.SetActive(true);
 
             _isGranted = true;
             _tickTimer = 0f; // tick immediately on grant rather than waiting a full interval

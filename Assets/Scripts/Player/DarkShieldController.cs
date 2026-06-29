@@ -21,6 +21,8 @@ namespace Player
     /// </summary>
     public class DarkShieldController : MonoBehaviour
     {
+        [SerializeField] private GameObject darkShieldVisual;
+
         private int _maxLayers;
         private int _currentLayers;
         private float _layerRegenSeconds;
@@ -57,6 +59,8 @@ namespace Player
             _currentLayers = stats.Layers;
             _layerRegenSeconds = stats.LayerRegenSeconds;
             _fullShieldRegenSeconds = stats.FullShieldRegenSeconds;
+            // Activate visual
+            darkShieldVisual.SetActive(true);
 
             _layerRegenTimers.Clear();
             _isFullyDepleted = false;

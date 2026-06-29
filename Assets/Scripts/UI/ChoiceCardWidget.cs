@@ -24,6 +24,8 @@ namespace UI
         [SerializeField] private Image iconImage;
         [SerializeField] private Button selectButton;
 
+        [SerializeField] private bool useRaritySprites = false;
+
         [Header("Rarity colours — index order: Common, Rare, Epic, Legendary")]
         [SerializeField] private Color[] rarityColors =
         {
@@ -32,6 +34,8 @@ namespace UI
             new(0.65f, 0.25f, 0.95f), // Epic - purple
             new(1f, 0.65f, 0.1f),     // Legendary - orange/gold
         };
+        [SerializeField] private Sprite[] RaritySprites;
+
 
         private System.Action _onSelected;
 
@@ -48,7 +52,12 @@ namespace UI
             if (descriptionLabel) descriptionLabel.text = data.Description;
             if (iconImage) iconImage.sprite = data.Icon;
 
+            if(useRaritySprites)
+            {
+                if (rarityBorder) rarityBorder.sprite = GetRaritySprite(data.Rarity);
+            }
             if (rarityBorder) rarityBorder.color = GetRarityColor(data.Rarity);
+            
 
             _onSelected = data.OnSelected;
         }
@@ -62,6 +71,17 @@ namespace UI
                 return Color.white;
             }
             return rarityColors[index];
+        }
+
+        private Sprite GetRaritySprite(Rarity rarity)
+        {
+            var index = (int)rarity;
+            if (index < 0 || index >= RaritySprites.Length)
+            {
+                Debug.LogWarning($"ChoiceCardWidget: no sprite configured for rarity {rarity}.", this);
+                return null;
+            }
+            return RaritySprites[index];
         }
 
         private void HandleClicked()

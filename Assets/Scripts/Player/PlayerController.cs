@@ -124,6 +124,7 @@ namespace Player
             if (_input.sqrMagnitude <= 0.0001f) return; // standing still — keep the last facing direction
 
             _facingDirection = new Vector3(_input.x, 0f, _input.y).normalized;
+            _rb.rotation = Quaternion.LookRotation(_facingDirection);
         }
 
         private void FixedUpdate()
