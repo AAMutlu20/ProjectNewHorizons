@@ -21,7 +21,7 @@ public class StatHUDUIElement : MonoBehaviour
     private void UpdateStatUI()
     {
         if (_statSheet == null) { return; }
-        _statUIStatNameElement.text = $"{_statTypeToShow.HumanName()}:";
+        _statUIStatNameElement.text = $"{_statTypeToShow.ToString()}:";
         string valueString = $"{_statSheet.GetTotal(_statTypeToShow)}";
         if (_addPercentageSignAfterValue) { valueString += "%"; }
         _statUIValueElement.text = valueString;
