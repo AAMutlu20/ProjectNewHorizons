@@ -186,7 +186,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemies.ZombieExplodeBehaviour
   playerBodyLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
 --- !u!1 &7820093109181825016
 GameObject:
   m_ObjectHideFlags: 0

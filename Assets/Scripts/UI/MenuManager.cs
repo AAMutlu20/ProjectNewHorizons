@@ -1,12 +1,19 @@
+using Core;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Linq;
 
 public class MenuManager : MonoBehaviour
 {
+    [SerializeField] private GameObject gameOverMenu;
+
     public GameObject overlay;
     public GameObject settings;
 
+    void Start()
+    {
+        EventBus.Subscribe<PlayerDiedEvent>(OnPlayerDied);
+    }
 
     // Closes the game
     public void QuitGame()
@@ -56,6 +63,12 @@ public class MenuManager : MonoBehaviour
         overlay.gameObject.SetActive(true);
         settings.gameObject.SetActive(false);
         Time.timeScale = 1f;
+    }
+
+    private void OnPlayerDied(PlayerDiedEvent @event)
+    {
+        Time.timeScale = 0;
+        gameOverMenu.SetActive(true);
     }
 
 }

@@ -21,7 +21,7 @@ namespace UI
         [SerializeField] private Image healthBarFill;
         [SerializeField] private TextMeshProUGUI hpLabel;
 
-        private void Start()
+        private void Awake()
         {
             EventBus.Subscribe<PlayerHealthChangedEvent>(OnHealthChanged);
             if (healthBarFill) healthBarFill.fillAmount = 1f;
