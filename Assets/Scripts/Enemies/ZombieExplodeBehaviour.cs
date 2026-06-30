@@ -58,13 +58,10 @@ namespace Enemies
         {
             if (_hasExploded) return;
             if (!OwnerView || !OwnerView.Data.IsAlive) return;
-
             if (playerBodyLayers != 0 && (playerBodyLayers.value & (1 << other.gameObject.layer)) == 0)
                 return; // hit something, but not on a layer we care about
-
             var playerHealth = other.GetComponentInParent<Player.PlayerHealth>();
             if (!playerHealth) return;
-
             Explode();
         }
 

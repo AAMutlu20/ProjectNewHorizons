@@ -31,7 +31,7 @@ namespace Player
         // How close an attack's reported position must be to count as a hit on
         // this player. Wider than melee range so ranged enemy attacks (which
         // report their impact point, not the enemy's position) still connect.
-        private const float AttackHitRadius = 1.5f;
+        private const float AttackHitRadius = 3.6f;
         private const float PercentToFraction = 100f;
 
         [SerializeField] private float baseMaxHp = 200f;
@@ -95,7 +95,6 @@ namespace Player
         private void OnEnemyAttack(EnemyAttackEvent attack)
         {
             if (_isDead) return;
-
             // XZ-only distance -- matches BehaviourController's attack-range
             // check (also XZ-only, per design: small vertical offsets between
             // an enemy's resting height and the player's shouldn't matter for
@@ -110,16 +109,13 @@ namespace Player
             var attackPositionXz = new Vector3(attack.Position.x, 0f, attack.Position.z);
             var distanceToAttack = Vector3.Distance(playerPositionXz, attackPositionXz);
             if (distanceToAttack > AttackHitRadius) return;
-
             ApplySlowIfAny(attack);
 
             if (_iFrameTimer > 0f) return; // still invincible — damage blocked, slow still applies
-
             // Shield blocks the hit entirely, consuming a layer, only for
             // hits that would otherwise actually land — no point spending a
             // layer on a hit i-frames would have nullified for free.
             if (_shield != null && _shield.TryBlockDamage()) return;
-
             TakeDamage(attack.Damage);
         }
 
