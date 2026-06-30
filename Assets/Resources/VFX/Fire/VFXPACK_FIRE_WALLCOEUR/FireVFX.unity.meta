@@ -1,14 +1,7 @@
 fileFormatVersion: 2
-guid: f77763c0712c15e41a1e6e842dd22b91
+guid: b6137f4786765f84c8c0c19b4f083f24
 DefaultImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 305098
-  packageName: VFX URP - Fire Package
-  packageVersion: 1.0
-  assetPath: Assets/VFXPACK_FIRE_WALLCOEUR/FireVFX.unity
-  uploadId: 716663
