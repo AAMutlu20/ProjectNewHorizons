@@ -40,12 +40,13 @@ namespace Enemies
 
         public void TickAttack(ref EnemyData enemy, float deltaTime)
         {
+            Debug.Log("Spider attack tick");
             enemy.State = EnemyState.Attacking;
             enemy.AttackTimer -= deltaTime;
             enemy.Velocity = Vector3.zero;
 
             if (!enemy.CanAttack) return;
-
+            Debug.Log("Spider attack tick 2");
             enemy.AttackTimer = enemy.TypeSo.attackCooldown;
             EventBus.Emit(new EnemyAttackEvent
             {

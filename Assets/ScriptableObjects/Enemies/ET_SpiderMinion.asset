@@ -14,11 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemies.EnemyTypeSo
   type: 2
   prefab: {fileID: 7564133134363199326, guid: 1f614e38a3f53d24aad6b72944c46f78, type: 3}
+  groundOffsetY: 1
   poolSize: 100
   baseHp: 6
   baseSpeed: 6
   baseDamage: 4
-  attackRange: 1
+  attackRange: 5
   attackCooldown: 0.8
   separationForce: 1.5
   xpValue: 1

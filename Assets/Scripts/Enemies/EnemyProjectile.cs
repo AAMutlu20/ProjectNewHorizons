@@ -56,9 +56,10 @@ namespace Enemies
 
         private void OnTriggerEnter(Collider other)
         {
+            Debug.Log($"Red Enemy projectile hit {other.name}");
             if (!_isActive) return;
             if (!other.GetComponentInParent<PlayerController>()) return;
-
+            Debug.Log($"Red Enemy projectile hit {other.name} and got through checks, will now damage with {_damage}");
             EventBus.Emit(new EnemyAttackEvent
             {
                 Damage = _damage,
