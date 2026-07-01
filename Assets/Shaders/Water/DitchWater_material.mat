@@ -66,8 +66,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _Current_Speed: 0.25
     - _QueueControl: 0
     - _QueueOffset: 0
+    - _Wave_Height: 0
+    - _Wave_Horizontal_Shaking: 0.05
     m_Colors: []
   m_BuildTextureStacks: []
   m_AllowLocking: 1
