@@ -9,6 +9,7 @@ public class StatHUDUIElement : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _statUIStatNameElement;
     [SerializeField] private TextMeshProUGUI _statUIValueElement;
     [SerializeField] private StatSheet _statSheet;
+    [SerializeField] private string _statName;
 
     [SerializeField] private bool _addPercentageSignAfterValue = false;
 
@@ -21,7 +22,7 @@ public class StatHUDUIElement : MonoBehaviour
     private void UpdateStatUI()
     {
         if (_statSheet == null) { return; }
-        _statUIStatNameElement.text = $"{_statTypeToShow.ToString()}:";
+        _statUIStatNameElement.text = $"{_statName}:";
         string valueString = $"{_statSheet.GetTotal(_statTypeToShow)}";
         if (_addPercentageSignAfterValue) { valueString += "%"; }
         _statUIValueElement.text = valueString;
