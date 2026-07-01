@@ -69,9 +69,12 @@ Material:
     - _Current_Speed: 0.25
     - _QueueControl: 0
     - _QueueOffset: 0
+    - _Smoothness: 1
+    - _Water_Normals: 3
     - _Wave_Height: 0
     - _Wave_Horizontal_Shaking: 0.05
-    m_Colors: []
+    m_Colors:
+    - _Water_Scale: {r: 2, g: 2, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &7358785126536736787
