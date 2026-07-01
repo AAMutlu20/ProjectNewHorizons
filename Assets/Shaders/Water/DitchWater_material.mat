@@ -70,7 +70,7 @@ Material:
     - _Distortion_Speed: 0.25
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _Smoothness: 1
+    - _Smoothness: 0.5
     - _Water_Normals: 3
     - _Wave_Height: 0
     - _Wave_Horizontal_Shaking: 0.05

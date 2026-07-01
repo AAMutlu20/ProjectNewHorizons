@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 813551313410199494}
   - component: {fileID: 3716639997159566287}
   - component: {fileID: 2099580445896292631}
-  - component: {fileID: -8521449192754006818}
+  - component: {fileID: 6995289707302715779}
   m_Layer: 0
   m_Name: WoodenBarrel_geo
   m_TagString: Untagged
@@ -91,8 +91,8 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &-8521449192754006818
-CapsuleCollider:
+--- !u!65 &6995289707302715779
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -109,8 +109,6 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 43.805412
-  m_Height: 86.47001
-  m_Direction: 1
-  m_Center: {x: 0, y: 41.631153, z: 0}
+  serializedVersion: 3
+  m_Size: {x: 74.535, y: 86.47, z: 74.92937}
+  m_Center: {x: 1.4069954, y: 41.63115, z: -0.42535764}
