@@ -14,7 +14,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &1021232552936627793
 Transform:
@@ -55,7 +55,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &6857817507042521583
 Transform:
@@ -91,7 +91,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &9198051592780488750
 Transform:
@@ -203,7 +203,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &952784820797989301
 Transform:
@@ -312,7 +312,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &6299221947236684520
 Transform:
@@ -358,7 +358,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &7980705350619224353
 Transform:
@@ -470,7 +470,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &6063887126441611800
 Transform:
@@ -582,7 +582,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &8519641358174594463
 Transform:
@@ -694,7 +694,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &5094142712479935810
 Transform:
@@ -806,7 +806,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &5694371475785779515
 Transform:
@@ -915,7 +915,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &6421717546312577744
 Transform:
@@ -959,7 +959,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &1805601212642982378
 Transform:
@@ -1071,7 +1071,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &7001342900479050530
 Transform:
@@ -1183,7 +1183,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &3115667650901004505
 Transform:
@@ -1290,6 +1290,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Column02_geo (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 5011934108458874810, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.048325
@@ -1363,6 +1367,10 @@ PrefabInstance:
     - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_Name
       value: Column02_geo (6)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 5011934108458874810, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_LocalScale.x
@@ -1438,6 +1446,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Column02_geo
       objectReference: {fileID: 0}
+    - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 5011934108458874810, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.048325
@@ -1512,6 +1524,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Column02_geo (8)
       objectReference: {fileID: 0}
+    - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 5011934108458874810, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.048325
@@ -1585,6 +1601,10 @@ PrefabInstance:
     - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_Name
       value: Column02_geo (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 5011934108458874810, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_LocalScale.x
@@ -1738,6 +1758,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Column02_geo
       objectReference: {fileID: 0}
+    - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 5011934108458874810, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.048325
@@ -1811,6 +1835,10 @@ PrefabInstance:
     - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_Name
       value: Column02_geo (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 5011934108458874810, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_LocalScale.x
@@ -1886,6 +1914,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Column02_geo (9)
       objectReference: {fileID: 0}
+    - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 5011934108458874810, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.048325
@@ -1959,6 +1991,10 @@ PrefabInstance:
     - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_Name
       value: Column02_geo (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 5011934108458874810, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_LocalScale.x
@@ -2034,6 +2070,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Column02_geo (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 5011934108458874810, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.048325
@@ -2107,6 +2147,10 @@ PrefabInstance:
     - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_Name
       value: Column02_geo (7)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 5011934108458874810, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_LocalScale.x
@@ -2182,6 +2226,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Column02_geo (6)
       objectReference: {fileID: 0}
+    - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 5011934108458874810, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.048325
@@ -2255,6 +2303,10 @@ PrefabInstance:
     - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_Name
       value: Column02_geo (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 5011934108458874810, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_LocalScale.x
@@ -2330,6 +2382,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Column02_geo (9)
       objectReference: {fileID: 0}
+    - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 5011934108458874810, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.048325
@@ -2403,6 +2459,10 @@ PrefabInstance:
     - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_Name
       value: Column02_geo (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 5011934108458874810, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_LocalScale.x
@@ -2478,6 +2538,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Column02_geo (7)
       objectReference: {fileID: 0}
+    - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 5011934108458874810, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.048325
@@ -2551,6 +2615,10 @@ PrefabInstance:
     - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_Name
       value: Column02_geo (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 5011934108458874810, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_LocalScale.x
@@ -2626,6 +2694,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Column02_geo (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 5011934108458874810, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.048325
@@ -2700,6 +2772,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Column02_geo (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 5011934108458874810, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.048325
@@ -2773,6 +2849,10 @@ PrefabInstance:
     - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_Name
       value: Column02_geo (8)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3211517823591795814, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 5011934108458874810, guid: cb15f6e05f80fd54bacb6c2f4061b643, type: 3}
       propertyPath: m_LocalScale.x

@@ -14,7 +14,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &1688592405979327493
 Transform:
@@ -46,6 +46,10 @@ PrefabInstance:
     - target: {fileID: 2830153777281974158, guid: 21cf402a83a972c48af45b74eb0b75eb, type: 3}
       propertyPath: m_Name
       value: WoodenBox_geo (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2830153777281974158, guid: 21cf402a83a972c48af45b74eb0b75eb, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 5013899305900084008, guid: 21cf402a83a972c48af45b74eb0b75eb, type: 3}
       propertyPath: m_LocalScale.x
@@ -116,6 +120,10 @@ PrefabInstance:
     - target: {fileID: 6694542590244643126, guid: 107be05b42e16b54398699beaabae606, type: 3}
       propertyPath: m_Name
       value: WoodPlate03_geo (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6694542590244643126, guid: 107be05b42e16b54398699beaabae606, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 8098932845171657537, guid: 107be05b42e16b54398699beaabae606, type: 3}
       propertyPath: m_LocalScale.x
@@ -243,6 +251,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: WoodenBarrel_geo
       objectReference: {fileID: 0}
+    - target: {fileID: 3449153535982565965, guid: e08342fed9d0f4547b6177a490bc7419, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -264,6 +276,10 @@ PrefabInstance:
     - target: {fileID: 2830153777281974158, guid: 21cf402a83a972c48af45b74eb0b75eb, type: 3}
       propertyPath: m_Name
       value: WoodenBox_geo
+      objectReference: {fileID: 0}
+    - target: {fileID: 2830153777281974158, guid: 21cf402a83a972c48af45b74eb0b75eb, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 5013899305900084008, guid: 21cf402a83a972c48af45b74eb0b75eb, type: 3}
       propertyPath: m_LocalScale.x
