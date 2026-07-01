@@ -455,14 +455,14 @@ RectTransform:
   m_GameObject: {fileID: 179232491}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 2}
-  m_LocalScale: {x: 2.9021997, y: 2.9021997, z: 2.9021997}
+  m_LocalScale: {x: 2.6354294, y: 2.6354294, z: 2.6354294}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1161358242}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 290.21997, y: 1.500061}
+  m_AnchoredPosition: {x: 284.21994, y: -10.499958}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &179232493
@@ -485,9 +485,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'GAME TITLE
-
-'
+  m_text: Death By Dungeon
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9855a2f92cd3a5046bccb2adb9d332f5, type: 2}
   m_sharedMaterial: {fileID: -1720298495724624386, guid: 9855a2f92cd3a5046bccb2adb9d332f5, type: 2}
@@ -514,8 +512,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 27
+  m_fontSizeBase: 27
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -553,7 +551,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: -52.390778, w: -0.8393698}
+  m_margin: {x: 0, y: 0, z: -86.537964, w: 14.506617}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -1119,6 +1117,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de92b65b6ce191b48ae8b4ab4ed52e51, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuManager
+  gameOverMenu: {fileID: 0}
   overlay: {fileID: 982129}
   settings: {fileID: 954538225}
 --- !u!4 &853630502
@@ -1771,14 +1770,14 @@ RectTransform:
   m_GameObject: {fileID: 1550368723}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 2}
-  m_LocalScale: {x: 2.9021997, y: 2.9021997, z: 2.9021997}
+  m_LocalScale: {x: 2.6354294, y: 2.6354294, z: 2.6354294}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1161358242}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 294, y: -2}
+  m_AnchoredPosition: {x: 288, y: -14}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &1550368725
@@ -1801,9 +1800,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'GAME TITLE
-
-'
+  m_text: Death By Dungeon
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9855a2f92cd3a5046bccb2adb9d332f5, type: 2}
   m_sharedMaterial: {fileID: -1720298495724624386, guid: 9855a2f92cd3a5046bccb2adb9d332f5, type: 2}
@@ -1830,8 +1827,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 27
+  m_fontSizeBase: 27
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1869,7 +1866,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: -52.390778, w: -0.8393698}
+  m_margin: {x: 0, y: 0, z: -85.25543, w: -0.8393698}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
