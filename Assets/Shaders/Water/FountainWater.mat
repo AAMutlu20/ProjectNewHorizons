@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: DitchWater_material
+  m_Name: FountainWater
   m_Shader: {fileID: -6465566751694194690, guid: 628de2b923d66a44b81c0e8bfd4c79f0, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -32,19 +32,7 @@ Material:
         m_Texture: {fileID: 2800000, guid: 7e5993f42353c03448e17dec319c249d, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _SampleTexture2DLOD_bd1f5cb19e234d9b94985ed3cba0caa8_Texture_1_Texture2D:
-        m_Texture: {fileID: 2800000, guid: 927631147c99167439e146a77fd52873, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _SampleTexture2D_08d81b84e0df45f6b3191b3149077a54_Texture_1_Texture2D:
-        m_Texture: {fileID: 2800000, guid: 927631147c99167439e146a77fd52873, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _SampleTexture2D_271d548c88cf4ed7b6cc8e0610bb3234_Texture_1_Texture2D:
-        m_Texture: {fileID: 2800000, guid: 927631147c99167439e146a77fd52873, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _SampleTexture2D_ba3a6890071f47658c2cdbd48e9fb5b8_Texture_1_Texture2D:
         m_Texture: {fileID: 2800000, guid: 927631147c99167439e146a77fd52873, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -66,19 +54,19 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Current_Speed: 0.25
-    - _Distortion_Speed: 0.25
+    - _Current_Speed: 0
+    - _Distortion_Speed: 0.01
     - _QueueControl: 0
     - _QueueOffset: 0
     - _Smoothness: 1
-    - _Water_Normals: 3
-    - _Wave_Height: 0
-    - _Wave_Horizontal_Shaking: 0.05
+    - _Water_Normals: 1
+    - _Wave_Height: 1.38
+    - _Wave_Horizontal_Shaking: 5
     m_Colors:
-    - _Water_Scale: {r: 2, g: 2, b: 0, a: 0}
+    - _Water_Scale: {r: 4.52, g: 2.13, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
---- !u!114 &7358785126536736787
+--- !u!114 &6226450618685511899
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
