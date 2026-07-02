@@ -1,6 +1,0 @@
-﻿<Solution>
-  <Project Path="Assembly-CSharp.csproj" />
-  <Project Path="SimpleFolderIcon.csproj" />
-  <Project Path="VirtualButtonsScripts.csproj" />
-  <Project Path="Assembly-CSharp-Editor.csproj" />
-</Solution>
