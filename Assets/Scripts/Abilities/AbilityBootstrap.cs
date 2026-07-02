@@ -24,27 +24,23 @@ namespace Abilities
         [Header("Shockwave")]
         [SerializeField] private ShockwaveDefinitionSo shockwaveDefinition;
         [SerializeField] private ShockwaveChoiceEntry shockwaveEntry;
-        [SerializeField] private ParticleSystem shockwaveParticles;
 
         [Header("Meteor Slam")]
         [SerializeField] private MeteorSlamDefinitionSo meteorSlamDefinition;
         [SerializeField] private AoeTelegraphRingPool meteorSlamTelegraphPool;
-        [SerializeField] private VFX.DamageOverTimeZonePool meteorSlamLavaPoolPool;
+        [SerializeField] private DamageOverTimeZonePool meteorSlamLavaPoolPool;
         [SerializeField] private MeteorSlamChoiceEntry meteorSlamEntry;
-        [SerializeField] private ParticleSystem meteorSlamParticles;
 
         [Header("Laser Beam")]
         [SerializeField] private LaserBeamDefinitionSo laserBeamDefinition;
-        [SerializeField] private VFX.LaserBeamZonePool laserBeamZonePool;
+        [SerializeField] private LaserBeamZonePool laserBeamZonePool;
         [SerializeField] private Transform playerTransform;
         [SerializeField] private LaserBeamChoiceEntry laserBeamEntry;
-        [SerializeField] private ParticleSystem laserBeamParticles;
 
         [Header("Cone of Fire")]
         [SerializeField] private ConeOfFireDefinitionSo coneOfFireDefinition;
         [SerializeField] private Player.PlayerController playerController;
         [SerializeField] private ConeOfFireChoiceEntry coneOfFireEntry;
-        [SerializeField] private ParticleSystem coneOfFireParticles;
 
         private void Awake()
         {
@@ -62,7 +58,7 @@ namespace Abilities
                 return;
             }
 
-            var ability = new ShockwaveAbility(shockwaveDefinition, shockwaveParticles);
+            var ability = new ShockwaveAbility(shockwaveDefinition);
             shockwaveEntry.Configure(ability,
                 stats => $"Damage: {stats.Damage:F0}  Radius: {stats.Radius:F0}  Stun: {stats.StunDuration:F1}s");
         }
@@ -75,8 +71,7 @@ namespace Abilities
                 return;
             }
 
-            var ability = new MeteorSlamAbility(meteorSlamDefinition, meteorSlamTelegraphPool,
-                meteorSlamLavaPoolPool, meteorSlamParticles);
+            var ability = new MeteorSlamAbility(meteorSlamDefinition, meteorSlamTelegraphPool, meteorSlamLavaPoolPool);
             meteorSlamEntry.Configure(ability,
                 stats => $"Damage: {stats.Damage:F0}  Impact Radius: {stats.ImpactRadius:F0}");
         }
@@ -89,8 +84,7 @@ namespace Abilities
                 return;
             }
 
-            var ability = new LaserBeamAbility(laserBeamDefinition, laserBeamZonePool,
-                playerTransform, laserBeamParticles);
+            var ability = new LaserBeamAbility(laserBeamDefinition, laserBeamZonePool, playerTransform);
             laserBeamEntry.Configure(ability,
                 stats => $"Beams: {stats.BeamCount}  Weakening: {stats.WeakeningMultiplierBonus * 100f:F0}%");
         }
@@ -103,7 +97,7 @@ namespace Abilities
                 return;
             }
 
-            var ability = new ConeOfFireAbility(coneOfFireDefinition, playerController, coneOfFireParticles);
+            var ability = new ConeOfFireAbility(coneOfFireDefinition, playerController);
             coneOfFireEntry.Configure(ability,
                 stats => $"Damage: {stats.Damage:F0}  Range: {stats.Range:F0}");
         }

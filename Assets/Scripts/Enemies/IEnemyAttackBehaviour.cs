@@ -58,14 +58,5 @@ namespace Enemies
         public UnityEngine.Vector3 Position;
         public float SlowFraction;
         public float SlowDuration;
-
-        /// <summary>
-        /// True for projectile hits — these are already validated by OnTriggerEnter
-        /// on the projectile collider, so PlayerHealth's proximity gate should be
-        /// skipped. False for melee/contact attacks that emit at the enemy's position
-        /// and do need the gate to filter out attacks from enemies that are
-        /// technically on cooldown but physically adjacent to the player.
-        /// </summary>
-        public bool IsRanged;
     }
 }

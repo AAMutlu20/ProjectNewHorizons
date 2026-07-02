@@ -138,21 +138,9 @@ namespace Player
 
         private void DamageEveryoneInRange()
         {
-            // Iterate backwards so we can safely remove stale entries mid-loop.
-            // A "stale" entry is an EnemyView that has been returned to the pool
-            // (deactivated) since it entered the trigger — OnTriggerExit doesn't
-            // fire when an object is deactivated, so the list can hold dead references.
-            for (var i = _enemiesInRange.Count - 1; i >= 0; i--)
+            foreach (var enemy in _enemiesInRange)
             {
-                var enemy = _enemiesInRange[i];
-
-                // Remove stale pool entries — deactivated enemies are no longer in the world
-                if (!enemy || !enemy.gameObject.activeInHierarchy)
-                {
-                    _enemiesInRange.RemoveAt(i);
-                    continue;
-                }
-
+                if (!enemy) continue; // pooled enemy may have been returned/deactivated
                 TryHit(enemy);
             }
         }
@@ -161,30 +149,21 @@ namespace Player
         {
             if (_hitThisSwing.Contains(enemy)) return;
 
-            var damage = RollDamage(out var isCrit);
+            var damage = RollDamage();
             enemy.TakeDamage(damage, transform.position, CurrentKnockbackForce(), knockbackDuration);
             _hitThisSwing.Add(enemy);
-
-            // VFX hook — ShieldVfx, CleavingVfx, LifestealVfx etc all listen here
-            // rather than coupling to MeleeWeapon directly.
-            Core.EventBus.Emit(new Core.MeleeHitEvent
-            {
-                HitPosition = enemy.Data.Position,
-                DamageDealt = damage,
-                IsCrit = isCrit,
-            });
 
             foreach (var enchant in _enchants)
                 enchant.OnMeleeHit(enemy, damage, transform.position);
         }
 
-        private float RollDamage(out bool isCrit)
+        private float RollDamage()
         {
             var totalDamage = baseDamage + _statSheet.GetTotal(StatType.AttackDamage);
 
             var critChancePercent = _statSheet.GetTotal(StatType.CriticalStrikeChance);
-            isCrit = Random.Range(0f, PercentToFraction) < critChancePercent;
-            if (!isCrit) return totalDamage;
+            var rolledCrit = Random.Range(0f, PercentToFraction) < critChancePercent;
+            if (!rolledCrit) return totalDamage;
 
             var critMultiplierPercent = BaseCriticalStrikeMultiplier + _statSheet.GetTotal(StatType.CriticalStrikeDamage);
             return totalDamage * (critMultiplierPercent / PercentToFraction);
@@ -198,12 +177,9 @@ namespace Player
             if (!_enemiesInRange.Contains(enemy))
                 _enemiesInRange.Add(enemy);
 
-            // Don't hit an enemy that is still in its spawn grace period —
-            // even if a swing is active, the IsSpawning check in TakeDamage
-            // would block the damage anyway, but skipping TryHit entirely
-            // also prevents the enemy from being added to _hitThisSwing,
-            // which would unfairly make them immune to the NEXT swing too.
-            if (_isSwinging && !enemy.Data.IsSpawning)
+            // If a swing is already active when the enemy walks in, hit them immediately
+            // instead of making them wait for the next cycle.
+            if (_isSwinging)
                 TryHit(enemy);
         }
 

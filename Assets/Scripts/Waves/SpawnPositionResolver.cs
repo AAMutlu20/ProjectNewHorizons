@@ -3,80 +3,94 @@ using UnityEngine;
 namespace Waves
 {
     /// <summary>
-    /// Resolves a candidate XZ position into a valid world spawn point.
+    /// Resolves a candidate X/Z spawn position into an actually-valid world
+    /// position: raycasts down to find the REAL ground height at that point
+    /// (so a raised platform, a ramp, or the floor mesh's own noise are all
+    /// respected, not assumed flat), then checks for obstruction (so an enemy
+    /// never spawns inside a wall, a well, or another solid collider).
     ///
-    /// TWO RULES ONLY:
-    ///   1. A downward raycast must hit a collider on groundLayers.
-    ///      The hit point becomes the enemy's Y position (+ groundOffsetY from the SO).
-    ///   2. The candidate must be within the spawn ring (enforced by WaveDirector
-    ///      before calling — this resolver does not re-check distance).
+    /// groundOffsetY (from EnemyTypeSo) is correctly treated as a LOCAL
+    /// foot-to-pivot offset, applied on top of whatever ground height this
+    /// resolver actually finds -- not a hardcoded absolute world Y.
     ///
-    /// The obstruction check has been removed. It was hitting unidentified
-    /// colliders in the scene and rejecting every valid position. If an enemy
-    /// spawns inside a prop, move the prop — do not add obstruction complexity
-    /// back until the scene is fully built and layers are confirmed stable.
-    ///
-    /// Attach to: the same GameObject as WaveDirector.
-    /// Wire: groundLayers to the Ground layer mask.
+    /// Attach to: the same GameObject as WaveDirector, or any [Systems] object --
+    /// EnemyPool holds a reference to this and calls TryResolve per spawn.
     /// </summary>
     public class SpawnPositionResolver : MonoBehaviour
     {
         [Header("Ground detection")]
-        [Tooltip("Layers the downward raycast looks for. Must include your floor tile layer (Ground).")]
+        [Tooltip("Layers considered 'ground' for the downward raycast -- the floor, platforms, ramps, etc.")]
         [SerializeField] private LayerMask groundLayers;
 
-        [Tooltip("Raycast origin is this many world units ABOVE the candidate XZ position. " +
-                 "Must be higher than your highest floor tile's world Y.")]
+        [Tooltip("Raycast starts this far above the candidate position, so it can find ground " +
+                 "even on a platform raised above the nominal arena Y.")]
         [SerializeField] private float raycastStartHeight = 50f;
 
-        [Tooltip("How far downward the ray travels. Must reach your lowest floor Y.")]
+        [Tooltip("Raycast travels this far downward looking for ground. Should comfortably exceed " +
+                 "the tallest expected platform/structure, plus raycastStartHeight's own margin.")]
         [SerializeField] private float raycastMaxDistance = 200f;
 
-        [Tooltip("How many times to re-roll a new candidate position if the first has no ground beneath it. " +
-                 "With the obstruction check removed, retries only matter for positions that fall " +
-                 "outside the floor geometry (e.g. over a hole or beyond the arena edge).")]
+        [Header("Obstruction check")]
+        [Tooltip("Layers that should block a spawn if something is already there -- the Obstructions layer, props, other solid geometry.")]
+        [SerializeField] private LayerMask obstructionLayers;
+
+        [Tooltip("Radius of the overlap check used to detect obstruction, roughly matching an enemy's footprint.")]
+        [SerializeField] private float obstructionCheckRadius = 0.6f;
+
+        [Tooltip("How many alternate candidate positions to try (via retryPositionFunc) before giving up on this spawn.")]
         [SerializeField] private int maxRetries = 5;
 
         /// <summary>
-        /// Fires a downward raycast at candidatePos (Y is ignored — ray always starts
-        /// at raycastStartHeight). Returns true if ground was found and sets
-        /// resolvedPosition to the hit point + groundOffsetY.
-        ///
-        /// If no ground is found, calls retryPositionFunc for a new candidate
-        /// and tries again up to maxRetries times.
+        /// Attempts to resolve candidateXz (Y ignored) into a valid grounded,
+        /// unobstructed world position at groundOffsetY above the real
+        /// detected ground. If the first candidate is obstructed, calls
+        /// retryPositionFunc to get a new candidate and tries again, up to
+        /// maxRetries times. Returns false if no valid position was found.
         /// </summary>
-        public bool TryResolve(Vector3 candidatePos, float groundOffsetY,
+        public bool TryResolve(Vector3 candidateXz, float groundOffsetY,
             System.Func<Vector3> retryPositionFunc, out Vector3 resolvedPosition)
         {
-            var candidate = candidatePos;
+            var candidate = candidateXz;
 
             for (var attempt = 0; attempt <= maxRetries; attempt++)
             {
-                // Always cast from a fixed height above the candidate XZ —
-                // the Y value of candidate is irrelevant (player Y, world Y, whatever).
-                var rayOrigin = new Vector3(candidate.x, raycastStartHeight, candidate.z);
-
-                if (Physics.Raycast(rayOrigin, Vector3.down, out var hit, raycastMaxDistance, groundLayers))
+                if (TryFindGroundHeight(candidate, out var groundHeight))
                 {
-                    resolvedPosition = new Vector3(candidate.x, hit.point.y + groundOffsetY, candidate.z);
-                    return true;
+                    var groundedPosition = new Vector3(candidate.x, groundHeight + groundOffsetY, candidate.z);
+
+                    if (!IsObstructed(groundedPosition))
+                    {
+                        resolvedPosition = groundedPosition;
+                        return true;
+                    }
                 }
 
-                // No ground under this candidate — roll a new one and try again.
                 candidate = retryPositionFunc();
             }
 
-            // All attempts found no ground. Likely means the spawn ring extends
-            // beyond the floor geometry. Increase floor coverage or reduce spawn radius.
-            Debug.LogWarning(
-                $"SpawnPositionResolver: no ground found after {maxRetries + 1} attempts. " +
-                $"Last candidate: ({candidate.x:F1}, {candidate.z:F1}). " +
-                "Check that groundLayers includes your floor layer and that " +
-                "the spawn ring radius does not extend beyond the floor geometry.",
-                this);
-
             resolvedPosition = default;
             return false;
+        }
+
+        private bool TryFindGroundHeight(Vector3 candidateXz, out float groundHeight)
+        {
+            var rayOrigin = new Vector3(candidateXz.x, raycastStartHeight, candidateXz.z);
+
+            if (Physics.Raycast(rayOrigin, Vector3.down, out var hit, raycastMaxDistance, groundLayers))
+            {
+                groundHeight = hit.point.y;
+                return true;
+            }
+
+            groundHeight = default;
+            Debug.LogWarning($"SpawnPositionResolver: no ground found below ({candidateXz.x:F1}, {candidateXz.z:F1}) -- " +
+                              "check groundLayers includes the floor, and raycastMaxDistance is tall enough.", this);
+            return false;
+        }
+
+        private bool IsObstructed(Vector3 position)
+        {
+            return Physics.CheckSphere(position, obstructionCheckRadius, obstructionLayers);
         }
     }
 }

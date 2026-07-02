@@ -34,25 +34,16 @@ namespace Abilities
         private readonly LaserBeamDefinitionSo _definition;
         private readonly LaserBeamZonePool _beamPool;
         private readonly Transform _playerTransform;
-        private readonly UnityEngine.ParticleSystem _particles;
 
-        public LaserBeamAbility(LaserBeamDefinitionSo definition, LaserBeamZonePool beamPool,
-            Transform playerTransform, UnityEngine.ParticleSystem particles = null)
+        public LaserBeamAbility(LaserBeamDefinitionSo definition, LaserBeamZonePool beamPool, Transform playerTransform)
         {
             _definition = definition;
             _beamPool = beamPool;
             _playerTransform = playerTransform;
-            _particles = particles;
         }
 
         public void Cast(Vector3 castOrigin, Rarity rarity, StatSheet statSheet, EnemyPool enemyPool)
         {
-            if (_particles)
-            {
-                _particles.transform.position = castOrigin;
-                _particles.Play();
-            }
-
             var stats = _definition.GetStatsForRarity(rarity);
             // Raw fraction (e.g. 0.10 for +10% damage taken), NOT 1+fraction --
             // EnemyData.ApplyWeaken now applies the "1 + fraction * stackMultiplier"

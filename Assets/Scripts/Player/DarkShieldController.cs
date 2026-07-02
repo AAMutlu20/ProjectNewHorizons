@@ -22,7 +22,6 @@ namespace Player
     public class DarkShieldController : MonoBehaviour
     {
         [SerializeField] private GameObject darkShieldVisual;
-        [SerializeField] private UnityEngine.ParticleSystem blockParticles;
 
         private int _maxLayers;
         private int _currentLayers;
@@ -86,7 +85,6 @@ namespace Player
             else
                 _layerRegenTimers.Add(_layerRegenSeconds);
 
-            if (blockParticles) blockParticles.Play();
             EventBus.Emit(new ShieldBlockedDamageEvent { RemainingLayers = _currentLayers });
             return true;
         }
