@@ -86,4 +86,4 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   minSpawnRadius: 12
-  maxSpawnRadius: 18
+  maxSpawnRadius: 100
