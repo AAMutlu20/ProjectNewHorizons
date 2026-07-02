@@ -9,8 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2143457216125900328}
-  - component: {fileID: 7435122773047666312}
-  - component: {fileID: 72545915510765054}
   - component: {fileID: 2465025611059068243}
   - component: {fileID: 2992137701745174249}
   - component: {fileID: 8148541144563909995}
@@ -39,63 +37,6 @@ Transform:
   - {fileID: 9146610077024476226}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &7435122773047666312
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7564133134363199326}
-  m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &72545915510765054
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7564133134363199326}
-  m_Enabled: 0
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 98a8c2b8d0ce5594e84afacbfdf5512d, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!136 &2465025611059068243
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -215,7 +156,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 93c1be4d7d2830e4399f4923910587f4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.212
+      value: -0.056
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 93c1be4d7d2830e4399f4923910587f4, type: 3}
       propertyPath: m_LocalPosition.z
@@ -223,32 +164,36 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 93c1be4d7d2830e4399f4923910587f4, type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.12488387
+      value: 0.70188713
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 93c1be4d7d2830e4399f4923910587f4, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.8146842
+      value: -0.70188713
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 93c1be4d7d2830e4399f4923910587f4, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.15211049
+      value: 0.08575819
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 93c1be4d7d2830e4399f4923910587f4, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.5454869
+      value: 0.08575819
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 93c1be4d7d2830e4399f4923910587f4, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 2.151
+      value: -90
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 93c1be4d7d2830e4399f4923910587f4, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: -248.04
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 93c1be4d7d2830e4399f4923910587f4, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 157.396
+      value: 13.932007
       objectReference: {fileID: 0}
+    - target: {fileID: -6993082514943641697, guid: 93c1be4d7d2830e4399f4923910587f4, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 98a8c2b8d0ce5594e84afacbfdf5512d, type: 2}
     - target: {fileID: 919132149155446097, guid: 93c1be4d7d2830e4399f4923910587f4, type: 3}
       propertyPath: m_Name
       value: Low Crawl
