@@ -12,29 +12,33 @@ PrefabInstance:
       propertyPath: m_Name
       value: Small Low Crawl
       objectReference: {fileID: 0}
+    - target: {fileID: 7381755237059780866, guid: a888c82daa4053648942fd9635d3645a, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 528279291b3b7654794900cdaa9799ce, type: 2}
     - target: {fileID: 9109956725168896826, guid: a888c82daa4053648942fd9635d3645a, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.44846
+      value: 0.9818497
       objectReference: {fileID: 0}
     - target: {fileID: 9109956725168896826, guid: a888c82daa4053648942fd9635d3645a, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.44846
+      value: 0.9818497
       objectReference: {fileID: 0}
     - target: {fileID: 9109956725168896826, guid: a888c82daa4053648942fd9635d3645a, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.44846
+      value: 0.9818497
       objectReference: {fileID: 0}
     - target: {fileID: 9109956725168896826, guid: a888c82daa4053648942fd9635d3645a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 21.614706
+      value: 23.15
       objectReference: {fileID: 0}
     - target: {fileID: 9109956725168896826, guid: a888c82daa4053648942fd9635d3645a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.0032129635
+      value: -0.61941
       objectReference: {fileID: 0}
     - target: {fileID: 9109956725168896826, guid: a888c82daa4053648942fd9635d3645a, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 3.5726418
+      value: 3.8962
       objectReference: {fileID: 0}
     - target: {fileID: 9109956725168896826, guid: a888c82daa4053648942fd9635d3645a, type: 3}
       propertyPath: m_LocalRotation.w

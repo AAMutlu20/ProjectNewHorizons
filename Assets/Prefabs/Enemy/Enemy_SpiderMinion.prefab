@@ -35,7 +35,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 1.4, z: 0}
   m_LocalScale: {x: 1.4, y: 1.4, z: 1.4}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 2899605397447887804}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &7435122773047666312
@@ -53,7 +54,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7564133134363199326}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -183,3 +184,77 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4046b2cf0d4692c4d9bb0e0f0ae26d12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemies.MeleeAttackBehaviour
+--- !u!1001 &3383470965267270399
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2143457216125900328}
+    m_Modifications:
+    - target: {fileID: 489193981795975491, guid: cee0200580c41bd48b3f403dde23e401, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.3203286
+      objectReference: {fileID: 0}
+    - target: {fileID: 489193981795975491, guid: cee0200580c41bd48b3f403dde23e401, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.32032856
+      objectReference: {fileID: 0}
+    - target: {fileID: 489193981795975491, guid: cee0200580c41bd48b3f403dde23e401, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.32032856
+      objectReference: {fileID: 0}
+    - target: {fileID: 489193981795975491, guid: cee0200580c41bd48b3f403dde23e401, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 489193981795975491, guid: cee0200580c41bd48b3f403dde23e401, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 489193981795975491, guid: cee0200580c41bd48b3f403dde23e401, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 489193981795975491, guid: cee0200580c41bd48b3f403dde23e401, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.6984799
+      objectReference: {fileID: 0}
+    - target: {fileID: 489193981795975491, guid: cee0200580c41bd48b3f403dde23e401, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7023121
+      objectReference: {fileID: 0}
+    - target: {fileID: 489193981795975491, guid: cee0200580c41bd48b3f403dde23e401, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.097434655
+      objectReference: {fileID: 0}
+    - target: {fileID: 489193981795975491, guid: cee0200580c41bd48b3f403dde23e401, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.0969029
+      objectReference: {fileID: 0}
+    - target: {fileID: 489193981795975491, guid: cee0200580c41bd48b3f403dde23e401, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90.312
+      objectReference: {fileID: 0}
+    - target: {fileID: 489193981795975491, guid: cee0200580c41bd48b3f403dde23e401, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -0.0010070801
+      objectReference: {fileID: 0}
+    - target: {fileID: 489193981795975491, guid: cee0200580c41bd48b3f403dde23e401, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 15.798004
+      objectReference: {fileID: 0}
+    - target: {fileID: 4385804171873417591, guid: cee0200580c41bd48b3f403dde23e401, type: 3}
+      propertyPath: m_Name
+      value: Small Low Crawl
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: cee0200580c41bd48b3f403dde23e401, type: 3}
+--- !u!4 &2899605397447887804 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 489193981795975491, guid: cee0200580c41bd48b3f403dde23e401, type: 3}
+  m_PrefabInstance: {fileID: 3383470965267270399}
+  m_PrefabAsset: {fileID: 0}

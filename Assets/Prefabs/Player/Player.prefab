@@ -47,6 +47,7 @@ MonoBehaviour:
   enemyPool: {fileID: 0}
   playerTransform: {fileID: 5432106020961286968}
   hoverHeight: 3
+  blackHoleParticles: {fileID: 0}
 --- !u!1 &4766739779060614339
 GameObject:
   m_ObjectHideFlags: 0
@@ -90,6 +91,7 @@ Transform:
   m_Children:
   - {fileID: 5604818524269325533}
   - {fileID: 7750488870421387143}
+  - {fileID: 8068061123293869164}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &3827775819622948975
@@ -107,7 +109,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4766739779060614339}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -264,6 +266,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3a57ec12194ce6408ed7456cccc9c23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player.DarkShieldController
+  darkShieldVisual: {fileID: 0}
+  blockParticles: {fileID: 0}
 --- !u!114 &228334806548918095
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -278,6 +282,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Player.PoisonAuraController
   enemyPool: {fileID: 0}
   statSheet: {fileID: 4969071804314949550}
+  poisonAuraVisual: {fileID: 0}
+  auraParticles: {fileID: 0}
 --- !u!114 &100904442818717114
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -379,6 +385,7 @@ MonoBehaviour:
   baseDamage: 5
   baseKnockbackForce: 4
   knockbackDuration: 0.2
+  AttackParticleEffect: {fileID: 0}
 --- !u!114 &2564277803011622410
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -392,6 +399,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player.CleavingAttacksEnchant
   definition: {fileID: 11400000, guid: 2eab74b1a115fb64c80f20ea1c45bb6b, type: 2}
+  cleaveParticles: {fileID: 0}
 --- !u!114 &21854933721318785
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -405,6 +413,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player.LifestealEnchant
   definition: {fileID: 11400000, guid: 1766771d9ffe3174dacbf570151b33e3, type: 2}
+  healParticles: {fileID: 0}
 --- !u!114 &6566405550504304502
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -418,3 +427,78 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player.KnockbackEnchant
   definition: {fileID: 11400000, guid: 16711a66a471151448e60128e35194fd, type: 2}
+  knockbackParticles: {fileID: 0}
+--- !u!1001 &5271146566206029032
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 5432106020961286968}
+    m_Modifications:
+    - target: {fileID: 1355464195884335729, guid: c202d73726ae2b34faa9017ce4c676b2, type: 3}
+      propertyPath: m_Name
+      value: MainCharacterFinal
+      objectReference: {fileID: 0}
+    - target: {fileID: 2797119131133610116, guid: c202d73726ae2b34faa9017ce4c676b2, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2797119131133610116, guid: c202d73726ae2b34faa9017ce4c676b2, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2797119131133610116, guid: c202d73726ae2b34faa9017ce4c676b2, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2797119131133610116, guid: c202d73726ae2b34faa9017ce4c676b2, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2797119131133610116, guid: c202d73726ae2b34faa9017ce4c676b2, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2797119131133610116, guid: c202d73726ae2b34faa9017ce4c676b2, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2797119131133610116, guid: c202d73726ae2b34faa9017ce4c676b2, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2797119131133610116, guid: c202d73726ae2b34faa9017ce4c676b2, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2797119131133610116, guid: c202d73726ae2b34faa9017ce4c676b2, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2797119131133610116, guid: c202d73726ae2b34faa9017ce4c676b2, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2797119131133610116, guid: c202d73726ae2b34faa9017ce4c676b2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2797119131133610116, guid: c202d73726ae2b34faa9017ce4c676b2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2797119131133610116, guid: c202d73726ae2b34faa9017ce4c676b2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c202d73726ae2b34faa9017ce4c676b2, type: 3}
+--- !u!4 &8068061123293869164 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2797119131133610116, guid: c202d73726ae2b34faa9017ce4c676b2, type: 3}
+  m_PrefabInstance: {fileID: 5271146566206029032}
+  m_PrefabAsset: {fileID: 0}
