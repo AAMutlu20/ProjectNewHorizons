@@ -31,9 +31,9 @@ namespace Enemies
         [SerializeField] private VFX.AoeTelegraphRingPool telegraphPool;
 
         [Header("Spawn placement")]
-        [Tooltip("Resolves a candidate X/Z into a real, grounded, unobstructed spawn position -- " +
-                 "owned here (not by callers of Get) so EVERY spawn path automatically benefits, " +
-                 "not just the ones that remember to resolve positions themselves first.")]
+        [Tooltip("Resolves candidate XZ positions into grounded world positions via a ground raycast. " +
+                 "Owned by EnemyPool so every spawn path (waves, boss escorts, etc.) goes through " +
+                 "the same resolver automatically.")]
         [SerializeField] private Waves.SpawnPositionResolver spawnPositionResolver;
 
         [Header("Combat")]
@@ -146,53 +146,56 @@ namespace Enemies
         /// isMiniboss is decided by the caller (spawn scheduler / boss-spawn rules) — see
         /// the design doc's miniboss-frequency-after-boss-kills rule.
         /// </summary>
-        public EnemyView Get(EnemyType type, Vector3 candidateXz, System.Func<Vector3> retryPositionFunc,
+        public EnemyView Get(EnemyType type, Vector3 candidatePos, System.Func<Vector3> retryPositionFunc,
             bool isMiniboss = false)
         {
             if (!_inactive.TryGetValue(type, out var queue) || queue.Count == 0)
             {
-                Debug.LogWarning($"EnemyPool: pool exhausted for {type}. " +
-                                 $"Increase poolSize on {type} EnemyTypeSO.");
+                Debug.LogWarning($"EnemyPool: pool exhausted for {type}. Increase poolSize on the SO.");
                 return null;
             }
 
-            // Respect active budget — don't spawn if we're at the cap
             if (_active.Count >= _currentDiff.Budget)
                 return null;
 
-            // Find the SO for this type to pass to Init
             var so = FindSo(type);
             if (!so) return null;
 
-            if (!spawnPositionResolver.TryResolve(candidateXz, so.groundOffsetY, retryPositionFunc, out var resolvedPosition))
+            // Resolve candidate to a grounded position via downward raycast.
+            // No obstruction check — that was blocking all spawns due to
+            // unidentified colliders. Ground raycast only.
+            if (!spawnPositionResolver.TryResolve(candidatePos, so.groundOffsetY,
+                    retryPositionFunc, out var resolvedPosition))
             {
-                Debug.LogWarning($"EnemyPool: could not find a valid grounded, unobstructed spawn " +
-                                  $"position for {type} after all retries — skipping this spawn.");
+                Debug.LogWarning($"EnemyPool: no ground found for {type} spawn — skipping.");
                 return null;
             }
 
             var view = queue.Dequeue();
-
             view.gameObject.SetActive(true);
-            view.Init(so, _currentDiff, resolvedPosition, playerTransform, spatialGrid, _active, isMiniboss,
-                projectilePool, telegraphPool, obstructionLayers, playerStatSheet);
+            view.Init(so, _currentDiff, resolvedPosition, playerTransform, spatialGrid, _active,
+                isMiniboss, projectilePool, telegraphPool, obstructionLayers, playerStatSheet);
             _active.Add(view);
             return view;
         }
 
-        /// <summary>
-        /// Return an enemy to the pool. Called by EnemyView after its death animation finishes.
-        /// Uses swap-with-last to remove from the middle of _active in O(1).
-        /// </summary>
+        // Helpers
+
+        /// <summary>Public SO lookup — used by WaveDirector to check canBeMiniboss.</summary>
+        public EnemyTypeSo FindSoPublic(EnemyType type) => FindSo(type);
+
+        private EnemyTypeSo FindSo(EnemyType type)
+        {
+            return enemyTypes.FirstOrDefault(so => so && so.type == type);
+        }
+
         public void Return(EnemyView view)
         {
             var idx = _active.IndexOf(view);
-            if (idx < 0) return; // already returned (safety guard)
+            if (idx < 0) return;
 
-            // Swap with last to avoid O(n) shift
             var last = _active.Count - 1;
-            if (idx != last)
-                _active[idx] = _active[last];
+            if (idx != last) _active[idx] = _active[last];
             _active.RemoveAt(last);
 
             view.gameObject.SetActive(false);
@@ -203,19 +206,10 @@ namespace Enemies
             EventBus.Emit(new EnemyReturnedEvent());
         }
 
-        /// <summary>Return all active enemies to pool immediately. Used on wave skip / debug.</summary>
         public void ReturnAll()
         {
-            // Iterate a copy since Return() modifies _active
             var copy = new List<EnemyView>(_active);
             foreach (var v in copy) Return(v);
-        }
-
-        // Helpers
-
-        private EnemyTypeSo FindSo(EnemyType type)
-        {
-            return enemyTypes.FirstOrDefault(so => so && so.type == type);
         }
     }
 }

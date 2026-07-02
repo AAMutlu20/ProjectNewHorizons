@@ -14,16 +14,24 @@ namespace Abilities
     public class ShockwaveAbility : IAbility
     {
         private readonly ShockwaveDefinitionSo _definition;
+        private readonly UnityEngine.ParticleSystem _particles;
 
-        public ShockwaveAbility(ShockwaveDefinitionSo definition)
+        public ShockwaveAbility(ShockwaveDefinitionSo definition, UnityEngine.ParticleSystem particles = null)
         {
             _definition = definition;
+            _particles = particles;
         }
 
         public void Cast(Vector3 castOrigin, Rarity rarity, StatSheet statSheet, EnemyPool enemyPool)
         {
             var stats = _definition.GetStatsForRarity(rarity);
             var scaledDamage = statSheet.ApplyPercentBonus(stats.Damage, StatType.AbilityPower);
+
+            if (_particles)
+            {
+                _particles.transform.position = castOrigin;
+                _particles.Play();
+            }
 
             DamageAndStunEnemiesInRadius(castOrigin, stats.Radius, scaledDamage, stats.StunDuration, enemyPool);
         }

@@ -24,7 +24,7 @@ namespace UI
         [SerializeField] private Image iconImage;
         [SerializeField] private Button selectButton;
 
-        [SerializeField] private bool useRaritySprites = false;
+        [SerializeField] private bool useRaritySprites;
 
         [Header("Rarity colours — index order: Common, Rare, Epic, Legendary")]
         [SerializeField] private Color[] rarityColors =

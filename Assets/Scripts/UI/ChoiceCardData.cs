@@ -7,8 +7,7 @@ namespace UI
     /// any future choice type (melee enchants, etc.) all convert into this
     /// before reaching ChoiceScreenController — the screen itself never
     /// references StatModifier, AbilityDefinitionSo, or any other concrete
-    /// type. This is what makes adding a new choice category later a matter
-    /// of writing one conversion function, not touching the screen at all.
+    /// type.
     /// </summary>
     public readonly struct ChoiceCardData
     {

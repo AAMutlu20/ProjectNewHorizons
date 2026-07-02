@@ -28,6 +28,7 @@ namespace Player
         [SerializeField] private EnemyPool enemyPool;
         [SerializeField] private Transform playerTransform;
         [SerializeField] private float hoverHeight = 3f;
+        [SerializeField] private UnityEngine.ParticleSystem blackHoleParticles;
 
         private float _baseSize;
         private float _sizeScalingPerEnemy;
@@ -79,6 +80,7 @@ namespace Player
             _executeScalingPerEnemy = stats.ExecuteScalingPerEnemy;
             _executeThresholdPercent = stats.ExecuteThresholdPercent;
 
+            if (blackHoleParticles) blackHoleParticles.Play();
             _isGranted = true;
         }
 

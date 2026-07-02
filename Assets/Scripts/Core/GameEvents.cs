@@ -89,4 +89,30 @@ namespace Core
     {
         public AbilityChoiceOption ChosenOption;
     }
+
+    // -------------------------------------------------------------------------
+    // Melee VFX events — emitted by MeleeWeapon and melee enchants so
+    // VFX scripts can react without being coupled to gameplay logic.
+    // -------------------------------------------------------------------------
+
+    /// <summary>Emitted by MeleeWeapon every time a hit lands on an enemy.</summary>
+    public struct MeleeHitEvent
+    {
+        public UnityEngine.Vector3 HitPosition; // world position of the struck enemy
+        public float DamageDealt;
+        public bool IsCrit;
+    }
+
+    /// <summary>Emitted by CleavingAttacksEnchant when a trigger swing cleaves.</summary>
+    public struct CleavingTriggeredEvent
+    {
+        public UnityEngine.Vector3 SwingOrigin; // player's position at the time of the cleave
+    }
+
+    /// <summary>Emitted by LifestealEnchant each time a hit heals the player.</summary>
+    public struct LifestealHealEvent
+    {
+        public float AmountHealed;
+        public UnityEngine.Vector3 HitPosition;
+    }
 }

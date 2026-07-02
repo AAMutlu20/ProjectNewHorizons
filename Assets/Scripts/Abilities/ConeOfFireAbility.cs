@@ -27,11 +27,14 @@ namespace Abilities
 
         private readonly ConeOfFireDefinitionSo _definition;
         private readonly PlayerController _playerController;
+        private readonly UnityEngine.ParticleSystem _particles;
 
-        public ConeOfFireAbility(ConeOfFireDefinitionSo definition, PlayerController playerController)
+        public ConeOfFireAbility(ConeOfFireDefinitionSo definition, PlayerController playerController,
+            UnityEngine.ParticleSystem particles = null)
         {
             _definition = definition;
             _playerController = playerController;
+            _particles = particles;
         }
 
         public void Cast(Vector3 castOrigin, Rarity rarity, StatSheet statSheet, EnemyPool enemyPool)
@@ -40,6 +43,15 @@ namespace Abilities
             var scaledDamage = statSheet.ApplyPercentBonus(stats.Damage, StatType.AbilityPower);
             var scaledBurnDamage = statSheet.ApplyPercentBonus(stats.ResidualDamagePerSecond, StatType.AbilityPower);
             var facingDirection = _playerController.FacingDirection;
+
+            if (_particles)
+            {
+                _particles.transform.position = castOrigin;
+                _particles.transform.rotation = facingDirection.sqrMagnitude > 0.001f
+                    ? UnityEngine.Quaternion.LookRotation(facingDirection)
+                    : UnityEngine.Quaternion.identity;
+                _particles.Play();
+            }
 
             DamageAndBurnEnemiesInCone(castOrigin, facingDirection, stats.Range, scaledDamage,
                 scaledBurnDamage, stats.ResidualDuration, enemyPool);

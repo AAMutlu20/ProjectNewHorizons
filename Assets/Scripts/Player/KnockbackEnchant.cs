@@ -14,6 +14,7 @@ namespace Player
     public class KnockbackEnchant : MonoBehaviour, IMeleeEnchant
     {
         [SerializeField] private Abilities.KnockbackDefinitionSo definition;
+        [SerializeField] private UnityEngine.ParticleSystem knockbackParticles;
 
         private float _knockbackForce;
         private bool _isGranted;
@@ -30,7 +31,15 @@ namespace Player
             _isGranted = true;
         }
 
-        public void OnMeleeHit(EnemyView target, float damageDealt, Vector3 hitOrigin) { }
+        public void OnMeleeHit(EnemyView target, float damageDealt, Vector3 hitOrigin)
+        {
+            if (!_isGranted) return;
+            if (knockbackParticles)
+            {
+                knockbackParticles.transform.position = hitOrigin;
+                knockbackParticles.Play();
+            }
+        }
 
         public float? GetKnockbackForceOverride() => _isGranted ? _knockbackForce : null;
     }

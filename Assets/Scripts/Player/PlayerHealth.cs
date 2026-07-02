@@ -95,26 +95,22 @@ namespace Player
         private void OnEnemyAttack(EnemyAttackEvent attack)
         {
             if (_isDead) return;
-            // XZ-only distance -- matches BehaviourController's attack-range
-            // check (also XZ-only, per design: small vertical offsets between
-            // an enemy's resting height and the player's shouldn't matter for
-            // whether a melee/explosion attack lands). A full 3D distance
-            // check here was rejecting attacks that BehaviourController had
-            // already correctly decided were in range, purely because each
-            // archetype's groundOffsetY doesn't exactly match the player's
-            // own resting Y -- e.g. a zombie sitting at Y=4.3 next to a
-            // player at Y=4.41 could exceed AttackHitRadius in full 3D
-            // distance while being right next to the player horizontally.
-            var playerPositionXz = new Vector3(transform.position.x, 0f, transform.position.z);
-            var attackPositionXz = new Vector3(attack.Position.x, 0f, attack.Position.z);
-            var distanceToAttack = Vector3.Distance(playerPositionXz, attackPositionXz);
-            if (distanceToAttack > AttackHitRadius) return;
+
+            // Ranged attacks (projectiles) are already validated by the projectile's
+            // own OnTriggerEnter — the collision IS the hit confirmation, so no
+            // additional proximity check is needed or appropriate here.
+            // Melee/contact attacks emit at the enemy's position and DO need
+            // the proximity gate to ensure the enemy is genuinely adjacent.
+            if (!attack.IsRanged)
+            {
+                var playerPositionXz = new Vector3(transform.position.x, 0f, transform.position.z);
+                var attackPositionXz = new Vector3(attack.Position.x, 0f, attack.Position.z);
+                if (Vector3.Distance(playerPositionXz, attackPositionXz) > AttackHitRadius) return;
+            }
+
             ApplySlowIfAny(attack);
 
-            if (_iFrameTimer > 0f) return; // still invincible — damage blocked, slow still applies
-            // Shield blocks the hit entirely, consuming a layer, only for
-            // hits that would otherwise actually land — no point spending a
-            // layer on a hit i-frames would have nullified for free.
+            if (_iFrameTimer > 0f) return;
             if (_shield != null && _shield.TryBlockDamage()) return;
             TakeDamage(attack.Damage);
         }

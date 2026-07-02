@@ -38,11 +38,27 @@ namespace Waves
         [SerializeField] private Transform arenaCentre;
         [SerializeField] private Transform player;
 
+        [Tooltip("Reads the live camera FOV and position to calculate the minimum inner radius " +
+                 "that guarantees spawns are off-screen at the current zoom level. " +
+                 "Attach SpawnRadiusProvider to the CinemachineCamera GameObject and wire it here. " +
+                 "If left null, falls back to spawnInnerRadiusFallback.")]
+        [SerializeField] private Camera.SpawnRadiusProvider spawnRadiusProvider;
+
+        [Tooltip("Used only when spawnRadiusProvider is not assigned — static fallback. " +
+                 "Set to roughly your camera's half-diagonal at max zoom-out.")]
+        [SerializeField] private float spawnInnerRadiusFallback = 10f;
+
         [Header("Debug")]
         [SerializeField] private bool logPhaseEvents = true;
 
         [Header("Startup")]
         [SerializeField] private float delayBeforeFirstPhase = 2f;
+
+        [Header("Sequential spawning")]
+        [Tooltip("Max enemies to activate from the burst queue per frame — design doc Section 17.1: " +
+                 "spreading burst activations across frames prevents a spike on the frame a new phase " +
+                 "unlocks or a boss fight starts. 2-3 per frame at 60fps is imperceptible to players.")]
+        [SerializeField] private int burstActivationsPerFrame = 3;
 
         /// <summary>
         /// One concurrently-active spawning type. Each entry ticks its own
@@ -60,6 +76,12 @@ namespace Waves
 
         private readonly List<ActivePhaseState> _activePhases = new();
         private readonly CycleEscalation _escalation = new();
+
+        // Sequential burst queue — SpawnInitialBurst and TickActivePhaseSpawning enqueue here
+        // instead of calling SpawnEnemy directly, so the per-frame drain limit applies.
+        // Design doc Section 17.1: burst activations spread across frames to eliminate the
+        // single-frame CPU spike that all-at-once Awake/activation otherwise causes.
+        private readonly Queue<EnemyType> _burstQueue = new();
 
         // Which phase index will unlock NEXT, and how long until it does --
         // separate from _activePhases, since "the next type is about to
@@ -108,29 +130,44 @@ namespace Waves
         {
             _elapsedGameTime += Time.deltaTime;
 
-            // Guards against ticking before BeginCycle's Invoke(delayBeforeFirstPhase)
-            // has fired -- without this, Update runs from the very first frame,
-            // before any phase has unlocked.
             if (!_hasCycleStarted) return;
 
-            if (_isWaitingToStartNextCycle)
+            // Difficulty must be set BEFORE DrainBurstQueue so budget > 0
+            // when the first spawns fire. Old order had budget = 0 on early frames.
+            if (!_isWaitingToStartNextCycle && !_isBossPhaseActive)
             {
-                TickNextCycleDelay();
-                return;
+                _currentDifficulty = difficultyScaler.Scale(_elapsedGameTime, _escalation);
+                enemyPool.SetDifficulty(_currentDifficulty);
             }
 
-            if (_isBossPhaseActive) return; // boss phase ends on EnemyDiedEvent, not a timer
+            DrainBurstQueue();
 
-            _currentDifficulty = difficultyScaler.Scale(_elapsedGameTime, _escalation);
-            enemyPool.SetDifficulty(_currentDifficulty);
+            if (_isWaitingToStartNextCycle) { TickNextCycleDelay(); return; }
+            if (_isBossPhaseActive) return;
 
             TickActivePhaseSpawning();
             TickNextUnlockTimer();
         }
 
+        /// <summary>
+        /// Drains up to burstActivationsPerFrame entries from the burst queue each frame.
+        /// Each dequeued entry results in one SpawnEnemy call — sequential, not batch.
+        /// </summary>
+        private void DrainBurstQueue()
+        {
+            var drained = 0;
+            while (_burstQueue.Count > 0 && drained < burstActivationsPerFrame)
+            {
+                var enemyType = _burstQueue.Dequeue();
+                SpawnEnemy(enemyType);
+                drained++;
+            }
+        }
+
         private void ResetCycleState()
         {
             _activePhases.Clear();
+            _burstQueue.Clear(); // discard any pending activations from the previous cycle
             _nextPhaseToUnlock = 0;
             _timeUntilNextUnlock = 0f; // unlock phase 0 immediately on cycle start
         }
@@ -156,8 +193,11 @@ namespace Waves
                     : 1f;
                 var spawnCountThisInterval = Mathf.Max(1, Mathf.RoundToInt(phase.countRampOverPhase.Evaluate(rampProgress)));
 
+                // Enqueue rather than spawn directly — DrainBurstQueue spreads these
+                // across frames (burstActivationsPerFrame per frame) so the interval
+                // tick doesn't cause a frame spike when multiple types fire at once.
                 for (var i = 0; i < spawnCountThisInterval; i++)
-                    SpawnEnemy(phase.enemyType);
+                    _burstQueue.Enqueue(phase.enemyType);
             }
         }
 
@@ -193,7 +233,11 @@ namespace Waves
                 return;
             }
 
-            var effectiveDuration = Mathf.Max(1f, phase.baseDuration - _escalation.PhaseIntervalReduction);
+            // Phase intervals shrink by 5s per boss kill but never below 30s —
+            // confirmed design doc floor (Section 9.5 / CycleEscalation.MinPhaseIntervalSeconds).
+            var effectiveDuration = Mathf.Max(
+                CycleEscalation.MinPhaseIntervalSeconds,
+                phase.baseDuration - _escalation.PhaseIntervalReduction);
             _timeUntilNextUnlock = effectiveDuration;
 
             _activePhases.Add(new ActivePhaseState { PhaseIndex = phaseIndex, TimeSinceUnlocked = 0f, SpawnIntervalTimer = 0f });
@@ -210,23 +254,31 @@ namespace Waves
 
         private void SpawnInitialBurst(EnemyCyclePhase phase)
         {
+            // Enqueue the whole burst — DrainBurstQueue drains burstActivationsPerFrame
+            // per frame so the phase-unlock moment doesn't activate all N instances at once.
+            // Design doc Section 17.1: sequential spawning for burst events.
             for (var i = 0; i < phase.startingCount; i++)
-                SpawnEnemy(phase.enemyType);
+                _burstQueue.Enqueue(phase.enemyType);
         }
 
         private void SpawnEnemy(EnemyType enemyType)
         {
-            // RollCandidatePosition is also the RETRY function -- if EnemyPool's
-            // SpawnPositionResolver finds the first roll obstructed or ungrounded,
-            // it calls this again for a fresh candidate on the same ring.
-            Vector3 RollCandidatePosition() => SpawnShape.GetPosition(
-                SpawnShapeType.Ring,
-                GetArenaCentre(),
-                _currentDifficulty.SpawnRadius,
-                GetPlayerPosition());
+            var innerRadius = spawnRadiusProvider
+                ? spawnRadiusProvider.SafeInnerRadius
+                : spawnInnerRadiusFallback;
 
-            var isMiniboss = Random.value < _escalation.MinibossChance(cycleConfig.baseMinibossChance);
-            enemyPool.Get(enemyType, RollCandidatePosition(), RollCandidatePosition, isMiniboss);
+            // Ring centred on player so spawns are always just outside the camera.
+            Vector3 Roll() => SpawnShape.GetPosition(
+                SpawnShapeType.Ring,
+                GetPlayerPosition(),
+                _currentDifficulty.SpawnRadius,
+                innerRadius: innerRadius);
+
+            var so = enemyPool.FindSoPublic(enemyType);
+            var isMiniboss = so != null && so.canBeMiniboss
+                && Random.value < _escalation.MinibossChance(cycleConfig.baseMinibossChance);
+
+            enemyPool.Get(enemyType, Roll(), Roll, isMiniboss);
         }
 
         // Boss phase
