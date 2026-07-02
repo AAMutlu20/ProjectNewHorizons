@@ -16,7 +16,7 @@ MonoBehaviour:
   prefab: {fileID: 7564133134363199326, guid: 5d35cb197e2463149bed85f355e53840, type: 3}
   groundOffsetY: 5
   poolSize: 1
-  baseHp: 2000
+  baseHp: 500
   baseSpeed: 15
   baseDamage: 100
   attackRange: 20
