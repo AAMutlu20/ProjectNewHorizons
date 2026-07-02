@@ -24,13 +24,15 @@ namespace Abilities
         private readonly MeteorSlamDefinitionSo _definition;
         private readonly AoeTelegraphRingPool _telegraphPool;
         private readonly DamageOverTimeZonePool _lavaPoolPool;
+        private readonly UnityEngine.ParticleSystem _particles;
 
         public MeteorSlamAbility(MeteorSlamDefinitionSo definition, AoeTelegraphRingPool telegraphPool,
-            DamageOverTimeZonePool lavaPoolPool)
+            DamageOverTimeZonePool lavaPoolPool, UnityEngine.ParticleSystem particles = null)
         {
             _definition = definition;
             _telegraphPool = telegraphPool;
             _lavaPoolPool = lavaPoolPool;
+            _particles = particles;
         }
 
         public void Cast(Vector3 castOrigin, Rarity rarity, StatSheet statSheet, EnemyPool enemyPool)
@@ -73,6 +75,12 @@ namespace Abilities
         private void LandMeteor(Vector3 impactPosition, MeteorSlamStats stats, float damage,
             float lavaPoolDamagePercent, EnemyPool enemyPool)
         {
+            if (_particles)
+            {
+                _particles.transform.position = impactPosition;
+                _particles.Play();
+            }
+
             DamageEnemiesInRadius(impactPosition, stats.ImpactRadius, damage, enemyPool);
 
             if (stats.LavaPoolDuration <= 0f) return; // Base/Rare have no lava pool

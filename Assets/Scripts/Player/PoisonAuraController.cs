@@ -21,6 +21,7 @@ namespace Player
         [SerializeField] private Stats.StatSheet statSheet;
 
         [SerializeField] private GameObject poisonAuraVisual;
+        [SerializeField] private UnityEngine.ParticleSystem auraParticles;
 
         private float _baseDamage;
         private float _damageFrequencySeconds;
@@ -60,6 +61,7 @@ namespace Player
 
             // Enable visual
             poisonAuraVisual.SetActive(true);
+            if (auraParticles) auraParticles.Play();
 
             _isGranted = true;
             _tickTimer = 0f; // tick immediately on grant rather than waiting a full interval

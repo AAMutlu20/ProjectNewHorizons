@@ -16,6 +16,7 @@ namespace Player
         private const float PercentToFraction = 100f;
 
         [SerializeField] private Abilities.LifestealDefinitionSo definition;
+        [SerializeField] private UnityEngine.ParticleSystem healParticles;
 
         private PlayerHealth _playerHealth;
         private float _healPercent;
@@ -43,6 +44,7 @@ namespace Player
 
             var healAmount = damageDealt * (_healPercent / PercentToFraction);
             _playerHealth.Heal(healAmount);
+            if (healParticles) healParticles.Play();
 
             if (_permanentHpIncreasePerHit > 0f)
                 _playerHealth.IncreaseMaxHpPermanently(_permanentHpIncreasePerHit);

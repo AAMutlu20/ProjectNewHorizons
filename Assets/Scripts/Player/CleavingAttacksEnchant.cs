@@ -24,6 +24,7 @@ namespace Player
     public class CleavingAttacksEnchant : MonoBehaviour, IMeleeEnchant
     {
         [SerializeField] private Abilities.CleavingDefinitionSo definition;
+        [SerializeField] private UnityEngine.ParticleSystem cleaveParticles;
 
         private Abilities.CleavingStats _stats;
         private bool _isGranted;
@@ -72,6 +73,7 @@ namespace Player
 
         private void ApplyCleaveToBufferedHits()
         {
+            if (cleaveParticles) cleaveParticles.Play();
             foreach (var (target, hitOrigin) in _hitsThisSwing)
             {
                 if (!target || !target.Data.IsAlive) continue;

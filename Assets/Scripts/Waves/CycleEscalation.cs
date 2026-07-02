@@ -15,6 +15,9 @@ namespace Waves
         private const float PhaseIntervalReductionPerBossKill = 5f;
         private const float MinibossChanceIncreasePerBossKill = 0.05f;
 
+        /// <summary>Phase intervals shrink 5s per boss kill, floored at 30s.</summary>
+        public const float MinPhaseIntervalSeconds = 30f;
+
         public int BossKillCount { get; private set; }
 
         /// <summary>Flat stat multiplier bonus stacked on top of normal time-based scaling.</summary>

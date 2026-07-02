@@ -76,20 +76,24 @@ namespace Player
             _statSheet = GetComponent<StatSheet>();
             _slowEffects = GetComponent<SlowEffectController>();
 
-            // Kinematic, matching the enemy revert -- the player's own movement
-            // is entirely MovePosition-driven (FixedUpdate below), same as every
-            // enemy via BehaviourController. Previously the player rigidbody
-            // relied on the Inspector's default (non-kinematic) while colliding
-            // against now-non-kinematic enemies -- when the player walked into
-            // an enemy, the solver's penetration-resolution impulse pushed/spun
-            // the player unpredictably, fighting the input-driven MovePosition
-            // call every tick. Kinematic removes the player from that fight
-            // entirely: no solver-applied impulses, ever, only what FixedUpdate
-            // explicitly tells it to do.
-            _rb.isKinematic = true;
+            // NON-kinematic so the physics solver can stop the player at walls,
+            // arena boundaries, and any other static/dynamic collider.
+            // MovePosition on a kinematic body teleports through all colliders —
+            // that was why the player passed through everything.
+            //
+            // To prevent enemies from launching the player through physics impulses,
+            // we lock Y position (no gravity), lock all rotation axes (no spin from
+            // collisions), and set a high angular/linear drag so solver impulses
+            // from enemy contact are absorbed immediately rather than accumulating.
+            // The player's own movement is still fully velocity-driven every FixedUpdate,
+            // so input feel is unchanged.
+            _rb.isKinematic = false;
             _rb.useGravity = false;
-
-            _rb.constraints = RigidbodyConstraints.FreezeRotationX
+            _rb.linearDamping = 0f;    // we set velocity directly every FixedUpdate, no damping needed
+            _rb.angularDamping = 0f;
+            _rb.constraints = RigidbodyConstraints.FreezePositionY
+                             | RigidbodyConstraints.FreezeRotationX
+                             | RigidbodyConstraints.FreezeRotationY
                              | RigidbodyConstraints.FreezeRotationZ;
         }
 
@@ -129,12 +133,18 @@ namespace Player
 
         private void FixedUpdate()
         {
-            // Map 2D input to XZ plane — Y (height) is untouched by movement
             var inputDirection = new Vector3(_input.x, 0f, _input.y);
-            var inputDisplacement = inputDirection * (CurrentMoveSpeed * Time.fixedDeltaTime);
-            var pullDisplacement = _externalPullVelocity * Time.fixedDeltaTime;
 
-            _rb.MovePosition(_rb.position + inputDisplacement + pullDisplacement);
+            // Drive movement via linearVelocity rather than MovePosition.
+            // MovePosition on a non-kinematic body fights the physics solver;
+            // setting velocity directly lets the solver handle wall/collider
+            // response naturally — when the player walks into a wall, the
+            // solver zeroes out the velocity component into the wall while
+            // preserving movement along the wall's surface.
+            var targetVelocity = inputDirection * CurrentMoveSpeed
+                                 + new Vector3(_externalPullVelocity.x, 0f, _externalPullVelocity.z);
+
+            _rb.linearVelocity = new Vector3(targetVelocity.x, 0f, targetVelocity.z);
 
             DecayExternalPull();
         }
