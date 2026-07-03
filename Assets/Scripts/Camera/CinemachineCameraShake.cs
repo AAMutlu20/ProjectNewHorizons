@@ -1,3 +1,5 @@
+using Core;
+using System;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -12,7 +14,22 @@ namespace Camera
         [SerializeField] private CinemachineImpulseSource impulseSource;
 
         [Header("Debug")]
-        [SerializeField] private Vector3 debugShakeVelocity = Vector3.up;
+        [SerializeField] private Vector3 ShakeVelocity = Vector3.up;
+
+        private void Start()
+        {
+            EventBus.Subscribe<PlayerHealthChangedEvent>(ShakeOnHit);
+        }
+
+        private void OnDisable()
+        {
+            EventBus.Unsubscribe<PlayerHealthChangedEvent>(ShakeOnHit);
+        }
+
+        private void ShakeOnHit(PlayerHealthChangedEvent @event)
+        {
+            Shake(ShakeVelocity);
+        }
 
         private void Shake(Vector3 velocity)
         {
@@ -27,13 +44,13 @@ namespace Camera
         [ContextMenu("Debug: Shake At This Position")]
         private void DebugShakeAtThisPosition()
         {
-            ShakeAtPosition(transform.position, debugShakeVelocity);
+            ShakeAtPosition(transform.position, ShakeVelocity);
         }
 
         [ContextMenu("Debug: Shake")]
         private void DebugShake()
         {
-            Shake(debugShakeVelocity);
+            Shake(ShakeVelocity);
         }
     }
 }
