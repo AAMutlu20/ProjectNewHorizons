@@ -27,7 +27,15 @@ namespace Player
 
         [SerializeField] private EnemyPool enemyPool;
         [SerializeField] private Transform playerTransform;
-        [SerializeField] private float hoverHeight = 3f;
+        [Tooltip("Height above the player's feet (ground level) where the black hole sits. " +
+                 "0 = ground level. Keep small so it doesn't block the top-down camera view. " +
+                 "playerFeetOffset accounts for the capsule centre being above the floor.")]
+        [SerializeField] private float hoverHeight = 0f;
+
+        [Tooltip("How far below playerTransform.position the player's feet actually are. " +
+                 "Equal to half the capsule height. Default 1 for a scale-1 capsule. " +
+                 "If your player is scaled 2x this should be 2.")]
+        [SerializeField] private float playerFeetOffset = 1f;
         [Tooltip("The black hole visual prefab (mesh, plane, sphere — any GameObject). " +
                  "Instantiated once on grant and scaled to match CurrentRadius every frame.")]
         [SerializeField] private UnityEngine.GameObject blackHolePrefab;
@@ -68,7 +76,11 @@ namespace Player
         {
             if (!_isGranted) return;
 
-            transform.position = playerTransform.position + Vector3.up * hoverHeight;
+            // Position at player feet (playerTransform.position - playerFeetOffset) + hoverHeight.
+            // playerTransform.position is the Rigidbody centre (capsule midpoint), not the floor.
+            // Subtracting playerFeetOffset brings us to ground level first.
+            var feetPosition = playerTransform.position - Vector3.up * playerFeetOffset;
+            transform.position = feetPosition + Vector3.up * hoverHeight;
 
             // Scale the visual to match the current gameplay radius every frame.
             // visualBaseRadius is the prefab's authored radius at scale 1 — dividing

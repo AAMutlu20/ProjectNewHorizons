@@ -138,9 +138,20 @@ namespace Player
 
         private void DamageEveryoneInRange()
         {
-            foreach (var enemy in _enemiesInRange)
+            // Iterate backwards so we can remove stale entries mid-loop.
+            // OnTriggerExit never fires when an enemy is deactivated (returned to pool),
+            // so _enemiesInRange accumulates dead references. On the next swing those
+            // stale entries point to freshly-reused zombies that just spawned far away
+            // and are still in their spawn grace period — but they're in the list, so
+            // StartSwing hits them anyway. This cleans that up.
+            for (var i = _enemiesInRange.Count - 1; i >= 0; i--)
             {
-                if (!enemy) continue; // pooled enemy may have been returned/deactivated
+                var enemy = _enemiesInRange[i];
+                if (!enemy || !enemy.gameObject.activeInHierarchy)
+                {
+                    _enemiesInRange.RemoveAt(i);
+                    continue;
+                }
                 TryHit(enemy);
             }
         }
@@ -177,9 +188,11 @@ namespace Player
             if (!_enemiesInRange.Contains(enemy))
                 _enemiesInRange.Add(enemy);
 
-            // If a swing is already active when the enemy walks in, hit them immediately
-            // instead of making them wait for the next cycle.
-            if (_isSwinging)
+            // Don't hit during spawn grace period — IsSpawning check in TakeDamage
+            // would block the damage anyway, but skipping TryHit here also prevents
+            // the enemy being added to _hitThisSwing, which would make them immune
+            // to the next swing as well.
+            if (_isSwinging && !enemy.Data.IsSpawning)
                 TryHit(enemy);
         }
 

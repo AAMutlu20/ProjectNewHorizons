@@ -206,6 +206,7 @@ namespace Enemies
             float knockbackForce = 0f, float knockbackDuration = 0.2f)
         {
             if (!_data.IsAlive) return;
+            if (_data.IsSpawning) return; // spawn grace period — damage blocked
 
             // Weaken applies here, at the single chokepoint every damage source
             // already passes through — melee, abilities, and any future source

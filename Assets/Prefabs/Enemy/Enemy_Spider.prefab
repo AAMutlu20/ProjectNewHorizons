@@ -32,7 +32,7 @@ Transform:
   m_GameObject: {fileID: 7564133134363199326}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.9, z: 0}
+  m_LocalPosition: {x: 0, y: 2, z: 0}
   m_LocalScale: {x: 1.9, y: 1.9, z: 1.9}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -184,8 +184,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a020ad2ff2434284f9e49d1dc90d9f2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemies.SpiderAttackBehaviour
-  webSlowFraction: 0.4
-  webSlowDuration: 2
   minionsPerSummon: 2
   summonInterval: 2
   summonRadius: 3
@@ -203,15 +201,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9109956725168896826, guid: a888c82daa4053648942fd9635d3645a, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.46566036
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 9109956725168896826, guid: a888c82daa4053648942fd9635d3645a, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.4656603
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 9109956725168896826, guid: a888c82daa4053648942fd9635d3645a, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.4656604
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 9109956725168896826, guid: a888c82daa4053648942fd9635d3645a, type: 3}
       propertyPath: m_LocalPosition.x

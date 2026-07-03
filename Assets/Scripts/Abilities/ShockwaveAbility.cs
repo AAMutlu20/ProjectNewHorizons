@@ -40,11 +40,20 @@ namespace Abilities
 
         // Scales the particle system so its visual radius matches the gameplay radius,
         // then plays it. Safe to call with a null particle — does nothing.
+        // pos.y is the Rigidbody centre (capsule midpoint) — we snap to ground level
+        // via a downward raycast so the shockwave plays on the floor, not in the air.
         private static void PlayScaled(UnityEngine.ParticleSystem ps, UnityEngine.Vector3 pos,
             float radius, float baseRadius)
         {
             if (!ps) return;
-            ps.transform.position = pos;
+
+            // Snap Y to ground level — raycast from above the position downward.
+            var groundY = pos.y;
+            if (UnityEngine.Physics.Raycast(pos + UnityEngine.Vector3.up * 2f, UnityEngine.Vector3.down,
+                    out var hit, 10f))
+                groundY = hit.point.y;
+
+            ps.transform.position = new UnityEngine.Vector3(pos.x, groundY, pos.z);
             var scale = baseRadius > 0f ? radius / baseRadius : 1f;
             ps.transform.localScale = UnityEngine.Vector3.one * scale;
             ps.Play();

@@ -47,7 +47,8 @@ MonoBehaviour:
   enemyPool: {fileID: 0}
   playerTransform: {fileID: 5432106020961286968}
   hoverHeight: 3
-  blackHoleParticles: {fileID: 0}
+  blackHolePrefab: {fileID: 0}
+  visualBaseRadius: 1
 --- !u!1 &4766739779060614339
 GameObject:
   m_ObjectHideFlags: 0
@@ -442,15 +443,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2797119131133610116, guid: c202d73726ae2b34faa9017ce4c676b2, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2797119131133610116, guid: c202d73726ae2b34faa9017ce4c676b2, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2797119131133610116, guid: c202d73726ae2b34faa9017ce4c676b2, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2797119131133610116, guid: c202d73726ae2b34faa9017ce4c676b2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -458,7 +459,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2797119131133610116, guid: c202d73726ae2b34faa9017ce4c676b2, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 2797119131133610116, guid: c202d73726ae2b34faa9017ce4c676b2, type: 3}
       propertyPath: m_LocalPosition.z

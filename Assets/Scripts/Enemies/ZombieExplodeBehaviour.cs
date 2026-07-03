@@ -58,6 +58,14 @@ namespace Enemies
         {
             if (_hasExploded) return;
             if (!OwnerView || !OwnerView.Data.IsAlive) return;
+
+            // Don't explode during the spawn grace period — the zombie just activated
+            // and may be physically adjacent to the player or a freshly-spawned minion.
+            // TakeDamage also blocks damage during Spawning, but refusing to explode here
+            // as well prevents the one-shot _hasExploded flag from being consumed during
+            // a spawn-frame overlap that would otherwise permanently disarm the trigger.
+            if (OwnerView.Data.IsSpawning) return;
+
             if (playerBodyLayers != 0 && (playerBodyLayers.value & (1 << other.gameObject.layer)) == 0)
                 return; // hit something, but not on a layer we care about
             var playerHealth = other.GetComponentInParent<Player.PlayerHealth>();

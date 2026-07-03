@@ -207,11 +207,11 @@ MonoBehaviour:
   warningDuration: 0.5
   flashDuration: 0.2
   beamRenderer: {fileID: 2347686856461837628}
-  warningWidth: 0.08
-  damageWidth: 0.35
+  warningWidth: 0.1
+  damageWidth: 0.5
   warningColor: {r: 1, g: 0.55, b: 0, a: 1}
   damageColor: {r: 1, g: 0.1, b: 0.1, a: 1}
-  beamLength: 25
+  beamLength: 30
   playerLayers:
     serializedVersion: 2
     m_Bits: 128
@@ -334,12 +334,24 @@ PrefabInstance:
     m_TransformParent: {fileID: 2143457216125900328}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 47604899ef8c7754e9c672a3727803c9, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 47604899ef8c7754e9c672a3727803c9, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 47604899ef8c7754e9c672a3727803c9, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 47604899ef8c7754e9c672a3727803c9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 47604899ef8c7754e9c672a3727803c9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.86
+      value: -2
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 47604899ef8c7754e9c672a3727803c9, type: 3}
       propertyPath: m_LocalPosition.z
