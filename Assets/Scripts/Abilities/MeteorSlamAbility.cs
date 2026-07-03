@@ -25,14 +25,17 @@ namespace Abilities
         private readonly AoeTelegraphRingPool _telegraphPool;
         private readonly DamageOverTimeZonePool _lavaPoolPool;
         private readonly UnityEngine.ParticleSystem _particles;
+        private readonly float _particleBaseRadius;
 
         public MeteorSlamAbility(MeteorSlamDefinitionSo definition, AoeTelegraphRingPool telegraphPool,
-            DamageOverTimeZonePool lavaPoolPool, UnityEngine.ParticleSystem particles = null)
+            DamageOverTimeZonePool lavaPoolPool, UnityEngine.ParticleSystem particles = null,
+            float particleBaseRadius = 1f)
         {
             _definition = definition;
             _telegraphPool = telegraphPool;
             _lavaPoolPool = lavaPoolPool;
             _particles = particles;
+            _particleBaseRadius = particleBaseRadius;
         }
 
         public void Cast(Vector3 castOrigin, Rarity rarity, StatSheet statSheet, EnemyPool enemyPool)
@@ -77,7 +80,9 @@ namespace Abilities
         {
             if (_particles)
             {
+                var scale = _particleBaseRadius > 0f ? stats.ImpactRadius / _particleBaseRadius : 1f;
                 _particles.transform.position = impactPosition;
+                _particles.transform.localScale = UnityEngine.Vector3.one * scale;
                 _particles.Play();
             }
 

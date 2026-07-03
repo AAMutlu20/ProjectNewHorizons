@@ -13,7 +13,6 @@ namespace Enemies
         SpiderMinion = 2,
         EyeWinged = 3,
         TornadoGhost = 4,
-        Boss = 10,
     }
 
     /// <summary>

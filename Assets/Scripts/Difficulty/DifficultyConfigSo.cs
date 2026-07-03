@@ -16,7 +16,7 @@ namespace Difficulty
         [Header("Time scaling — X axis is 0..1 (elapsed time / maxScalingTimeSeconds)")]
         [Tooltip("Seconds of elapsed game time at which the curves below reach their final (X=1) value. " +
                  "Past this point, values stay flat at the curve's end — the cycle keeps escalating via " +
-                 "boss kills (CycleEscalation) instead of this curve climbing further.")]
+                 "time scaling reaches its cap instead of this curve climbing further.")]
         public float maxScalingTimeSeconds = 1800f; // 30 minutes
 
         [Tooltip("How much more HP enemies have as time passes")]

@@ -57,7 +57,7 @@ namespace Waves
         [Header("Sequential spawning")]
         [Tooltip("Max enemies to activate from the burst queue per frame — design doc Section 17.1: " +
                  "spreading burst activations across frames prevents a spike on the frame a new phase " +
-                 "unlocks or a boss fight starts. 2-3 per frame at 60fps is imperceptible to players.")]
+                 "unlocks. 2-3 per frame at 60fps is imperceptible to players.")]
         [SerializeField] private int burstActivationsPerFrame = 3;
 
         /// <summary>
@@ -91,16 +91,17 @@ namespace Waves
         private float _timeUntilNextUnlock;
 
         private float _elapsedGameTime;
-        private bool _isBossPhaseActive;
-        private bool _isWaitingToStartNextCycle;
-        private float _nextCycleDelayTimer;
         private bool _hasCycleStarted;
+
+        // Set to true when all phases have completed their baseDuration —
+        // spawning pauses while the player picks their Legendary reward.
+        // Cleared by RestartCycle() once the reward is resolved.
+        private bool _isWaitingForCycleReward;
+        private int _cycleNumber; // 1-indexed count of full cycles completed
 
         private DifficultyParams _currentDifficulty;
 
         public float ElapsedGameTime => _elapsedGameTime;
-        public int BossKillCount => _escalation.BossKillCount;
-
         private void Awake()
         {
             Debug.Assert(cycleConfig, "WaveDirector: CycleConfig not assigned.", this);
@@ -110,8 +111,13 @@ namespace Waves
 
         private void Start()
         {
-            EventBus.Subscribe<EnemyDiedEvent>(OnEnemyDied);
+            EventBus.Subscribe<CycleRewardResolvedEvent>(OnCycleRewardResolved);
             Invoke(nameof(BeginCycle), delayBeforeFirstPhase);
+        }
+
+        private void OnDestroy()
+        {
+            EventBus.Unsubscribe<CycleRewardResolvedEvent>(OnCycleRewardResolved);
         }
 
         private void BeginCycle()
@@ -121,30 +127,17 @@ namespace Waves
             UnlockNextPhase(); // unlocks phase 0 (Zombie) immediately
         }
 
-        private void OnDestroy()
-        {
-            EventBus.Unsubscribe<EnemyDiedEvent>(OnEnemyDied);
-        }
-
         private void Update()
         {
             _elapsedGameTime += Time.deltaTime;
 
             if (!_hasCycleStarted) return;
+            if (_isWaitingForCycleReward) return; // paused while player picks Legendary reward
 
-            // Difficulty must be set BEFORE DrainBurstQueue so budget > 0
-            // when the first spawns fire. Old order had budget = 0 on early frames.
-            if (!_isWaitingToStartNextCycle && !_isBossPhaseActive)
-            {
-                _currentDifficulty = difficultyScaler.Scale(_elapsedGameTime, _escalation);
-                enemyPool.SetDifficulty(_currentDifficulty);
-            }
+            _currentDifficulty = difficultyScaler.Scale(_elapsedGameTime, _escalation);
+            enemyPool.SetDifficulty(_currentDifficulty);
 
             DrainBurstQueue();
-
-            if (_isWaitingToStartNextCycle) { TickNextCycleDelay(); return; }
-            if (_isBossPhaseActive) return;
-
             TickActivePhaseSpawning();
             TickNextUnlockTimer();
         }
@@ -211,7 +204,18 @@ namespace Waves
         /// </summary>
         private void TickNextUnlockTimer()
         {
-            if (_nextPhaseToUnlock >= cycleConfig.phases.Length) return; // every non-boss phase already unlocked
+            if (_nextPhaseToUnlock >= cycleConfig.phases.Length)
+            {
+                // All phases are active. Wait for the LAST phase to finish its
+                // baseDuration, then end the cycle and give the Legendary reward.
+                // We track this by checking the last ActivePhaseState's TimeSinceUnlocked.
+                if (_activePhases.Count == 0) return;
+                var lastPhase = _activePhases[_activePhases.Count - 1];
+                var lastPhaseDef = cycleConfig.phases[lastPhase.PhaseIndex];
+                if (lastPhase.TimeSinceUnlocked >= lastPhaseDef.baseDuration)
+                    BeginCycleEnd();
+                return;
+            }
 
             _timeUntilNextUnlock -= Time.deltaTime;
             if (_timeUntilNextUnlock > 0f) return;
@@ -227,13 +231,7 @@ namespace Waves
             var phase = cycleConfig.phases[phaseIndex];
             _nextPhaseToUnlock++;
 
-            if (phase.isBossPhase)
-            {
-                BeginBossPhase();
-                return;
-            }
-
-            // Phase intervals shrink by 5s per boss kill but never below 30s —
+            // Phase intervals are floored at MinPhaseIntervalSeconds —
             // confirmed design doc floor (Section 9.5 / CycleEscalation.MinPhaseIntervalSeconds).
             var effectiveDuration = Mathf.Max(
                 CycleEscalation.MinPhaseIntervalSeconds,
@@ -246,8 +244,7 @@ namespace Waves
 
             if (logPhaseEvents)
                 Debug.Log($"WaveDirector: phase {phaseIndex} unlocked — {phase.enemyType} joins the mix " +
-                          $"({_activePhases.Count} type(s) now active), {phase.startingCount} initial, " +
-                          $"bossKills={_escalation.BossKillCount}");
+                          $"({_activePhases.Count} type(s) now active), {phase.startingCount} initial, ");
 
             EventBus.Emit(new PhaseStartedEvent { EnemyType = phase.enemyType, PhaseIndex = phaseIndex });
         }
@@ -276,68 +273,52 @@ namespace Waves
 
             var so = enemyPool.FindSoPublic(enemyType);
             var isMiniboss = so != null && so.canBeMiniboss
-                && Random.value < _escalation.MinibossChance(cycleConfig.baseMinibossChance);
+                && Random.value < _escalation.MinibossChance(cycleConfig.baseMinibossChance, _elapsedGameTime);
 
             enemyPool.Get(enemyType, Roll(), Roll, isMiniboss);
         }
 
-        // Boss phase
+        // Cycle end and restart
 
-        private void BeginBossPhase()
+        private void BeginCycleEnd()
         {
-            _isBossPhaseActive = true;
-            enemyPool.ReturnAll(); // clear the arena per the design doc
+            if (_isWaitingForCycleReward) return; // guard against firing multiple times
+            _isWaitingForCycleReward = true;
+            _cycleNumber++;
 
-            // The boss's candidate is always the arena centre, per the design doc --
-            // but retrying the SAME point if obstructed would loop uselessly, so a
-            // small jitter gives the resolver an actually different candidate.
-            const float bossRetryJitterRadius = 2f;
-            Vector3 RollBossRetryPosition()
-            {
-                var jitter2D = Random.insideUnitCircle * bossRetryJitterRadius;
-                // Explicit X/Z construction -- Unity's implicit Vector2->Vector3 cast
-                // would put jitter2D.y into world Y (height), not Z (ground depth).
-                return GetArenaCentre() + new Vector3(jitter2D.x, 0f, jitter2D.y);
-            }
-
-            enemyPool.Get(EnemyType.Boss, GetArenaCentre(), RollBossRetryPosition);
+            // Clear the arena — all active enemies despawn instantly.
+            enemyPool.ReturnAll();
+            _burstQueue.Clear();
 
             if (logPhaseEvents)
-                Debug.Log($"WaveDirector: boss phase started (kill #{_escalation.BossKillCount + 1})");
+                Debug.Log($"WaveDirector: cycle {_cycleNumber} complete — presenting Legendary reward.");
 
-            EventBus.Emit(new PhaseStartedEvent { EnemyType = EnemyType.Boss, PhaseIndex = _nextPhaseToUnlock - 1 });
+            // LevelSystem listens to this and presents the Legendary choice screen.
+            // Spawning is paused (_isWaitingForCycleReward = true) until the player
+            // picks and CycleRewardResolvedEvent fires back.
+            EventBus.Emit(new CycleEndedEvent { CycleNumber = _cycleNumber });
         }
 
-        private void OnEnemyDied(EnemyDiedEvent enemyDied)
+        private void OnCycleRewardResolved(CycleRewardResolvedEvent _)
         {
-            if (!enemyDied.IsBoss) return;
-            if (!_isBossPhaseActive) return; // ignore stray boss-death events outside an active boss phase
-
-            _isBossPhaseActive = false;
-            _escalation.OnBossKilled();
-
-            if (logPhaseEvents)
-                Debug.Log($"WaveDirector: boss killed — total kills now {_escalation.BossKillCount}");
-
-            EventBus.Emit(new CycleCompleteEvent { BossKillCount = _escalation.BossKillCount });
-
-            _isWaitingToStartNextCycle = true;
-            _nextCycleDelayTimer = cycleConfig.delayAfterBossKill;
+            // Player has picked their Legendary reward. Wait the configured delay
+            // then restart the cycle, escalated.
+            Invoke(nameof(RestartCycle), cycleConfig.delayAfterCycleEnd);
         }
 
-        private void TickNextCycleDelay()
+        private void RestartCycle()
         {
-            _nextCycleDelayTimer -= Time.deltaTime;
-            if (_nextCycleDelayTimer > 0f) return;
-
-            _isWaitingToStartNextCycle = false;
+            _escalation.OnCycleCompleted();
+            _isWaitingForCycleReward = false;
             ResetCycleState();
-            UnlockNextPhase(); // restarts from phase 0 (Zombie) -- the whole accumulated set clears with the arena
+            UnlockNextPhase(); // restarts from Zombie
+
+            if (logPhaseEvents)
+                Debug.Log($"WaveDirector: cycle restarting (escalation cycle #{_escalation.CycleCount}).");
         }
 
         // Helpers
 
-        private Vector3 GetArenaCentre() => arenaCentre ? arenaCentre.position : Vector3.zero;
         private Vector3 GetPlayerPosition() => player ? player.position : Vector3.zero;
     }
 
@@ -346,11 +327,5 @@ namespace Waves
     {
         public EnemyType EnemyType;
         public int PhaseIndex;
-    }
-
-    /// <summary>Emitted when a boss dies and the cycle is about to restart, harder.</summary>
-    public struct CycleCompleteEvent
-    {
-        public int BossKillCount;
     }
 }

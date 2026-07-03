@@ -1,0 +1,74 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1956788833254577208
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1994420706260587954}
+  - component: {fileID: 7319356527122808229}
+  m_Layer: 0
+  m_Name: '[Audio]'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1994420706260587954
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1956788833254577208}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -89.45042, y: -5.11419, z: -29.96909}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7319356527122808229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1956788833254577208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ddcdd35760cf2046b915b5bc2527169, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Audio.AudioManager
+  musicMixerGroup: {fileID: 4614740334137647308, guid: 72529d55ddb52ed4496d4f1f4bf6ebaa, type: 2}
+  sfxMixerGroup: {fileID: 5838464400891147789, guid: 72529d55ddb52ed4496d4f1f4bf6ebaa, type: 2}
+  uiMixerGroup: {fileID: -2797456439384700976, guid: 72529d55ddb52ed4496d4f1f4bf6ebaa, type: 2}
+  mainMenuMusic: {fileID: 8300000, guid: 89f888769892a66428f042b5035f2709, type: 3}
+  inGameMusic: {fileID: 8300000, guid: 59a163636cec1644f9fcceb9f8fc1a07, type: 3}
+  bossMusic: {fileID: 0}
+  musicCrossfadeDuration: 1.5
+  shockwaveSound: {fileID: 0}
+  meteorSlamCastSound: {fileID: 0}
+  meteorSlamImpactSound: {fileID: 0}
+  laserBeamSound: {fileID: 0}
+  coneOfFireSound: {fileID: 0}
+  darkShieldBlockSound: {fileID: 0}
+  poisonAuraLoopClip: {fileID: 0}
+  meleeHitSound: {fileID: 0}
+  meleeCritSound: {fileID: 0}
+  cleavingSound: {fileID: 0}
+  lifestealSound: {fileID: 0}
+  enemyDeathSound: {fileID: 0}
+  minibossDeathSound: {fileID: 0}
+  bossDeathSound: {fileID: 0}
+  playerHitSound: {fileID: 0}
+  playerDeathSound: {fileID: 0}
+  xpPickupSound: {fileID: 0}
+  levelUpSound: {fileID: 0}
+  choicePresentedSound: {fileID: 0}
+  choiceSelectedSound: {fileID: 0}
+  bossPhaseStartStinger: {fileID: 0}

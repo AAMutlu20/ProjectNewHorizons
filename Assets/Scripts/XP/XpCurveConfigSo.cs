@@ -24,12 +24,8 @@ namespace XP
         public AnimationCurve enemyXpDropMultiplier = AnimationCurve.Linear(0, 1, 1, 1.5f);
         public float maxScalingTimeSeconds = 1200f; // 20 minutes
 
-        [Header("Miniboss / boss XP rules")]
+        [Header("Miniboss XP rules")]
         public float minibossXpMultiplier = 1.5f;
-
-        [Tooltip("XP given by the Nth boss, as a fraction of the XP required for the player's NEXT level. " +
-                 "Index 0 = first boss, index 1 = second boss, etc. The last entry repeats for all further bosses.")]
-        public float[] bossXpFractionOfNextLevel = { 1.5f, 1f, 0.75f, 0.35f };
 
         public float GetXpRequiredForLevel(int level)
         {
@@ -47,16 +43,5 @@ namespace XP
             return enemyXpDropMultiplier.Evaluate(normalisedTime);
         }
 
-        public float GetBossXpFraction(int bossKillNumber)
-        {
-            if (bossXpFractionOfNextLevel == null || bossXpFractionOfNextLevel.Length == 0)
-            {
-                Debug.LogError("XpCurveConfigSo: bossXpFractionOfNextLevel is empty.", this);
-                return 0f;
-            }
-
-            var index = Mathf.Min(bossKillNumber, bossXpFractionOfNextLevel.Length - 1);
-            return bossXpFractionOfNextLevel[index];
-        }
     }
 }

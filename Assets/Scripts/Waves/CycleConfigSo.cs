@@ -21,7 +21,6 @@ namespace Waves
             new() { enemyType = Enemies.EnemyType.Spider, startingCount = 3, spawnInterval = 2f, baseDuration = 60f },
             new() { enemyType = Enemies.EnemyType.EyeWinged, startingCount = 9, spawnInterval = 2.5f, baseDuration = 60f },
             new() { enemyType = Enemies.EnemyType.TornadoGhost, startingCount = 5, spawnInterval = 3f, baseDuration = 60f },
-            new() { isBossPhase = true },
         };
 
         [Header("Miniboss")]
@@ -29,8 +28,9 @@ namespace Waves
         [Range(0f, 1f)]
         public float baseMinibossChance = 0.05f;
 
-        [Header("Arena")]
-        [Tooltip("Seconds to wait after a boss dies before the next cycle's first phase begins.")]
-        public float delayAfterBossKill = 0.5f;
+        [Header("Cycle restart")]
+        [Tooltip("Seconds to wait after the player picks their Legendary reward before " +
+                 "the next cycle begins. Gives the player a beat to re-orient.")]
+        public float delayAfterCycleEnd = 0.5f;
     }
 }

@@ -28,7 +28,11 @@ namespace Player
         [SerializeField] private EnemyPool enemyPool;
         [SerializeField] private Transform playerTransform;
         [SerializeField] private float hoverHeight = 3f;
-        [SerializeField] private UnityEngine.ParticleSystem blackHoleParticles;
+        [Tooltip("The black hole visual prefab (mesh, plane, sphere — any GameObject). " +
+                 "Instantiated once on grant and scaled to match CurrentRadius every frame.")]
+        [SerializeField] private UnityEngine.GameObject blackHolePrefab;
+        [Tooltip("The prefab's visual radius at localScale = 1.")]
+        [SerializeField] private float visualBaseRadius = 1f;
 
         private float _baseSize;
         private float _sizeScalingPerEnemy;
@@ -38,6 +42,7 @@ namespace Player
         private int _totalKillsObserved;
         private float _checkTimer;
         private bool _isGranted;
+        private UnityEngine.GameObject _visualInstance;
 
         public bool IsGranted => _isGranted;
         public float CurrentRadius => _baseSize + _sizeScalingPerEnemy * _totalKillsObserved;
@@ -65,6 +70,15 @@ namespace Player
 
             transform.position = playerTransform.position + Vector3.up * hoverHeight;
 
+            // Scale the visual to match the current gameplay radius every frame.
+            // visualBaseRadius is the prefab's authored radius at scale 1 — dividing
+            // CurrentRadius by it gives the correct uniform scale factor.
+            if (_visualInstance)
+            {
+                var scale = visualBaseRadius > 0f ? CurrentRadius / visualBaseRadius : CurrentRadius;
+                _visualInstance.transform.localScale = UnityEngine.Vector3.one * scale;
+            }
+
             _checkTimer -= Time.deltaTime;
             if (_checkTimer > 0f) return;
 
@@ -80,7 +94,11 @@ namespace Player
             _executeScalingPerEnemy = stats.ExecuteScalingPerEnemy;
             _executeThresholdPercent = stats.ExecuteThresholdPercent;
 
-            if (blackHoleParticles) blackHoleParticles.Play();
+            if (blackHolePrefab && _visualInstance == null)
+            {
+                _visualInstance = UnityEngine.Object.Instantiate(blackHolePrefab, transform);
+                _visualInstance.transform.localPosition = UnityEngine.Vector3.zero;
+            }
             _isGranted = true;
         }
 

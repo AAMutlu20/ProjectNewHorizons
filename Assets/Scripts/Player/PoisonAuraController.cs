@@ -62,6 +62,7 @@ namespace Player
             // Enable visual
             poisonAuraVisual.SetActive(true);
             if (auraParticles) auraParticles.Play();
+            Audio.AudioManager.Instance?.SetPoisonAuraLoop(true);
 
             _isGranted = true;
             _tickTimer = 0f; // tick immediately on grant rather than waiting a full interval

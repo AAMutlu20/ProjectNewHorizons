@@ -1,20 +1,25 @@
 using Core;
-using Player;
 using UnityEngine;
 
 namespace Enemies
 {
     /// <summary>
-    /// A single pooled projectile fired by a ranged enemy. Travels in a
-    /// straight line and emits EnemyAttackEvent on hitting the player's
-    /// collider, then returns itself to the pool. Also returns itself after
-    /// lifetimeSeconds if it never hits anything.
+    /// A pooled projectile that travels in a straight line and damages the
+    /// player on contact using the same trigger pattern as ZombieExplodeBehaviour
+    /// — OnTriggerEnter checks for PlayerHealth in the parent chain, emits
+    /// EnemyAttackEvent, then returns to pool.
     ///
-    /// Attach to: the projectile prefab root, with a Collider set to IsTrigger.
+    /// The old approach checked for PlayerController instead of PlayerHealth,
+    /// which was inconsistent with everything else and caused misses. This
+    /// matches the proven zombie pattern exactly.
+    ///
+    /// Attach to: the projectile prefab root. Collider must be IsTrigger.
     /// </summary>
     [RequireComponent(typeof(Collider))]
     public class EnemyProjectile : MonoBehaviour
     {
+        [SerializeField] private LayerMask playerBodyLayers;
+
         [System.NonSerialized] public EnemyProjectilePool Pool;
 
         private Vector3 _direction;
@@ -22,6 +27,7 @@ namespace Enemies
         private float _damage;
         private float _remainingLifetime;
         private bool _isActive;
+        private bool _hasHit;
 
         private void Awake()
         {
@@ -30,7 +36,6 @@ namespace Enemies
                 Debug.LogWarning("EnemyProjectile: collider should be set to IsTrigger.", this);
         }
 
-        /// <summary>Called by EnemyProjectilePool.Fire() to launch this projectile.</summary>
         public void Launch(Vector3 origin, Vector3 direction, float speed, float damage, float lifetimeSeconds)
         {
             transform.position = origin;
@@ -41,6 +46,7 @@ namespace Enemies
             _damage = damage;
             _remainingLifetime = lifetimeSeconds;
             _isActive = true;
+            _hasHit = false;
         }
 
         private void Update()
@@ -56,14 +62,23 @@ namespace Enemies
 
         private void OnTriggerEnter(Collider other)
         {
-            Debug.Log($"Red Enemy projectile hit {other.name}");
-            if (!_isActive) return;
-            if (!other.GetComponentInParent<PlayerController>()) return;
-            Debug.Log($"Red Enemy projectile hit {other.name} and got through checks, will now damage with {_damage}");
+            if (!_isActive || _hasHit) return;
+
+            // Same layer + PlayerHealth check as ZombieExplodeBehaviour —
+            // the proven pattern that actually works.
+            if (playerBodyLayers != 0 && (playerBodyLayers.value & (1 << other.gameObject.layer)) == 0)
+                return;
+
+            var playerHealth = other.GetComponentInParent<Player.PlayerHealth>();
+            if (!playerHealth) return;
+
+            _hasHit = true;
+
             EventBus.Emit(new EnemyAttackEvent
             {
                 Damage = _damage,
                 Position = transform.position,
+                IsRanged = true,
             });
 
             ReturnToPool();

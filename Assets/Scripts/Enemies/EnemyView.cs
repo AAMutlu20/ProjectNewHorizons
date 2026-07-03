@@ -16,7 +16,9 @@ namespace Enemies
     public class EnemyView : MonoBehaviour
     {
         [SerializeField] private Animator animator; // graybox enemies have none
-        [SerializeField] private Rigidbody rb;      // kinematic — logic owns position/rotation, physics only for collision/trigger events
+
+        [SerializeField]
+        private Rigidbody rb; // kinematic — logic owns position/rotation, physics only for collision/trigger events
 
         // The actual runtime data — ref-accessible so BehaviourController writes directly
         private EnemyData _data;
@@ -59,8 +61,8 @@ namespace Enemies
             // Tradeoff accepted: ground is treated as flat going forward -- no
             // falling, no climbing onto raised platforms via physics anymore.
             rb.constraints = RigidbodyConstraints.FreezeRotationX
-                            | RigidbodyConstraints.FreezeRotationZ
-                            | RigidbodyConstraints.FreezePositionY;
+                             | RigidbodyConstraints.FreezeRotationZ
+                             | RigidbodyConstraints.FreezePositionY;
 
             // Continuous detection avoids tunnelling through thin platform edges at
             // normal enemy speeds.
@@ -74,7 +76,8 @@ namespace Enemies
         /// <summary>Initialise this view with fresh data. Called immediately after Get() from pool.</summary>
         public void Init(EnemyTypeSo typeSo, DifficultyParams diff, Vector3 worldPos,
             Transform playerTransform, SpatialGrid grid, System.Collections.Generic.List<EnemyView> activeList,
-            bool isMiniboss = false, EnemyProjectilePool projectilePool = null, VFX.AoeTelegraphRingPool telegraphPool = null,
+            bool isMiniboss = false, EnemyProjectilePool projectilePool = null,
+            VFX.AoeTelegraphRingPool telegraphPool = null,
             LayerMask obstructionLayers = default, Stats.StatSheet playerStatSheet = null)
         {
             // worldPos arrives here ALREADY fully resolved -- EnemyPool.Get()
@@ -82,7 +85,7 @@ namespace Enemies
             // REAL ground height at this X/Z and adds typeSo.groundOffsetY on
             // top of that actual detected surface.
             _data = EnemyData.Create(typeSo, diff, worldPos, isMiniboss);
-            
+
             transform.position = worldPos;
             transform.rotation = Quaternion.identity;
 
@@ -115,11 +118,14 @@ namespace Enemies
             var explodeBehaviour = GetComponentInChildren<ZombieExplodeBehaviour>(includeInactive: true);
             if (explodeBehaviour) explodeBehaviour.ResetForReuse(this);
 
+            // Spider minion uses the same trigger pattern as the zombie —
+            // reset its bite flag and owner reference on pool reuse.
+            var biteBehaviour = GetComponentInChildren<SpiderMinionBiteBehaviour>(includeInactive: true);
+            if (biteBehaviour) biteBehaviour.ResetForReuse(this);
+
             if (animator) animator.SetInteger(AnimState, (int)EnemyState.Spawning);
             _lastState = EnemyState.Spawning;
 
-            if (_data.Type == EnemyType.Boss)
-                EmitBossHealthChanged();
         }
 
         /// <summary>
@@ -166,7 +172,7 @@ namespace Enemies
             {
                 transform.position = _data.Position;
             }
-            
+
             var flatVel = new Vector3(_data.Velocity.x, 0f, _data.Velocity.z);
             if (flatVel.sqrMagnitude > 0.0001f)
             {
@@ -223,8 +229,6 @@ namespace Enemies
             // Only the Boss has a persistent HUD health bar — other enemy types
             // don't need a per-hit event, so this stays Boss-specific rather
             // than firing for every enemy in the game.
-            if (_data.Type == EnemyType.Boss)
-                EmitBossHealthChanged();
 
             if (!(_data.Hp <= 0f)) return;
             _data.Hp = 0f;
@@ -235,24 +239,7 @@ namespace Enemies
                 Position = _data.Position,
                 XpValue = _data.XpValue,
                 IsMiniboss = _data.IsMiniboss,
-                IsBoss = _data.Type == EnemyType.Boss,
             });
         }
-
-        private void EmitBossHealthChanged()
-        {
-            EventBus.Emit(new BossHealthChangedEvent
-            {
-                Current = _data.Hp,
-                Max = _data.MaxHp,
-            });
-        }
-    }
-
-    /// <summary>Emitted whenever the Boss takes damage or spawns — drives the boss bar UI.</summary>
-    public struct BossHealthChangedEvent
-    {
-        public float Current;
-        public float Max;
     }
 }

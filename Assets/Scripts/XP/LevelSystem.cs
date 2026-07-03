@@ -41,8 +41,11 @@ namespace XP
         private AbilityChoiceGenerator _abilityChoiceGenerator;
         private float _currentXp;
         private int _currentLevel;
-        private int _bossKillCount;
         private float _elapsedGameTime;
+        // True when the current choice screen was triggered by a cycle end —
+        // causes ResolveStatChoice/ResolveAbilityChoice to also emit
+        // CycleRewardResolvedEvent so WaveDirector knows to restart.
+        private bool _isCycleRewardPending;
 
         public int CurrentLevel => _currentLevel;
 
@@ -62,12 +65,14 @@ namespace XP
         private void Start()
         {
             EventBus.Subscribe<EnemyDiedEvent>(OnEnemyDied);
+            EventBus.Subscribe<CycleEndedEvent>(OnCycleEnded);
             EmitExperienceChanged();
         }
 
         private void OnDestroy()
         {
             EventBus.Unsubscribe<EnemyDiedEvent>(OnEnemyDied);
+            EventBus.Unsubscribe<CycleEndedEvent>(OnCycleEnded);
         }
 
         private void Update()
@@ -77,12 +82,6 @@ namespace XP
 
         private void OnEnemyDied(EnemyDiedEvent enemyDied)
         {
-            if (enemyDied.IsBoss)
-            {
-                GrantBossXp();
-                return;
-            }
-
             SpawnXpOrbForEnemy(enemyDied);
         }
 
@@ -100,15 +99,6 @@ namespace XP
                 : timeScaledXp;
 
             xpOrbPool.Spawn(enemyDied.Position, minibossScaledXp);
-        }
-
-        private void GrantBossXp()
-        {
-            var xpRequiredForNextLevel = xpCurveConfig.GetXpRequiredForLevel(_currentLevel + 1);
-            var bossXpFraction = xpCurveConfig.GetBossXpFraction(_bossKillCount);
-
-            _bossKillCount++;
-            GrantXp(xpRequiredForNextLevel * bossXpFraction);
         }
 
         /// <summary>
@@ -161,6 +151,36 @@ namespace XP
             }
         }
 
+        // ── Cycle-end Legendary reward ───────────────────────────────────────
+
+        private void OnCycleEnded(CycleEndedEvent e)
+        {
+            _isCycleRewardPending = true;
+            BeginCycleRewardChoice();
+        }
+
+        private void BeginCycleRewardChoice()
+        {
+            GameFreezeController.RequestFreeze(FreezeReason);
+
+            // Same ability/stat cadence as normal level-ups — just with Legendary included.
+            var isAbilityLevel = _currentLevel % LevelsPerAbilityChoice == 0;
+            EventBus.Emit(new LevelUpEvent { NewLevel = _currentLevel, IsAbilityLevel = isAbilityLevel });
+
+            if (isAbilityLevel)
+            {
+                var choices = _abilityChoiceGenerator.RollLevelUpChoicesLegendary();
+                EventBus.Emit(new AbilityChoicePresentedEvent { Choices = choices });
+            }
+            else
+            {
+                var choices = _statChoiceGenerator.RollLevelUpChoicesLegendary();
+                EventBus.Emit(new StatChoicePresentedEvent { Choices = choices });
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+
         /// <summary>
         /// Called by the choice UI once the player picks a stat card. Applies
         /// the stat and unfreezes the game after a short delay so the player
@@ -171,6 +191,13 @@ namespace XP
             statSheet.ApplyModifier(chosenModifier);
             EventBus.Emit(new StatChoiceResolvedEvent { ChosenModifier = chosenModifier });
 
+            // If this choice was triggered by a cycle end, tell WaveDirector to restart.
+            if (_isCycleRewardPending)
+            {
+                _isCycleRewardPending = false;
+                EventBus.Emit(new CycleRewardResolvedEvent());
+            }
+
             StartCoroutine(UnfreezeAfterDelay());
         }
 
@@ -179,6 +206,13 @@ namespace XP
         {
             chosenOption.Entry.Grant(chosenOption.Rarity);
             EventBus.Emit(new AbilityChoiceResolvedEvent { ChosenOption = chosenOption });
+
+            // If this choice was triggered by a cycle end, tell WaveDirector to restart.
+            if (_isCycleRewardPending)
+            {
+                _isCycleRewardPending = false;
+                EventBus.Emit(new CycleRewardResolvedEvent());
+            }
 
             StartCoroutine(UnfreezeAfterDelay());
         }

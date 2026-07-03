@@ -23,14 +23,11 @@ namespace UI
         private void Start()
         {
             EventBus.Subscribe<PhaseStartedEvent>(OnPhaseStarted);
-            EventBus.Subscribe<CycleCompleteEvent>(OnCycleComplete);
         }
 
         private void OnDestroy()
         {
-            EventBus.Unsubscribe<PhaseStartedEvent>(OnPhaseStarted);
-            EventBus.Unsubscribe<CycleCompleteEvent>(OnCycleComplete);
-        }
+            EventBus.Unsubscribe<PhaseStartedEvent>(OnPhaseStarted); }
 
         private void Update()
         {
@@ -42,15 +39,10 @@ namespace UI
         {
             if (!phaseLabel) return;
 
-            phaseLabel.text = phaseStarted.EnemyType == Enemies.EnemyType.Boss
+            phaseLabel.text = false // boss removed
                 ? "BOSS"
                 : $"{phaseStarted.EnemyType} incoming";
         }
-
-        private void OnCycleComplete(CycleCompleteEvent cycleComplete)
-        {
-            if (!phaseLabel) return;
-            phaseLabel.text = $"Boss defeated! ({cycleComplete.BossKillCount})";
-        }
+        
     }
 }

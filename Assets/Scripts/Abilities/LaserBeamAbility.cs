@@ -35,21 +35,29 @@ namespace Abilities
         private readonly LaserBeamZonePool _beamPool;
         private readonly Transform _playerTransform;
         private readonly UnityEngine.ParticleSystem _particles;
+        private readonly float _particleBaseWidth;
 
         public LaserBeamAbility(LaserBeamDefinitionSo definition, LaserBeamZonePool beamPool,
-            Transform playerTransform, UnityEngine.ParticleSystem particles = null)
+            Transform playerTransform, UnityEngine.ParticleSystem particles = null,
+            float particleBaseWidth = 1f)
         {
             _definition = definition;
             _beamPool = beamPool;
             _playerTransform = playerTransform;
             _particles = particles;
+            _particleBaseWidth = particleBaseWidth;
         }
 
         public void Cast(Vector3 castOrigin, Rarity rarity, StatSheet statSheet, EnemyPool enemyPool)
         {
             if (_particles)
             {
+                // Scale X/Z by beam width so the particle matches the gameplay hitbox width.
+                // Y scale 1 — beam is infinite length, so length isn't author-scaled here;
+                // use a long particle system emission shape authored at your desired length.
+                var widthScale = _particleBaseWidth > 0f ? BeamWidth / _particleBaseWidth : 1f;
                 _particles.transform.position = castOrigin;
+                _particles.transform.localScale = new UnityEngine.Vector3(widthScale, 1f, widthScale);
                 _particles.Play();
             }
 

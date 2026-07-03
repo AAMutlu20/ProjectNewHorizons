@@ -38,11 +38,12 @@ namespace Abilities
             return RollChoices(_rarityWeights.RollExcludingLegendary);
         }
 
-        /// <summary>Rolls 3 unique abilities including Legendary. Used for boss-kill rewards.</summary>
-        public List<AbilityChoiceOption> RollBossRewardChoices()
+        /// <summary>Rolls 3 unique abilities including Legendary. Used for cycle-end rewards.</summary>
+        public List<AbilityChoiceOption> RollLevelUpChoicesLegendary()
         {
             return RollChoices(_rarityWeights.RollAnyRarity);
         }
+
 
         private List<AbilityChoiceOption> RollChoices(System.Func<Rarity> rollRarity)
         {

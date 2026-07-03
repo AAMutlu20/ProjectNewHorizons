@@ -28,13 +28,15 @@ namespace Abilities
         private readonly ConeOfFireDefinitionSo _definition;
         private readonly PlayerController _playerController;
         private readonly UnityEngine.ParticleSystem _particles;
+        private readonly float _particleBaseRange;
 
         public ConeOfFireAbility(ConeOfFireDefinitionSo definition, PlayerController playerController,
-            UnityEngine.ParticleSystem particles = null)
+            UnityEngine.ParticleSystem particles = null, float particleBaseRange = 1f)
         {
             _definition = definition;
             _playerController = playerController;
             _particles = particles;
+            _particleBaseRange = particleBaseRange;
         }
 
         public void Cast(Vector3 castOrigin, Rarity rarity, StatSheet statSheet, EnemyPool enemyPool)
@@ -46,7 +48,10 @@ namespace Abilities
 
             if (_particles)
             {
+                var scale = _particleBaseRange > 0f ? stats.Range / _particleBaseRange : 1f;
                 _particles.transform.position = castOrigin;
+                _particles.transform.localScale = UnityEngine.Vector3.one * scale;
+                // Rotate so the particle faces the same direction as the cone.
                 _particles.transform.rotation = facingDirection.sqrMagnitude > 0.001f
                     ? UnityEngine.Quaternion.LookRotation(facingDirection)
                     : UnityEngine.Quaternion.identity;

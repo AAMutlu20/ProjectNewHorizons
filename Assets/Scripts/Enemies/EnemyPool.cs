@@ -32,7 +32,7 @@ namespace Enemies
 
         [Header("Spawn placement")]
         [Tooltip("Resolves candidate XZ positions into grounded world positions via a ground raycast. " +
-                 "Owned by EnemyPool so every spawn path (waves, boss escorts, etc.) goes through " +
+                 "Owned by EnemyPool so every spawn path goes through " +
                  "the same resolver automatically.")]
         [SerializeField] private Waves.SpawnPositionResolver spawnPositionResolver;
 

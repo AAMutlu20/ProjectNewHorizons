@@ -30,12 +30,13 @@ namespace Stats
             return RollChoices(_rarityWeights.RollExcludingLegendary);
         }
 
-        /// <summary>Rolls 3 unique stats including Legendary. Used for boss-kill rewards.</summary>
-        public List<StatChoiceOption> RollBossRewardChoices()
+        /// <summary>Rolls 3 unique stats including Legendary. Used for cycle-end rewards.</summary>
+        public List<StatChoiceOption> RollLevelUpChoicesLegendary()
         {
             return RollChoices(_rarityWeights.RollAnyRarity);
         }
 
+        /// <summary>Rolls 3 unique stats including Legendary. Used for boss-kill rewards.</summary>
         private List<StatChoiceOption> RollChoices(System.Func<Rarity> rollRarity)
         {
             var choices = new List<StatChoiceOption>(ChoiceCount);

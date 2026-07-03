@@ -28,8 +28,5 @@ namespace Waves
                  "1 = flat rate, 2 = doubles by the end of the phase.")]
         public AnimationCurve countRampOverPhase = AnimationCurve.Linear(0, 1, 1, 2);
 
-        [Tooltip("If true, this is the boss phase — ignores enemyType/startingCount/spawnInterval " +
-                 "and instead clears the arena and spawns a single Boss at the centre.")]
-        public bool isBossPhase;
     }
 }

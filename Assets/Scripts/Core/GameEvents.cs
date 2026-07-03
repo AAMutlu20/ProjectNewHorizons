@@ -27,7 +27,6 @@ namespace Core
         public UnityEngine.Vector3 Position;
         public float XpValue;
         public bool IsMiniboss;
-        public bool IsBoss;
     }
 
     public struct EnemyReturnedEvent
@@ -88,5 +87,50 @@ namespace Core
     public struct AbilityChoiceResolvedEvent
     {
         public AbilityChoiceOption ChosenOption;
+    }
+
+    /// <summary>
+    /// Fired by WaveDirector when the last phase (TornadoGhost) completes
+    /// its baseDuration. LevelSystem listens to this and presents the
+    /// Legendary reward choice before the cycle restarts.
+    /// </summary>
+    public struct CycleEndedEvent
+    {
+        public int CycleNumber;
+    }
+
+    /// <summary>
+    /// Fired by LevelSystem after the player picks their Legendary reward
+    /// from the cycle-end choice screen. WaveDirector listens to this to
+    /// know it's safe to restart the cycle.
+    /// </summary>
+    public struct CycleRewardResolvedEvent { }
+
+    // -------------------------------------------------------------------------
+    // Boss phase events — emitted by WaveDirector so audio/UI can react to the
+    // boss fight starting and ending without coupling to WaveDirector directly.
+    // -------------------------------------------------------------------------
+
+
+    // -------------------------------------------------------------------------
+    // Melee VFX / Audio events
+    // -------------------------------------------------------------------------
+
+    public struct MeleeHitEvent
+    {
+        public UnityEngine.Vector3 HitPosition;
+        public float DamageDealt;
+        public bool IsCrit;
+    }
+
+    public struct CleavingTriggeredEvent
+    {
+        public UnityEngine.Vector3 SwingOrigin;
+    }
+
+    public struct LifestealHealEvent
+    {
+        public float AmountHealed;
+        public UnityEngine.Vector3 HitPosition;
     }
 }
