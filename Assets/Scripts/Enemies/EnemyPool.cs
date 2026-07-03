@@ -27,7 +27,6 @@ namespace Enemies
         [Tooltip("Wired here, not on individual enemy prefabs, since a prefab asset " +
                  "can't reference a scene object directly. EnemyPool (itself a scene " +
                  "object) holds the reference and forwards it to each spawned enemy.")]
-        [SerializeField] private EnemyProjectilePool projectilePool;
         [SerializeField] private VFX.AoeTelegraphRingPool telegraphPool;
 
         [Header("Spawn placement")]
@@ -174,7 +173,7 @@ namespace Enemies
             var view = queue.Dequeue();
             view.gameObject.SetActive(true);
             view.Init(so, _currentDiff, resolvedPosition, playerTransform, spatialGrid, _active,
-                isMiniboss, projectilePool, telegraphPool, obstructionLayers, playerStatSheet);
+                isMiniboss, telegraphPool, obstructionLayers, playerStatSheet);
             _active.Add(view);
             return view;
         }

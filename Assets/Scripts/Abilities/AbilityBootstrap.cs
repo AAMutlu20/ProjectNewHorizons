@@ -41,8 +41,6 @@ namespace Abilities
         [SerializeField] private VFX.LaserBeamZonePool laserBeamZonePool;
         [SerializeField] private Transform playerTransform;
         [SerializeField] private LaserBeamChoiceEntry laserBeamEntry;
-        [SerializeField] private UnityEngine.ParticleSystem laserBeamParticles;
-        [SerializeField] private float laserBeamParticleBaseWidth = 1f;
 
         [Header("Cone of Fire")]
         [SerializeField] private ConeOfFireDefinitionSo coneOfFireDefinition;
@@ -93,7 +91,7 @@ namespace Abilities
                 return;
             }
 
-            var ability = new LaserBeamAbility(laserBeamDefinition, laserBeamZonePool, playerTransform, laserBeamParticles, laserBeamParticleBaseWidth);
+            var ability = new LaserBeamAbility(laserBeamDefinition, laserBeamZonePool, playerTransform);
             laserBeamEntry.Configure(ability,
                 stats => $"Beams: {stats.BeamCount}  Weakening: {stats.WeakeningMultiplierBonus * 100f:F0}%");
         }

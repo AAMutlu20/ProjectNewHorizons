@@ -58,5 +58,13 @@ namespace Enemies
         public UnityEngine.Vector3 Position;
         public float SlowFraction;
         public float SlowDuration;
+
+        /// <summary>
+        /// Set to true when the caller has already confirmed the hit geometrically
+        /// (e.g. a raycast) and PlayerHealth should skip its proximity distance check.
+        /// False for melee/contact attacks that report the enemy's position and
+        /// rely on the distance check to confirm they're actually adjacent.
+        /// </summary>
+        public bool HitConfirmed;
     }
 }

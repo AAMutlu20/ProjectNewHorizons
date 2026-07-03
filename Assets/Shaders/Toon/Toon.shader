@@ -1,7 +1,7 @@
 // Toon.shader
 //
-// Stylized toon shader for URP, hand-written HLSL (not Shader Graph -- see
-// project notes for why). Two passes:
+// Stylized toon shader for URP, hand-written HLSL.
+// Two passes:
 //   1. Outline -- inverted hull: the mesh is duplicated, pushed outward along
 //      vertex normals by _OutlineWidth, and only its BACK faces are drawn
 //      (front-face culled), so it appears as a rim around the silhouette

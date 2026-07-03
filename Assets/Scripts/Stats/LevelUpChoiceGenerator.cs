@@ -30,7 +30,7 @@ namespace Stats
             return RollChoices(_rarityWeights.RollExcludingLegendary);
         }
 
-        /// <summary>Rolls 3 unique stats including Legendary. Used for cycle-end rewards.</summary>
+        /// <summary>Rolls 3 stats including Legendary. Used for cycle-end rewards.</summary>
         public List<StatChoiceOption> RollLevelUpChoicesLegendary()
         {
             return RollChoices(_rarityWeights.RollAnyRarity);

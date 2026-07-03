@@ -28,11 +28,9 @@ namespace Enemies
 
         // Shared scene-level pools, also injected by EnemyPool. Cannot be
         // serialized directly on the prefab -- a prefab asset can't hold a
-        // reference to a scene object (EnemyProjectilePool/AoeTelegraphRingPool
         // live in [Systems] in the scene, not as assets), so archetypes that
         // need them (EyeRangedAttackBehaviour, BossAttackBehaviour) read these
         // instead of having their own [SerializeField] for the pool.
-        [System.NonSerialized] public EnemyProjectilePool ProjectilePool;
         [System.NonSerialized] public VFX.AoeTelegraphRingPool TelegraphPool;
 
         // Layers considered solid for line-of-sight purposes (the Obstructions

@@ -38,7 +38,7 @@ namespace Abilities
             return RollChoices(_rarityWeights.RollExcludingLegendary);
         }
 
-        /// <summary>Rolls 3 unique abilities including Legendary. Used for cycle-end rewards.</summary>
+        /// <summary>Rolls 3 abilities including Legendary. Used for cycle-end rewards.</summary>
         public List<AbilityChoiceOption> RollLevelUpChoicesLegendary()
         {
             return RollChoices(_rarityWeights.RollAnyRarity);

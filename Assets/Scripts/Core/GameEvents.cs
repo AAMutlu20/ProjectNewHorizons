@@ -89,23 +89,6 @@ namespace Core
         public AbilityChoiceOption ChosenOption;
     }
 
-    /// <summary>
-    /// Fired by WaveDirector when the last phase (TornadoGhost) completes
-    /// its baseDuration. LevelSystem listens to this and presents the
-    /// Legendary reward choice before the cycle restarts.
-    /// </summary>
-    public struct CycleEndedEvent
-    {
-        public int CycleNumber;
-    }
-
-    /// <summary>
-    /// Fired by LevelSystem after the player picks their Legendary reward
-    /// from the cycle-end choice screen. WaveDirector listens to this to
-    /// know it's safe to restart the cycle.
-    /// </summary>
-    public struct CycleRewardResolvedEvent { }
-
     // -------------------------------------------------------------------------
     // Boss phase events — emitted by WaveDirector so audio/UI can react to the
     // boss fight starting and ending without coupling to WaveDirector directly.
@@ -133,4 +116,15 @@ namespace Core
         public float AmountHealed;
         public UnityEngine.Vector3 HitPosition;
     }
+
+    /// <summary>Fired by WaveDirector at the 4-minute mark. LevelSystem listens
+    /// and presents the Legendary reward choice before the cycle restarts.</summary>
+    public struct CycleEndedEvent
+    {
+        public int CycleNumber;
+    }
+
+    /// <summary>Fired by LevelSystem after the player picks their Legendary reward.
+    /// WaveDirector listens to restart the cycle.</summary>
+    public struct CycleRewardResolvedEvent { }
 }

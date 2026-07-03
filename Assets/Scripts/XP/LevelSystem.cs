@@ -42,9 +42,8 @@ namespace XP
         private float _currentXp;
         private int _currentLevel;
         private float _elapsedGameTime;
-        // True when the current choice screen was triggered by a cycle end —
-        // causes ResolveStatChoice/ResolveAbilityChoice to also emit
-        // CycleRewardResolvedEvent so WaveDirector knows to restart.
+        // True while the current choice screen was triggered by a cycle end —
+        // causes the existing resolve methods to also emit CycleRewardResolvedEvent.
         private bool _isCycleRewardPending;
 
         public int CurrentLevel => _currentLevel;
@@ -151,19 +150,25 @@ namespace XP
             }
         }
 
-        // ── Cycle-end Legendary reward ───────────────────────────────────────
+        // ── Cycle-end Legendary reward ────────────────────────────────────────
 
         private void OnCycleEnded(CycleEndedEvent e)
         {
             _isCycleRewardPending = true;
-            BeginCycleRewardChoice();
+            BeginLegendaryChoice();
         }
 
-        private void BeginCycleRewardChoice()
+        /// <summary>
+        /// Presents a Legendary-inclusive choice using the SAME UI as a normal
+        /// level-up — same events, same screens, same card widgets. The only
+        /// difference is RollAnyRarity instead of RollExcludingLegendary, and
+        /// the _isCycleRewardPending flag that makes the resolve methods also
+        /// emit CycleRewardResolvedEvent so WaveDirector knows to restart.
+        /// </summary>
+        private void BeginLegendaryChoice()
         {
             GameFreezeController.RequestFreeze(FreezeReason);
 
-            // Same ability/stat cadence as normal level-ups — just with Legendary included.
             var isAbilityLevel = _currentLevel % LevelsPerAbilityChoice == 0;
             EventBus.Emit(new LevelUpEvent { NewLevel = _currentLevel, IsAbilityLevel = isAbilityLevel });
 
@@ -191,7 +196,6 @@ namespace XP
             statSheet.ApplyModifier(chosenModifier);
             EventBus.Emit(new StatChoiceResolvedEvent { ChosenModifier = chosenModifier });
 
-            // If this choice was triggered by a cycle end, tell WaveDirector to restart.
             if (_isCycleRewardPending)
             {
                 _isCycleRewardPending = false;
@@ -207,7 +211,6 @@ namespace XP
             chosenOption.Entry.Grant(chosenOption.Rarity);
             EventBus.Emit(new AbilityChoiceResolvedEvent { ChosenOption = chosenOption });
 
-            // If this choice was triggered by a cycle end, tell WaveDirector to restart.
             if (_isCycleRewardPending)
             {
                 _isCycleRewardPending = false;

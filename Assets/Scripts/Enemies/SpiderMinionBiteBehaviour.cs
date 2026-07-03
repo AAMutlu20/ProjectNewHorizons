@@ -55,8 +55,7 @@ namespace Enemies
             EventBus.Emit(new EnemyAttackEvent
             {
                 Damage = OwnerView.Data.Damage,
-                Position = OwnerView.Data.Position,
-                IsRanged = false,
+                Position = OwnerView.Data.Position
             });
 
             // Reset bite flag after cooldown so the minion can bite again

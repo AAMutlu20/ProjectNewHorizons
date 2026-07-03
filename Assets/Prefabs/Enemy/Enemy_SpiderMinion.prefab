@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 8148541144563909995}
   - component: {fileID: 2294053772694181053}
   - component: {fileID: -8866229447534743604}
+  - component: {fileID: 5654674018392168781}
   m_Layer: 0
   m_Name: Enemy_SpiderMinion
   m_TagString: Untagged
@@ -184,6 +185,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4046b2cf0d4692c4d9bb0e0f0ae26d12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemies.MeleeAttackBehaviour
+--- !u!114 &5654674018392168781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7564133134363199326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5f536e5dfbaa244c82ccef81ab0482c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Enemies.SpiderMinionBiteBehaviour
+  playerBodyLayers:
+    serializedVersion: 2
+    m_Bits: 128
+  biteCooldown: 1
 --- !u!1001 &3383470965267270399
 PrefabInstance:
   m_ObjectHideFlags: 0

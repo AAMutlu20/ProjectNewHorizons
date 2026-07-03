@@ -76,7 +76,7 @@ namespace Enemies
         /// <summary>Initialise this view with fresh data. Called immediately after Get() from pool.</summary>
         public void Init(EnemyTypeSo typeSo, DifficultyParams diff, Vector3 worldPos,
             Transform playerTransform, SpatialGrid grid, System.Collections.Generic.List<EnemyView> activeList,
-            bool isMiniboss = false, EnemyProjectilePool projectilePool = null,
+            bool isMiniboss = false,
             VFX.AoeTelegraphRingPool telegraphPool = null,
             LayerMask obstructionLayers = default, Stats.StatSheet playerStatSheet = null)
         {
@@ -105,7 +105,6 @@ namespace Enemies
             _behaviour.PlayerTransform = playerTransform;
             _behaviour.Grid = grid;
             _behaviour.ActiveEnemies = activeList;
-            _behaviour.ProjectilePool = projectilePool;
             _behaviour.TelegraphPool = telegraphPool;
             _behaviour.ObstructionLayers = obstructionLayers;
             _behaviour.PlayerStatSheet = playerStatSheet;
@@ -117,11 +116,6 @@ namespace Enemies
             // safe to call unconditionally here rather than special-casing by type.
             var explodeBehaviour = GetComponentInChildren<ZombieExplodeBehaviour>(includeInactive: true);
             if (explodeBehaviour) explodeBehaviour.ResetForReuse(this);
-
-            // Spider minion uses the same trigger pattern as the zombie —
-            // reset its bite flag and owner reference on pool reuse.
-            var biteBehaviour = GetComponentInChildren<SpiderMinionBiteBehaviour>(includeInactive: true);
-            if (biteBehaviour) biteBehaviour.ResetForReuse(this);
 
             if (animator) animator.SetInteger(AnimState, (int)EnemyState.Spawning);
             _lastState = EnemyState.Spawning;

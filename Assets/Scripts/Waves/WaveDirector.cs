@@ -92,12 +92,9 @@ namespace Waves
 
         private float _elapsedGameTime;
         private bool _hasCycleStarted;
-
-        // Set to true when all phases have completed their baseDuration —
-        // spawning pauses while the player picks their Legendary reward.
-        // Cleared by RestartCycle() once the reward is resolved.
-        private bool _isWaitingForCycleReward;
-        private int _cycleNumber; // 1-indexed count of full cycles completed
+        private bool _isWaitingForReward;   // true while player picks their Legendary reward
+        private int  _cycleCount;           // how many 4-minute cycles have completed
+        private const float CycleIntervalSeconds = 240f; // exactly 4 minutes
 
         private DifficultyParams _currentDifficulty;
 
@@ -132,10 +129,19 @@ namespace Waves
             _elapsedGameTime += Time.deltaTime;
 
             if (!_hasCycleStarted) return;
-            if (_isWaitingForCycleReward) return; // paused while player picks Legendary reward
+            if (_isWaitingForReward) return;
 
             _currentDifficulty = difficultyScaler.Scale(_elapsedGameTime, _escalation);
             enemyPool.SetDifficulty(_currentDifficulty);
+
+            // Trigger a cycle end every 4 minutes of elapsed game time.
+            // _cycleCount tracks how many have fired so the threshold advances each time.
+            var nextCycleThreshold = CycleIntervalSeconds * (_cycleCount + 1);
+            if (_elapsedGameTime >= nextCycleThreshold)
+            {
+                BeginCycleEnd();
+                return;
+            }
 
             DrainBurstQueue();
             TickActivePhaseSpawning();
@@ -204,18 +210,7 @@ namespace Waves
         /// </summary>
         private void TickNextUnlockTimer()
         {
-            if (_nextPhaseToUnlock >= cycleConfig.phases.Length)
-            {
-                // All phases are active. Wait for the LAST phase to finish its
-                // baseDuration, then end the cycle and give the Legendary reward.
-                // We track this by checking the last ActivePhaseState's TimeSinceUnlocked.
-                if (_activePhases.Count == 0) return;
-                var lastPhase = _activePhases[_activePhases.Count - 1];
-                var lastPhaseDef = cycleConfig.phases[lastPhase.PhaseIndex];
-                if (lastPhase.TimeSinceUnlocked >= lastPhaseDef.baseDuration)
-                    BeginCycleEnd();
-                return;
-            }
+            if (_nextPhaseToUnlock >= cycleConfig.phases.Length) return; // all phases unlocked — keep spawning indefinitely
 
             _timeUntilNextUnlock -= Time.deltaTime;
             if (_timeUntilNextUnlock > 0f) return;
@@ -278,43 +273,31 @@ namespace Waves
             enemyPool.Get(enemyType, Roll(), Roll, isMiniboss);
         }
 
-        // Cycle end and restart
+        // Cycle end — fires every 4 minutes
 
         private void BeginCycleEnd()
         {
-            if (_isWaitingForCycleReward) return; // guard against firing multiple times
-            _isWaitingForCycleReward = true;
-            _cycleNumber++;
+            _isWaitingForReward = true;
+            _cycleCount++;
 
-            // Clear the arena — all active enemies despawn instantly.
             enemyPool.ReturnAll();
             _burstQueue.Clear();
 
             if (logPhaseEvents)
-                Debug.Log($"WaveDirector: cycle {_cycleNumber} complete — presenting Legendary reward.");
+                Debug.Log($"WaveDirector: 4-minute mark hit (cycle {_cycleCount}) — clearing arena, presenting Legendary reward.");
 
-            // LevelSystem listens to this and presents the Legendary choice screen.
-            // Spawning is paused (_isWaitingForCycleReward = true) until the player
-            // picks and CycleRewardResolvedEvent fires back.
-            EventBus.Emit(new CycleEndedEvent { CycleNumber = _cycleNumber });
+            EventBus.Emit(new CycleEndedEvent { CycleNumber = _cycleCount });
         }
 
         private void OnCycleRewardResolved(CycleRewardResolvedEvent _)
         {
-            // Player has picked their Legendary reward. Wait the configured delay
-            // then restart the cycle, escalated.
-            Invoke(nameof(RestartCycle), cycleConfig.delayAfterCycleEnd);
-        }
-
-        private void RestartCycle()
-        {
             _escalation.OnCycleCompleted();
-            _isWaitingForCycleReward = false;
+            _isWaitingForReward = false;
             ResetCycleState();
-            UnlockNextPhase(); // restarts from Zombie
+            UnlockNextPhase();
 
             if (logPhaseEvents)
-                Debug.Log($"WaveDirector: cycle restarting (escalation cycle #{_escalation.CycleCount}).");
+                Debug.Log($"WaveDirector: cycle reward picked — restarting from phase 0 (escalation level {_escalation.CycleCount}).");
         }
 
         // Helpers
