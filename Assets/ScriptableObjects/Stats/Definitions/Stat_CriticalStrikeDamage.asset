@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Stats.StatDefinitionSo
   statType: 9
   displayName: Critical Strike Damage
+  icon: {fileID: 1854783910, guid: 72e4211387f8cdb45849214c5903677e, type: 3}
   modifierType: 1
   valueByRarity:
   - 5

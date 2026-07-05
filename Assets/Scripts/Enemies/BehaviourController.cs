@@ -21,6 +21,17 @@ namespace Enemies
         private const float SeparationCheckRadius = 2.5f;
         private const float SeparationWeight = 0.6f;
 
+        // Movement DECISION (distance check, LOS raycast, separation query) only
+        // happens on 1 of every DecisionStaggerGroupCount frames per enemy -- at
+        // 100 enemies, doing this every frame for every enemy is the single
+        // biggest per-frame cost in the AI loop. Position INTEGRATION still runs
+        // every frame regardless (see Tick()), so movement itself stays smooth;
+        // only the relatively expensive "which way should I go" recompute is
+        // throttled. A stale decision for up to (DecisionStaggerGroupCount - 1)
+        // frames is imperceptible at 60fps but the physics/spatial-query savings
+        // are real.
+        private const int DecisionStaggerGroupCount = 10;
+
         // Injected by EnemyPool after Get() - not serialized
         [System.NonSerialized] public Transform PlayerTransform;
         [System.NonSerialized] public SpatialGrid Grid;
@@ -53,11 +64,20 @@ namespace Enemies
         private IEnemyAttackBehaviour _attackBehaviour;
         private IPeriodicAbility _periodicAbility; // optional — not every archetype has one
 
+        // Stable per-instance offset so this enemy's decision frames are spread
+        // evenly against every other enemy's, rather than all 100 enemies
+        // deciding on the same frame and idling in lockstep on the others.
+        // Derived from GetInstanceID() rather than a new EnemyData field, since
+        // it never needs to change across this pooled object's lifetime and
+        // keeps EnemyData exactly as lean as it already is.
+        private int _staggerOffset;
+
         private void Awake()
         {
             _view = GetComponent<EnemyView>();
             _attackBehaviour = GetComponent<IEnemyAttackBehaviour>();
             _periodicAbility = GetComponent<IPeriodicAbility>();
+            _staggerOffset = Mathf.Abs(gameObject.GetInstanceID()) % DecisionStaggerGroupCount;
 
             if (_attackBehaviour == null)
                 Debug.LogWarning($"BehaviourController on '{name}' has no IEnemyAttackBehaviour " +
@@ -111,7 +131,31 @@ namespace Enemies
 
             if (!PlayerTransform) return;
 
-            MoveTowardPlayer(ref enemy, deltaTime);
+            // Mid-attack sequences (WINDUP/EXECUTE/RECOVER) must tick every single
+            // frame for accurate timing no matter this enemy's stagger slot -- only
+            // the "should I start moving/attacking" decision itself gets throttled.
+            if (enemy.State == EnemyState.Attacking)
+            {
+                _attackBehaviour?.TickAttack(ref enemy, deltaTime);
+                return;
+            }
+
+            var isDecisionFrame = (Time.frameCount + _staggerOffset) % DecisionStaggerGroupCount == 0;
+
+            // Also force a decision on the very first tick after spawning/knockback
+            // recovery (Velocity == zero) -- otherwise a fresh enemy would sit
+            // motionless for up to DecisionStaggerGroupCount-1 frames waiting for
+            // its slot to come up, which reads as a visible hitch, not a smoothing.
+            if (isDecisionFrame || enemy.Velocity == Vector3.zero)
+            {
+                MoveTowardPlayer(ref enemy, deltaTime);
+            }
+            else
+            {
+                // Cheap path: keep coasting on the last decided velocity. No distance
+                // check, no LOS raycast, no separation query -- just integration.
+                enemy.Position += enemy.Velocity * deltaTime;
+            }
         }
 
         /// <summary>Called by EnemyView when the enemy takes lethal damage.</summary>

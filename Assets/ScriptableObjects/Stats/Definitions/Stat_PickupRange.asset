@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Stats.StatDefinitionSo
   statType: 10
   displayName: Pickup Range
+  icon: {fileID: 45700689, guid: fb3cae9e4f4948b4fb7b205c7a43c0a2, type: 3}
   modifierType: 1
   valueByRarity:
   - 10

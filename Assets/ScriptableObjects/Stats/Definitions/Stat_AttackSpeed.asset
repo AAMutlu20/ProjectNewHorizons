@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Stats.StatDefinitionSo
   statType: 2
   displayName: Attack Speed
+  icon: {fileID: 1662471853, guid: 30291312557c9ed468d84bdf5ad9e876, type: 3}
   modifierType: 1
   valueByRarity:
   - 2

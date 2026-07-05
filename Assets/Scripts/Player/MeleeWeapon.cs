@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Core;
 using Enemies;
 using Stats;
 using UnityEngine;
@@ -160,21 +161,32 @@ namespace Player
         {
             if (_hitThisSwing.Contains(enemy)) return;
 
-            var damage = RollDamage();
+            var damage = RollDamage(out var isCrit);
             enemy.TakeDamage(damage, transform.position, CurrentKnockbackForce(), knockbackDuration);
             _hitThisSwing.Add(enemy);
+
+            // AudioManager (and anything else that cares about melee impacts) listens
+            // for this — without it, meleeHitSounds/meleeCritSounds in AudioManager
+            // are correctly configured but never actually play, since nothing ever
+            // triggered the event they're wired to.
+            EventBus.Emit(new MeleeHitEvent
+            {
+                HitPosition = enemy.transform.position,
+                DamageDealt = damage,
+                IsCrit = isCrit
+            });
 
             foreach (var enchant in _enchants)
                 enchant.OnMeleeHit(enemy, damage, transform.position);
         }
 
-        private float RollDamage()
+        private float RollDamage(out bool isCrit)
         {
             var totalDamage = baseDamage + _statSheet.GetTotal(StatType.AttackDamage);
 
             var critChancePercent = _statSheet.GetTotal(StatType.CriticalStrikeChance);
-            var rolledCrit = Random.Range(0f, PercentToFraction) < critChancePercent;
-            if (!rolledCrit) return totalDamage;
+            isCrit = Random.Range(0f, PercentToFraction) < critChancePercent;
+            if (!isCrit) return totalDamage;
 
             var critMultiplierPercent = BaseCriticalStrikeMultiplier + _statSheet.GetTotal(StatType.CriticalStrikeDamage);
             return totalDamage * (critMultiplierPercent / PercentToFraction);

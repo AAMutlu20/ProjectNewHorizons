@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Stats.StatDefinitionSo
   statType: 6
   displayName: Damage Reduction
+  icon: {fileID: -1336063297, guid: b7b4fd295a069df4192f73c2b4338575, type: 3}
   modifierType: 1
   valueByRarity:
   - 2

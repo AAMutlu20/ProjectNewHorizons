@@ -30,7 +30,7 @@ namespace UI
             var minutes = Mathf.FloorToInt(totalSeconds / 60f);
             var seconds = Mathf.FloorToInt(totalSeconds % 60f);
 
-            timeAliveLabel.text = $"{minutes}:{seconds:D2}";
+            timeAliveLabel.text = $"Time Alive: {minutes}:{seconds:D2}";
         }
     }
 }

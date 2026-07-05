@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Stats.StatDefinitionSo
   statType: 5
   displayName: Health Regeneration
+  icon: {fileID: -1298547240, guid: 8ddaf6e544da3c94db4a32841cf952e9, type: 3}
   modifierType: 1
   valueByRarity:
   - 0.25

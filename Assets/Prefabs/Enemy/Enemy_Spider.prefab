@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 8148541144563909995}
   - component: {fileID: 2294053772694181053}
   - component: {fileID: 6955725628605733781}
+  - component: {fileID: 2229263582608023400}
   m_Layer: 0
   m_Name: Enemy_Spider
   m_TagString: Untagged
@@ -187,6 +188,22 @@ MonoBehaviour:
   minionsPerSummon: 2
   summonInterval: 2
   summonRadius: 3
+--- !u!114 &2229263582608023400
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7564133134363199326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06cdaf694c7e98444881b3f03854f211, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VFX.EnemyGlowController
+  modelRenderer: {fileID: 1226042089147350710}
+  minibossGlowIntensity: 1.5
+  buffedGlowIntensity: 1
+  fadeSpeed: 4
 --- !u!1001 &8607088690853699508
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -259,5 +276,10 @@ PrefabInstance:
 --- !u!4 &657407692134065294 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9109956725168896826, guid: a888c82daa4053648942fd9635d3645a, type: 3}
+  m_PrefabInstance: {fileID: 8607088690853699508}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &1226042089147350710 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 7381755237059780866, guid: a888c82daa4053648942fd9635d3645a, type: 3}
   m_PrefabInstance: {fileID: 8607088690853699508}
   m_PrefabAsset: {fileID: 0}

@@ -75,7 +75,7 @@ namespace UI
                 title: definition.displayName,
                 description: valueText,
                 rarity: modifier.Rarity,
-                icon: null, // no icon assets exist yet — wire once art is available
+                icon: definition.icon,
                 onSelected: () => HandleCardSelected(modifier));
         }
 

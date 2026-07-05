@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 8148541144563909995}
   - component: {fileID: 2294053772694181053}
   - component: {fileID: -7861976475287640502}
+  - component: {fileID: 842091767600180857}
   m_Layer: 0
   m_Name: Enemy_Zombie
   m_TagString: Untagged
@@ -188,6 +189,22 @@ MonoBehaviour:
   playerBodyLayers:
     serializedVersion: 2
     m_Bits: 128
+--- !u!114 &842091767600180857
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7564133134363199326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06cdaf694c7e98444881b3f03854f211, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VFX.EnemyGlowController
+  modelRenderer: {fileID: 8507416648394361235}
+  minibossGlowIntensity: 1.5
+  buffedGlowIntensity: 1
+  fadeSpeed: 4
 --- !u!1 &7820093109181825016
 GameObject:
   m_ObjectHideFlags: 0
@@ -329,5 +346,10 @@ PrefabInstance:
 --- !u!4 &7660633645169696196 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2478147002537863141, guid: 82ead759ea8bf464296f2ccd5c87818e, type: 3}
+  m_PrefabInstance: {fileID: 5202832018987629089}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &8507416648394361235 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 4477781418742870962, guid: 82ead759ea8bf464296f2ccd5c87818e, type: 3}
   m_PrefabInstance: {fileID: 5202832018987629089}
   m_PrefabAsset: {fileID: 0}

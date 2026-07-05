@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Stats.StatDefinitionSo
   statType: 0
   displayName: Attack Damage
+  icon: {fileID: 373633114, guid: 395253ed10a1c4c4d9438ec7a319c6bb, type: 3}
   modifierType: 0
   valueByRarity:
   - 5

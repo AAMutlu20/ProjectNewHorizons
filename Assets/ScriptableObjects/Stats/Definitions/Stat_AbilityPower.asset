@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Stats.StatDefinitionSo
   statType: 1
   displayName: Ability Power
+  icon: {fileID: -314877268, guid: 53846b83b2fd5884abdb0a7a29524924, type: 3}
   modifierType: 1
   valueByRarity:
   - 2

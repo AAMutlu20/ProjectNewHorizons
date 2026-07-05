@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Stats.StatDefinitionSo
   statType: 4
   displayName: Vitality
+  icon: {fileID: -158164068, guid: a034399f8d671f141b31dabbec5f2748, type: 3}
   modifierType: 0
   valueByRarity:
   - 20

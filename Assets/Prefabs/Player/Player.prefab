@@ -47,6 +47,7 @@ MonoBehaviour:
   enemyPool: {fileID: 0}
   playerTransform: {fileID: 5432106020961286968}
   hoverHeight: 3
+  playerFeetOffset: 1
   blackHolePrefab: {fileID: 0}
   visualBaseRadius: 1
 --- !u!1 &4766739779060614339
@@ -70,6 +71,7 @@ GameObject:
   - component: {fileID: 228334806548918095}
   - component: {fileID: 100904442818717114}
   - component: {fileID: 2468955218097995076}
+  - component: {fileID: 4252167065801646615}
   m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
@@ -311,7 +313,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Camera.CinemachineCameraShake
   impulseSource: {fileID: 0}
-  debugShakeVelocity: {x: 0, y: 1, z: 0}
+  ShakeVelocity: {x: 0, y: 1, z: 0}
+--- !u!114 &4252167065801646615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4766739779060614339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17cce981cbc501d43a5d11d3752b8942, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VFX.PlayerGlowController
+  modelRenderer: {fileID: 7079717680294752261}
+  hitGlowIntensity: 1.5
+  fadeSpeed: 6
 --- !u!1 &8504597042455349107
 GameObject:
   m_ObjectHideFlags: 0
@@ -498,6 +515,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c202d73726ae2b34faa9017ce4c676b2, type: 3}
+--- !u!137 &7079717680294752261 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 3127444722205822189, guid: c202d73726ae2b34faa9017ce4c676b2, type: 3}
+  m_PrefabInstance: {fileID: 5271146566206029032}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8068061123293869164 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2797119131133610116, guid: c202d73726ae2b34faa9017ce4c676b2, type: 3}

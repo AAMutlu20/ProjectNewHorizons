@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Stats.StatDefinitionSo
   statType: 11
   displayName: Experience Gain
+  icon: {fileID: -555739704, guid: dbff58565b67ddf40860b3a19b89aed6, type: 3}
   modifierType: 1
   valueByRarity:
   - 4

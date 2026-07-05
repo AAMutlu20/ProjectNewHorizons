@@ -20,6 +20,8 @@ namespace Core
         [SerializeField] private WaveDirector waveDirector;
         [SerializeField] private EnemyPool enemyPool;
         [SerializeField] private DifficultyScaler difficultyScaler;
+        
+        [SerializeField] private TutorialSequenceController tutorial;
 
         private bool _gameOver;
 
@@ -33,7 +35,14 @@ namespace Core
 
         private void Start()
         {
+            StartCoroutine(BeginNextFrame());
             EventBus.Subscribe<PlayerDiedEvent>(OnPlayerDied);
+        }
+        
+        private System.Collections.IEnumerator BeginNextFrame()
+        {
+            yield return null; // wait one frame for HUD layout to settle
+            tutorial.BeginIfNotSeen();
         }
 
         private void OnDestroy()

@@ -19,6 +19,10 @@ namespace Stats
         public StatType statType;
         public string displayName = "New Stat";
 
+        [Tooltip("Icon shown on the choice card. Assign any Sprite in the Project window. " +
+                 "Leave null to show no icon (the card still works fine without one).")]
+        public UnityEngine.Sprite icon;
+
         [Header("Scaling")]
         public StatModifierType modifierType = StatModifierType.Flat;
 
